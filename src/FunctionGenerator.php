@@ -2,6 +2,11 @@
 
 namespace Synth\FunctionGenerator;
 
+use Synth\Buffer\SignalPacket;
+
+/**
+ * Synth\FunctionGenerator\Limits
+ */
 interface Limits {
     const
         // Sample rate
@@ -23,7 +28,7 @@ interface Limits {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * FunctionGenerator\Base
+ * Synth\FunctionGenerator\Base
  */
 abstract class Base implements Limits {
 
@@ -52,6 +57,9 @@ abstract class Base implements Limits {
         $this->setFrequency($fFrequency);
     }
 
+    /**
+     * @return string
+     */
     public function __toString() : string {
         return sprintf(
             "%s [freq:%.3fHz rate:%dHz, pos:%d]",
@@ -96,7 +104,7 @@ abstract class Base implements Limits {
      * @param  float $fFrequency
      * @return self
      */
-    public function reset() : Base {
+    public function reset() : self {
         $this->iSamplePosition = 0;
         return $this;
     }
@@ -107,7 +115,7 @@ abstract class Base implements Limits {
      * @param  float $fFrequency
      * @return self
      */
-    public function setFrequency(float $fFrequency) : Base {
+    public function setFrequency(float $fFrequency) : self {
         $this->fFrequency = $this->clamp($fFrequency, self::MIN_FREQ, self::MAX_FREQ);
         return $this;
     }
@@ -118,7 +126,7 @@ abstract class Base implements Limits {
      * @param  int $iLength
      * @return float[]
      */
-    abstract public function generate(int $iLength) : array;
+    abstract public function generate(int $iLength) : SignalPacket;
 
     /**
      * Clamp some numeric vale between a minimum and maximum
@@ -136,7 +144,7 @@ abstract class Base implements Limits {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * FunctionGenerator\DC
+ * Synth\FunctionGenerator\DC
  *
  * Generates a continuous DC signal
  */
@@ -152,30 +160,35 @@ class DC extends Base {
     /**
      * @inheritdoc
      */
-    public function generate(int $iLength) : array {
+    public function generate(int $iLength) : SignalPacket {
         $this->iSamplePosition += $iLength;
-        return array_fill(0, $iLength, $this->fLevel);
+        return new SignalPacket(array_fill(0, $iLength, $this->fLevel));
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Synth\FunctionGenerator\Noise
+ *
+ * Generates a continuous random noise signal
+ */
 class Noise extends Base {
 
     /**
      * @inheritdoc
      */
-    public function generate(int $iLength) : array {
+    public function generate(int $iLength) : SignalPacket {
+        $this->iSamplePosition += $iLength;
         static $fNormalize = null;
         if (null === $fNormalize) {
             $fNormalize = (self::MAX_SLVL - self::MIN_SLVL) / (float)mt_getrandmax();
         }
-
         $aSamples = [];
         while ($iLength-- > 0) {
             $aSamples[] = self::MIN_SLVL + mt_rand() * $fNormalize;
         }
-        return $aSamples;
+        return new SignalPacket($aSamples);
     }
 }
 
@@ -204,12 +217,12 @@ class Sine extends Base {
     /**
      * @inheritdoc
      */
-    public function generate(int $iLength) : array {
+    public function generate(int $iLength) : SignalPacket {
         $aSamples = [];
         while ($iLength-- > 0) {
             $aSamples[] = sin($this->fScaleVal * $this->iSamplePosition++);
         }
-        return $aSamples;
+        return new SignalPacket($aSamples);
     }
 }
 

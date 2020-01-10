@@ -1,5 +1,5 @@
 <?php
-
+require_once 'Buffer.php';
 require_once 'FunctionGenerator.php';
 
 $oGenerator = new Synth\FunctionGenerator\DC();
