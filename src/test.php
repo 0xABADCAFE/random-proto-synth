@@ -24,11 +24,15 @@ $aGenerators = [
 ];
 
 foreach ($aGenerators as $oGenerator) {
-    $oOscillator = new Oscillator\Basic($oGenerator);
+    $oOscillator = new Oscillator\Basic(
+        $oGenerator,
+        11025,     // Sample rate Hz
+        11025/4.0  // Signal Frequency Hz
+    );
 
     echo "Testing : ", $oOscillator, "\n";
-    for ($i = 0; $i<5; $i++) {
-        $oPacket = $oOscillator->emit(Signal\Packet::I_DEF_LENGTH);
+    for ($i = 0; $i<4; $i++) {
+        $oPacket = $oOscillator->emit(Signal\Packet::I_MIN_LENGTH);
         echo "iteration #", $i, " => ", json_encode($oPacket->getValues(), JSON_PRETTY_PRINT), "\n";
     }
 
