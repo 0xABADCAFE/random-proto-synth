@@ -21,7 +21,7 @@ class Packet implements Countable {
 
     protected
         $aSamples,
-        $iLength
+        $iLength = 0
     ;
 
     /**
@@ -123,8 +123,9 @@ class Packet implements Countable {
      */
     private function initFromArray(array $aValues) {
         $iLength = count($aValues);
-        $this->assertLengthValid($iLegnth);
+        $this->assertLengthValid($iLength);
         $this->aSamples = array_map('floatval', $aValues);
+        $this->iLength  = $iLength;
     }
 
     /**

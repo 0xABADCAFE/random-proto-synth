@@ -14,3 +14,5 @@ interface ILimits {
     ;
 }
 
+require_once 'signal/Packet.php';
+require_once 'signal/Generator.php';
