@@ -8,10 +8,12 @@ $oInputPacket = new Packet(range(-5.0, 5.0, 0.25));
 echo "Input Packet => ";
 print_r($oInputPacket);
 
+// Test some generators
 $aGenerators = [
     new Generator\DC(0.5),
     new Generator\Sine(),
     new Generator\Square(),
+    new Generator\Saw(),
     new Generator\Noise(),
 ];
 

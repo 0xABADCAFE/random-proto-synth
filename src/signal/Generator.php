@@ -5,6 +5,15 @@ namespace ABadCafe\Synth\Signal\Generator;
 use ABadCafe\Synth\Signal\ILimits;
 use ABadCafe\Synth\Signal\Packet;
 
+class PacketHelper extends Packet {
+
+    public static function cloneFrom(Packet $oInput, array $aValues) : Packet {
+        $oOutput = clone $oInput;
+        $oOutput->aSamples = $aValues;
+        return $oOutput;
+    }
+}
+
 /**
  * IFunction
  *
@@ -33,9 +42,9 @@ interface IFunction {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * DC
+ * DC - simplest spectral complexity (zero frequencies)
  *
- * Outputs a fixed value, irrespective of input
+ * Maps to a fixed value, irrespective of input
  */
 class DC implements IFunction {
 
@@ -76,12 +85,108 @@ class DC implements IFunction {
      * @inheritdoc
      */
     public function map(Packet $oInput) : Packet {
-        return new Packet(array_fill(0, $oInput->count(), $this->fLevel));
+        return PacketHelper::cloneFrom($oInput, array_fill(0, $oInput->count(), $this->fLevel));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Sine - single frequency
+ *
+ * Maps input values to a sine wave output.
+ */
+class Sine implements IFunction {
+
+    const F_PERIOD = 2.0 * M_PI;
+
+    /**
+     * @inheritdoc
+     */
+    public function getPeriod() : float {
+        return self::F_PERIOD;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function map(Packet $oInput) : Packet {
+        $aValues = [];
+        foreach ($oInput->getValues() as $fValue) {
+            $aValues[] = sin($fValue);
+        }
+        return PacketHelper::cloneFrom($oInput, $aValues);
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Square - series of frequencies
+ *
+ * Maps input values to a square output.
+ */
+class Square implements IFunction {
+
+    const F_PERIOD = 2.0;
+
+    /**
+     * @inheritdoc
+     */
+    public function getPeriod() : float {
+        return self::F_PERIOD;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function map(Packet $oInput) : Packet {
+        $aValues = [];
+        foreach ($oInput->getValues() as $fValue) {
+            $aValues[] = floor($fValue)&1 ? ILimits::F_MAX_NOCLIP : ILimits::F_MIN_NOCLIP;
+        }
+        return PacketHelper::cloneFrom($oInput, $aValues);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Saw - series of frequencies
+ *
+ * Maps input values to a sawtooth output.
+ */
+class Saw implements IFunction {
+    const F_PERIOD = 1.0;
+
+    /**
+     * @inheritdoc
+     */
+    public function getPeriod() : float {
+        return self::F_PERIOD;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function map(Packet $oInput) : Packet {
+        $aValues = [];
+        foreach ($oInput->getValues() as $fValue) {
+            $aValues[] = ILimits::F_P2P_NOCLIP * ($fValue - floor($fValue) - 0.5);
+        }
+        return PacketHelper::cloneFrom($oInput, $aValues);
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Noise - all frequencies
+ *
+ * Maps to a randomised value, irrespective of input
+ */
 class Noise implements IFunction {
 
     const F_PERIOD = 1.0;
@@ -106,57 +211,6 @@ class Noise implements IFunction {
         while ($iLength-- > 0) {
             $aValues[] = ILimits::F_MIN_NOCLIP + mt_rand() * $fNormalize;
         }
-        return new Packet($aValues);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class Square implements IFunction {
-
-    const F_PERIOD = 2.0;
-
-    /**
-     * @inheritdoc
-     */
-    public function getPeriod() : float {
-        return self::F_PERIOD;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function map(Packet $oInput) : Packet {
-        $aValues = [];
-        foreach ($oInput->getValues() as $fValue) {
-            $fOutput = ($fValue & 1) ? ILimits::F_MIN_NOCLIP : ILimits::F_MAX_NOCLIP;
-            $aValues[] = ($fValue < 0.0) ? -$fOutput : $fOutput;
-        }
-        return new Packet($aValues);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class Sine implements IFunction {
-
-    const F_PERIOD = 2.0 * M_PI;
-
-    /**
-     * @inheritdoc
-     */
-    public function getPeriod() : float {
-        return self::F_PERIOD;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function map(Packet $oInput) : Packet {
-        $aValues = [];
-        foreach ($oInput->getValues() as $fValue) {
-            $aValues[] = sin($fValue);
-        }
-        return new Packet($aValues);
+        return PacketHelper::cloneFrom($oInput, $aValues);
     }
 }
