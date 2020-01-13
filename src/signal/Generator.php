@@ -15,12 +15,12 @@ class PacketHelper extends Packet {
 }
 
 /**
- * IFunction
+ * IGenerator
  *
  * Main function generator interface. Function generators generate a basic waveform, with a time-independent duty
  * cycle of 0.0 - 1.0. Values outside this range will have their integer part ignored.
  */
-interface IFunction {
+interface IGenerator {
 
     /**
      * Returns the period of this function, i.e. the numeric interval after which it's output cycles.
@@ -46,7 +46,7 @@ interface IFunction {
  *
  * Maps to a fixed value, irrespective of input
  */
-class DC implements IFunction {
+class DC implements IGenerator {
 
     const F_PERIOD = 1.0;
 
@@ -96,7 +96,7 @@ class DC implements IFunction {
  *
  * Maps input values to a sine wave output.
  */
-class Sine implements IFunction {
+class Sine implements IGenerator {
 
     const F_PERIOD = 2.0 * M_PI;
 
@@ -127,7 +127,7 @@ class Sine implements IFunction {
  *
  * Maps input values to a square output.
  */
-class Square implements IFunction {
+class Square implements IGenerator {
 
     const F_PERIOD = 2.0;
 
@@ -157,7 +157,7 @@ class Square implements IFunction {
  *
  * Maps input values to a sawtooth output.
  */
-class Saw implements IFunction {
+class Saw implements IGenerator {
     const F_PERIOD = 1.0;
 
     /**
@@ -187,7 +187,7 @@ class Saw implements IFunction {
  *
  * Maps to a randomised value, irrespective of input
  */
-class Noise implements IFunction {
+class Noise implements IGenerator {
 
     const F_PERIOD = 1.0;
 

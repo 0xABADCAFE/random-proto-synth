@@ -1,11 +1,12 @@
 <?php
 
-namespace ABadCafe\Synth\Signal;
+namespace ABadCafe\Synth;
 require_once 'Signal.php';
+require_once 'Oscillator.php';
 
 $aRange = range(-5.0, 5.0, 0.25);
 
-$oInputPacket = new Packet($aRange);
+$oInputPacket = new Signal\Packet($aRange);
 
 $aRange = array_map('strval', $aRange);
 
@@ -15,23 +16,21 @@ print_r($oInputPacket);
 
 // Test some generators
 $aGenerators = [
-    new Generator\DC(0.5),
-    new Generator\Sine(),
-    new Generator\Square(),
-    new Generator\Saw(),
-    new Generator\Noise(),
+    new Signal\Generator\DC(0.5),
+    new Signal\Generator\Sine(),
+    new Signal\Generator\Square(),
+    new Signal\Generator\Saw(),
+    new Signal\Generator\Noise(),
 ];
 
 foreach ($aGenerators as $oGenerator) {
-    echo "Testing ", get_class($oGenerator), ", getPeriod() = ", $oGenerator->getPeriod(), "\nOutput Packet => ";
-    $oOutputPacket = $oGenerator->map($oInputPacket);
+    $oOscillator = new Oscillator\Basic($oGenerator);
 
-    echo json_encode(
-        array_combine(
-            $aRange,
-            $oOutputPacket->getValues()
-        ),
-        JSON_PRETTY_PRINT
-    ), "\n";
+    echo "Testing : ", $oOscillator, "\n";
+    for ($i = 0; $i<5; $i++) {
+        $oPacket = $oOscillator->emit(Signal\Packet::I_DEF_LENGTH);
+        echo "iteration #", $i, " => ", json_encode($oPacket->getValues(), JSON_PRETTY_PRINT), "\n";
+    }
+
 }
 
