@@ -3,7 +3,12 @@
 namespace ABadCafe\Synth\Signal;
 require_once 'Signal.php';
 
-$oInputPacket = new Packet(range(-5.0, 5.0, 0.25));
+$aRange = range(-5.0, 5.0, 0.25);
+
+$oInputPacket = new Packet($aRange);
+
+$aRange = array_map('strval', $aRange);
+
 
 echo "Input Packet => ";
 print_r($oInputPacket);
@@ -20,5 +25,13 @@ $aGenerators = [
 foreach ($aGenerators as $oGenerator) {
     echo "Testing ", get_class($oGenerator), ", getPeriod() = ", $oGenerator->getPeriod(), "\nOutput Packet => ";
     $oOutputPacket = $oGenerator->map($oInputPacket);
-    print_r($oOutputPacket);
+
+    echo json_encode(
+        array_combine(
+            $aRange,
+            $oOutputPacket->getValues()
+        ),
+        JSON_PRETTY_PRINT
+    ), "\n";
 }
+
