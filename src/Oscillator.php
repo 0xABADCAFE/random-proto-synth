@@ -17,13 +17,16 @@ interface ILimits {
         MAX_RATE = 192000,
         DEF_RATE = 44100,
 
-        // Frequency
-        MIN_FREQ = 55.0,
+        // Frequency Range
+        MIN_FREQ = 1.0/60.0,
         MAX_FREQ = 3520.0,
         DEF_FREQ = 440.0
     ;
 }
 
+/**
+ * Interface for simple output only oscillators
+ */
 interface IOutputOnly {
     public function emit(int $iLength);
 }

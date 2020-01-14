@@ -144,7 +144,7 @@ class Square implements IGenerator {
     public function map(Packet $oInput) : Packet {
         $aValues = [];
         foreach ($oInput->getValues() as $fValue) {
-            $aValues[] = floor($fValue)&1 ? ILimits::F_MAX_NOCLIP : ILimits::F_MIN_NOCLIP;
+            $aValues[] = floor($fValue)&1 ? ILimits::F_MIN_NOCLIP : ILimits::F_MAX_NOCLIP;
         }
         return PacketHelper::cloneFrom($oInput, $aValues);
     }
@@ -158,7 +158,7 @@ class Square implements IGenerator {
  * Maps input values to a sawtooth output.
  */
 class Saw implements IGenerator {
-    const F_PERIOD = 1.0;
+    const F_PERIOD = 2.0;
 
     /**
      * @inheritdoc
