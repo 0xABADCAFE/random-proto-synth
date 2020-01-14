@@ -1,9 +1,9 @@
 <?php
 
 namespace ABadCafe\Synth;
-require_once 'Signal.php';
-require_once 'Oscillator.php';
-require_once 'Output.php';
+require_once '../Signal.php';
+require_once '../Oscillator.php';
+require_once '../Output.php';
 
 
 // Test some generators

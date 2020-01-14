@@ -65,6 +65,13 @@ class Packet implements Countable {
         return $this;
     }
 
+    public function scale(float $fValue) : self {
+        for ($i = 0; $i < $this->iLength; ++$i) {
+            $this->aSamples[$i] *= $fValue;
+        }
+        return $this;
+    }
+
     /**
      * Perform an amplitude summation with another packet. The values in this packet are summed with the
      * values in the supplied packet. Where the incoming packet length is different, only the overlapping
