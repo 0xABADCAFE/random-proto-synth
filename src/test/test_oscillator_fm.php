@@ -5,26 +5,21 @@ require_once '../Signal.php';
 require_once '../Oscillator.php';
 require_once '../Output.php';
 
-
-const I_RATE = 44100;
-
+$iOneSecond = Signal\Context::get()->getProcessRate();
 $oGenerator = new Signal\Generator\Sine();
 
 $oLFO = new Oscillator\Basic(
     $oGenerator,
-    I_RATE,
     5
 );
 
 $oModulator = new Oscillator\AM(
     $oGenerator,
-    I_RATE,
     880
 );
 
 $oCarrier = new Oscillator\FM(
     $oGenerator,
-    I_RATE,
     440
 );
 
@@ -36,11 +31,11 @@ do {
     $oOutput->write(
         $oCarrier->emit(
             $oModulator->emit(
-                $oLFO->emit(128)
+                $oLFO->emit()
             )
         )
     );
-} while ($oCarrier->getPosition() < I_RATE);
+} while ($oCarrier->getPosition() < $iOneSecond);
 
 
 $oOutput->close();

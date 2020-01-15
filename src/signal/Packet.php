@@ -1,28 +1,20 @@
 <?php
 
 namespace ABadCafe\Synth\Signal;
-
-use \InvalidArgumentException;
-use \RangeException;
-use \Countable;
+use \SPLFixedArray;
 
 /**
  * Packet
  *
- * Represents a packet of a signal, quantised by sample rate but with continuous (float) intensity
+ * Represents a packet of a signal. All Packet instances have the same length, configured in Signal\Context
  */
-class Packet implements Countable {
+class Packet {
 
-    const
-        I_MIN_LENGTH = 8,
-        I_DEF_LENGTH = 32,
-        I_MAX_LENGTH = 256
-    ;
+    /** @var SPLFixedArray $oEmpty */
+    private static $oEmpty = null;
 
-    protected
-        $aSamples,
-        $iLength = 0
-    ;
+    /** @var SPLFixedArray */
+    private $oValues = null;
 
     /**
      * Constructor. Accepts either an integer length for a new, zero initialised packet, or an array of values that
@@ -30,121 +22,130 @@ class Packet implements Countable {
      *
      * @param int|float[] $mInput
      */
-    public function __construct($mInput = self::I_DEF_LENGTH) {
-        if (is_int($mInput)) {
-            $this->initFromLength($mInput);
-        } else if (is_array($mInput)) {
-            $this->initFromArray($mInput);
-        } else {
-            throw new InvalidArgumentException();
-        }
+    public function __construct(SPLFixedArray $oValues = null) {
+        $this->oValues = $oValues ?: self::initEmpty();
     }
 
     /**
-     * Get packet length
-     *
-     * @return int
+     * Packet cloning must ensure that the internal fixed array instance is cloned
      */
-    public function count() : int {
-        return $this->iLength;
+    public function __clone() {
+        $this->oValues = clone $this->oValues;
     }
 
     /**
-     * Perform an amplitude modulation with another packet. The values in this packet are multiplied
-     * by the values in the supplied packet. Where the incoming packet length is different, only the
-     * overlapping region, aligned at the start is processed.
+     * Fill the packet with a given value
+     *
+     * @param  float  $fValue
+     * @return Packet fluent
+     */
+    public function fillWith(float $fFill) : self {
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fFill;
+        }
+        return $this;
+    }
+
+    /**
+     * Adjust all values in the packet by a given value
+     *
+     * @param  float  $fBias
+     * @return Packet fluent
+     */
+    public function biasBy(float $fBias) : self {
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue + $fBias;
+        }
+        return $this;
+    }
+
+    /**
+     * Multiply all values in the packet by a given value
+     *
+     * @param  float  $fValue
+     * @return Packet fluent
+     */
+    public function scaleBy(float $fScale) : self {
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue * $fScale;
+        }
+        return $this;
+    }
+
+    /**
+     * Multiply the values in this packet with those in the provided packet
      *
      * @param  Packet $oPacket
      * @return Packet fluent
      */
-    public function multiply(Packet $oPacket) : self {
-        $iMax = min($this->iLength, $oPacket->iLength);
-        for ($i = 0; $i < $iMax; ++$i) {
-            $this->aSamples[$i] *= $oPacket->aSamples[$i];
-        }
-        return $this;
-    }
-
-    public function scale(float $fValue) : self {
-        for ($i = 0; $i < $this->iLength; ++$i) {
-            $this->aSamples[$i] *= $fValue;
+    public function modulateWith(Packet $oPacket) : self {
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue * $oPacket->oValues[$i];
         }
         return $this;
     }
 
     /**
-     * Perform an amplitude summation with another packet. The values in this packet are summed with the
-     * values in the supplied packet. Where the incoming packet length is different, only the overlapping
-     * region, aligned at the start is processed.
+     * Sum the values in this packet with those in the provided packet
      *
      * @param  Packet $oPacket
      * @return Packet fluent
      */
-    public function add(Packet $oPacket) : self {
-        $iMax = min($this->iLength, $oPacket->iLength);
-        for ($i = 0; $i < $iMax; ++$i) {
-            $this->aSamples[$i] += $oPacket->aSamples[$i];
+    public function sumWith(Packet $oPacket) : self {
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue + $oPacket->oValues[$i];
         }
         return $this;
     }
 
     /**
-     * Perform an amplitude difference with another packet. The values in the supplied packet are subtracted
-     * from the values in this packet. Where the incoming packet length is different, only the overlapping
-     * region, aligned at the start is processed.
+     * Subtract the values in the provided packed with those in this packet
      *
      * @param  Packet $oPacket
      * @return Packet fluent
      */
-    public function subtract(Packet $oPacket) : self {
-        $iMax = min($this->iLength, $oPacket->iLength);
-        for ($i = 0; $i < $iMax; ++$i) {
-            $this->aSamples[$i] -= $oPacket->aSamples[$i];
+    public function diffWith(Packet $oPacket) : self {
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue - $oPacket->oValues[$i];
         }
         return $this;
     }
 
-    public function getValues() : array {
-        return $this->aSamples;
+    /**
+     * @return SPLFixedArray
+     */
+    public function getValues() : SPLFixedArray {
+        return $this->oValues;
     }
 
     /**
-     * Initialise a new Packet with a given length. All values are floating point zero. Input length must be between
-     * I_MIN_LENGTH and I_MAX_LENGTH, otherwise RangeException will be thrown.
+     * Obtain the values scaled and quantized to some fixed integer range (e.g. conversion to sint16 for final output)
      *
-     * @param  int $iLength
-     * @throws RangeException
+     * @return SPLFixedArray
      */
-    private function initFromLength(int $iLength) {
-        $this->assertLengthValid($iLength);
-        $this->aSamples = array_fill(0, $iLength, 0.0);
-        $this->iLength  = $iLength;
-    }
-
-    /**
-     * Initialise a new Packet from a raw array of values, which will be mapped to floating point. The input
-     * array length must be between I_MAX_LENGTH and I_MAX_LENGTH, otherwise RangeException will be thrown.
-     *
-     * @param  float[] $aValues
-     * @throws RangeException
-     */
-    private function initFromArray(array $aValues) {
-        $iLength = count($aValues);
-        $this->assertLengthValid($iLength);
-        $this->aSamples = array_map('floatval', $aValues);
-        $this->iLength  = $iLength;
-    }
-
-    /**
-     * Checks a proposed length against I_MIN_LENGTH and I_MAX_LENGTH, throwing RangeException if the value falls
-     * outside the range defined by I_MIN_LENGTH and I_MAX_LENGTH
-     *
-     * @param  int $iLength
-     * @throws RangeException
-     */
-    private function assertLengthValid(int $iLength) {
-        if ($iLength < self::I_MIN_LENGTH || $iLength > self::I_MAX_LENGTH) {
-            throw new RangeException();
+    public function quantize(int $iScaleValue, int $iMinValue, int $iMaxValue) : SPLFixedArray {
+        $oResult = clone $this->oValues;
+        foreach ($oResult as $i => $mValue) {
+            $oResult[$i] = min(
+                max(
+                    (int)($mValue * $iScaleValue),
+                    $iMinValue
+                ),
+                $iMaxValue
+            );
         }
+        return $oResult;
+    }
+
+    /**
+     * Get a zero filled SPLFixedArray
+     *
+     * @return SPLFixedArray
+     */
+    private static function initEmpty() : SPLFixedArray {
+        if (!self::$oEmpty) {
+            self::$oEmpty = SPLFixedArray::fromArray(array_fill(0, Context::get()->getPacketLength(), 0.0));
+        }
+        return clone self::$oEmpty;
     }
 }

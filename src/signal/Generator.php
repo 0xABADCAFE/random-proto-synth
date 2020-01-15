@@ -3,6 +3,7 @@
 namespace ABadCafe\Synth\Signal\Generator;
 
 use ABadCafe\Synth\Signal\ILimits;
+use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 
 class PacketHelper extends Packet {
@@ -51,9 +52,9 @@ class DC implements IGenerator {
     const F_PERIOD = 1.0;
 
     /**
-     * @var float $fLevel
+     * @var Packet $oOutput
      */
-    private $fLevel = 0.0;
+    private $oOutput;
 
     /**
      * Constructor
@@ -61,16 +62,18 @@ class DC implements IGenerator {
      * @param float $fLevel
      */
     public function __construct(float $fLevel = 0) {
-        $this->fLevel = $fLevel;
+        $this->oPacket = new Packet();
+        $this->setLevel($fLevel);
     }
 
     /**
      * Set the level
      *
-     * @param float $fLevel
+     * @param  float $fLevel
+     * @return DC fluent
      */
     public function setLevel(float $fLevel) : DC {
-        $this->fLevel = $fLevel;
+        $this->oPacket->fillWith($fLevel);
         return $this;
     }
 
@@ -83,9 +86,11 @@ class DC implements IGenerator {
 
     /**
      * @inheritdoc
+     *
+     * Input packet has no effect, output is constant.
      */
     public function map(Packet $oInput) : Packet {
-        return PacketHelper::cloneFrom($oInput, array_fill(0, $oInput->count(), $this->fLevel));
+        return clone $this->oPacket;
     }
 }
 
@@ -111,11 +116,12 @@ class Sine implements IGenerator {
      * @inheritdoc
      */
     public function map(Packet $oInput) : Packet {
-        $aValues = [];
-        foreach ($oInput->getValues() as $fValue) {
-            $aValues[] = sin($fValue);
+        $oOutput = clone $oInput;
+        $oValues = $oOutput->getValues();
+        foreach ($oValues as $i => $fValue) {
+            $oValues[$i] = sin($fValue);
         }
-        return PacketHelper::cloneFrom($oInput, $aValues);
+        return $oOutput;
     }
 }
 
@@ -142,11 +148,12 @@ class Square implements IGenerator {
      * @inheritdoc
      */
     public function map(Packet $oInput) : Packet {
-        $aValues = [];
-        foreach ($oInput->getValues() as $fValue) {
-            $aValues[] = floor($fValue)&1 ? ILimits::F_MIN_NOCLIP : ILimits::F_MAX_NOCLIP;
+        $oOutput = clone $oInput;
+        $oValues = $oOutput->getValues();
+        foreach ($oValues as $i => $fValue) {
+            $oValues[$i] = floor($fValue) & 1 ? ILimits::F_MIN_LEVEL_NO_CLIP : ILimits::F_MAX_LEVEL_NO_CLIP;
         }
-        return PacketHelper::cloneFrom($oInput, $aValues);
+        return $oOutput;
     }
 }
 
@@ -171,11 +178,12 @@ class Saw implements IGenerator {
      * @inheritdoc
      */
     public function map(Packet $oInput) : Packet {
-        $aValues = [];
-        foreach ($oInput->getValues() as $fValue) {
-            $aValues[] = ILimits::F_P2P_NOCLIP * ($fValue - floor($fValue) - 0.5);
+        $oOutput = clone $oInput;
+        $oValues = $oOutput->getValues();
+        foreach ($oValues as $i => $fValue) {
+            $oValues[$i] = ILimits::F_P2P_LEVEL_NO_CLIP * ($fValue - floor($fValue) - 0.5);
         }
-        return PacketHelper::cloneFrom($oInput, $aValues);
+        return $oOutput;
     }
 }
 
@@ -204,13 +212,14 @@ class Noise implements IGenerator {
     public function map(Packet $oInput) : Packet {
         static $fNormalize = null;
         if (null === $fNormalize) {
-            $fNormalize = (ILimits::F_MAX_NOCLIP - ILimits::F_MIN_NOCLIP) / (float)mt_getrandmax();
+            $fNormalize = (ILimits::F_MAX_LEVEL_NO_CLIP - ILimits::F_MIN_LEVEL_NO_CLIP) / (float)mt_getrandmax();
         }
-        $iLength = $oInput->count();
-        $aValues = [];
-        while ($iLength-- > 0) {
-            $aValues[] = ILimits::F_MIN_NOCLIP + mt_rand() * $fNormalize;
+
+        $oOutput = clone $oInput;
+        $oValues = $oOutput->getValues();
+        foreach($oValues as $i => $fValue) {
+            $oValues[$i] = ILimits::F_MIN_LEVEL_NO_CLIP + mt_rand() * $fNormalize;
         }
-        return PacketHelper::cloneFrom($oInput, $aValues);
+        return $oOutput;
     }
 }
