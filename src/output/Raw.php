@@ -37,17 +37,9 @@ class Raw16BitLittle extends Raw {
     ;
 
     public function write(Packet $oPacket) {
-        $aSamples = $oPacket->getValues();
-        $aOutput  = [];
-        foreach ($aSamples as $fSample) {
-            $aOutput[] = min(
-                max(
-                    (int)($fSample * self::I_MAX_LEVEL),
-                    self::I_MIN_LEVEL
-                ),
-                self::I_MAX_LEVEL
-            );
-        }
+        $aOutput = $oPacket
+            ->quantize(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)
+            ->toArray();
         fwrite($this->rOutput, pack('v*', ...$aOutput));
     }
 }
