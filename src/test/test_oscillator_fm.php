@@ -10,16 +10,16 @@ $oGenerator = new Signal\Generator\Sine();
 
 $oLFO = new Oscillator\Basic(
     $oGenerator,
-    0.5
+    0.1
 );
 
 $oModulator = new Oscillator\AM(
     $oGenerator,
-    440
+    55
 );
 
 $oCarrier = new Oscillator\FM(
-    $oGenerator,
+    new Signal\Generator\Square(),
     220
 );
 
