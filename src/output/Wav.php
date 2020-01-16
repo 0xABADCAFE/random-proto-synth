@@ -2,9 +2,22 @@
 
 namespace ABadCafe\Synth\Output;
 
+use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 
+/**
+ * Wav
+ *
+ * Minimal implementation of the RIFF Wave standard for linear PCM
+ */
 class Wav implements IPCMOutput {
+
+    const
+        I_DEF_RATE_SIGNAL_DEFAULT = 0,
+        I_DEF_RESOLUTION_BITS     = 16,
+        I_DEF_CHANNELS            = 1,
+        I_HEADER_SIZE             = 44
+    ;
 
     const M_HEADER = [
         'sChunkID'       => 'RIFF', //  0: 4
@@ -22,20 +35,44 @@ class Wav implements IPCMOutput {
         'iSubChunk2Size' => -1,     // 40: 4
     ];
 
-    const S_HEADER_PACK = 'C4 V C4 C4 V v v V V v v C4 V';
+    const S_HEADER_PACK = 'a4Va4a4VvvVVvva4V';
 
     protected
-        $rOutput = null
+        $rOutput = null,
+        $iSampleRate,
+        $iBitsPerSample,
+        $iNumChannels,
+        $iQuantize
     ;
 
-    public function __construct() {
-
+    /**
+     * Constructor
+     *
+     * @param int $iSampleRate    (defaults to the Signal Process Rate
+     * @param int $iBitsPerSample (defaults to 16)
+     * @param int $iNumChannels   (defaults to mono)
+     */
+    public function __construct(
+        int $iSampleRate    = self::I_DEF_RATE_SIGNAL_DEFAULT,
+        int $iBitsPerSample = self::I_DEF_RESOLUTION_BITS,
+        int $iNumChannels   = self::I_DEF_CHANNELS
+    ) {
+        $this->iSampleRate    = $iSampleRate != self::I_DEF_RATE_SIGNAL_DEFAULT ?: Context::get()->getProcessRate();
+        $this->iBitsPerSample = $iBitsPerSample;
+        $this->iNumChannels   = $iNumChannels;
+        $this->iQuantize      = (1 << ($this->iBitsPerSample - 1)) - 1;
     }
 
+    /**
+     * Destructor, ensures output is closed
+     */
     public function __destruct() {
         $this->close();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function open(string $sPath) {
         if (
             $this->rOutput ||
@@ -46,6 +83,9 @@ class Wav implements IPCMOutput {
         $this->reserveHeader();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function close() {
         if ($this->rOutput) {
             $this->writeHeader();
@@ -54,29 +94,44 @@ class Wav implements IPCMOutput {
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function write(Packet $oPacket) {
         $aOutput = $oPacket
-             ->quantize(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)
+             ->quantize($this->iQuantize, -$this->iQuantize, $this->iQuantize)
             ->toArray();
         fwrite($this->rOutput, pack('v*', ...$aOutput));
     }
 
+    /**
+     * Reserve the header storage on opening the file
+     */
     private function reserveHeader() {
-        // Todo - write the first 44 bytes to be
-        // replaced by the header
+        fwrite($this->rOutput, str_repeat('-', self::I_HEADER_SIZE));
     }
 
+    /**
+     * Rewinds and writes the header on closing the file
+     */
     private function writeHeader() {
-        $aHeader   = self::M_HEADER;
-        $iFileSize = ftell($this->rOutput);
+        $aHeader     = self::M_HEADER;
+        $iFileSize   = ftell($this->rOutput);
+        $iBlockAlign = ($this->iNumChannels * $this->iBitsPerSample) >> 3;
+
         $aHeader['iChunkSize']     = $iFileSize - 8;
-        $aHeader['iSubChunk2Size'] = $iFileSize - 40;
+        $aHeader['iSubChunk2Size'] = $iFileSize - self::I_HEADER_SIZE;
+        $aHeader['iNumChannels']   = $this->iNumChannels;
+        $aHeader['iSampleRate']    = $this->iSampleRate;
+        $aHeader['iByteRate']      = $this->iSampleRate * $iBlockAlign;
+        $aHeader['iBlockAlign']    = $iBlockAlign;
+        $aHeader['iBitsPerSample'] = $this->iBitsPerSample;
 
         // Todo - other properties
         rewind($this->rOutput);
         fwrite(
             $this->rOutput,
-            pack(self::S_HEADER_PACK, ...$aHeader)
+            pack(self::S_HEADER_PACK, ...array_values($aHeader))
         );
     }
 }

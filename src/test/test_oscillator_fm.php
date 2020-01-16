@@ -10,22 +10,22 @@ $oGenerator = new Signal\Generator\Sine();
 
 $oLFO = new Oscillator\Basic(
     $oGenerator,
-    5
+    0.5
 );
 
 $oModulator = new Oscillator\AM(
     $oGenerator,
-    880
+    440
 );
 
 $oCarrier = new Oscillator\FM(
     $oGenerator,
-    440
+    220
 );
 
-$oOutput = new Output\Raw16BitLittle;
+$oOutput = new Output\Wav;
 
-$oOutput->open('test_simple_fm.bin');
+$oOutput->open('test_simple_fm.wav');
 
 $fStart = microtime(true);
 do {

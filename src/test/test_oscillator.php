@@ -16,7 +16,7 @@ $aGenerators = [
 ];
 
 $iOneSecond = Signal\Context::get()->getProcessRate();
-$oOutput    = new Output\Raw16BitLittle;
+$oOutput    = new Output\Wav;
 
 foreach ($aGenerators as $sName => $oGenerator) {
     $oOscillator = new Oscillator\Basic(
@@ -25,7 +25,7 @@ foreach ($aGenerators as $sName => $oGenerator) {
     );
 
     echo "Testing : ", $oOscillator, "\n";
-    $oOutput->open('test_' . $sName . ".bin");
+    $oOutput->open('test_' . $sName . ".wav");
 
     do {
         $oOutput->write($oOscillator->emit());

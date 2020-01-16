@@ -4,14 +4,25 @@ namespace ABadCafe\Synth\Output;
 
 use ABadCafe\Synth\Signal\Packet;
 
+/**
+ * Raw
+ *
+ * Base class for raw output
+ */
 abstract class Raw implements IPCMOutput {
 
+    /**
+     * @param resource $rOutput
+     */
     protected $rOutput = null;
 
     public function __destruct() {
         $this->close();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function open(string $sPath) {
         if (
             $this->rOutput ||
@@ -21,6 +32,9 @@ abstract class Raw implements IPCMOutput {
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function close() {
         if ($this->rOutput) {
             fclose($this->rOutput);
@@ -29,6 +43,11 @@ abstract class Raw implements IPCMOutput {
     }
 }
 
+/**
+ * Raw16BitLittle
+ *
+ * Raw stream of 16-bit signed samples, LSB order
+ */
 class Raw16BitLittle extends Raw {
 
     const
@@ -36,6 +55,9 @@ class Raw16BitLittle extends Raw {
         I_MAX_LEVEL = 32767
     ;
 
+    /**
+     * @inheritdoc
+     */
     public function write(Packet $oPacket) {
         $aOutput = $oPacket
             ->quantize(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)

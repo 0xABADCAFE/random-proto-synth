@@ -165,7 +165,7 @@ class Square implements IGenerator {
  * Maps input values to a sawtooth output.
  */
 class Saw implements IGenerator {
-    const F_PERIOD = 2.0;
+    const F_PERIOD = 1.0;
 
     /**
      * @inheritdoc
