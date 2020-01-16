@@ -8,11 +8,12 @@ require_once '../Output.php';
 
 // Test some generators
 $aGenerators = [
-    'dc'     => new Signal\Generator\DC(0.5),
-    'sine'   => new Signal\Generator\Sine(),
-    'square' => new Signal\Generator\Square(),
-    'saw'    => new Signal\Generator\Saw(),
-    'noise'  => new Signal\Generator\Noise(),
+    'flat'     => new Signal\Generator\Flat(0.5),
+    'sine'     => new Signal\Generator\Sine(),
+    'square'   => new Signal\Generator\Square(),
+    'saw_up'   => new Signal\Generator\SawUp(),
+    'saw_down' => new Signal\Generator\SawDown(),
+    'noise'    => new Signal\Generator\Noise(),
 ];
 
 $iOneSecond = Signal\Context::get()->getProcessRate();
@@ -25,7 +26,7 @@ foreach ($aGenerators as $sName => $oGenerator) {
     );
 
     echo "Testing : ", $oOscillator, "\n";
-    $oOutput->open('test_' . $sName . ".wav");
+    $oOutput->open('output/test_' . $sName . ".wav");
 
     do {
         $oOutput->write($oOscillator->emit());

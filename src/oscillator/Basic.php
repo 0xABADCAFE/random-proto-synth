@@ -22,32 +22,63 @@ class Basic extends Base implements IOutputOnly {
     }
 }
 
-/**
- * Amplitude modulated
- */
-class AM extends Base implements ISingleInput {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public function emit(Packet $oAmplitudeModulator) : Packet {
+/**
+ * AmplitudeModulated
+ */
+class AmplitudeModulated extends Base implements ISingleInput {
+
+    /**
+     * @inheritdoc
+     */
+    public function emit(Packet $oAmplitude) : Packet {
         $oValues = $this->oGeneratorInput->getValues();
         foreach ($oValues as $i => $fValue) {
             $oValues[$i] = $this->fScaleVal * $this->iSamplePosition++;
         }
-        return $this->oGenerator->map($this->oGeneratorInput)->modulateWith($oAmplitudeModulator);
+        return $this->oGenerator->map($this->oGeneratorInput)->modulateWith($oAmplitude);
     }
 }
 
-/**
- * Phase modulated
- */
-class FM extends Base implements ISingleInput {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public function emit(Packet $oPhaseModulator) : Packet {
+/**
+ * PhaseModulated
+ */
+class PhaseModulated extends Base implements ISingleInput {
+
+    /**
+     * @inheritdoc
+     */
+    public function emit(Packet $oPhase) : Packet {
         $fPhaseSize = $this->oGenerator->getPeriod();
         $oValues    = $this->oGeneratorInput->getValues();
-        $oModulator = $oPhaseModulator->getValues();
+        $oModulator = $oPhase->getValues();
         foreach ($oValues as $i => $fValue) {
             $oValues[$i] = ($this->fScaleVal * $this->iSamplePosition++) + ($fPhaseSize * $oModulator[$i]);
         }
         return $this->oGenerator->map($this->oGeneratorInput);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * PhaseAndAmplitudeModulated
+ */
+class PhaseAndAmplitudeModulated extends Base implements IDualInput {
+
+    /**
+     * @inheritdoc
+     */
+    public function emit(Packet $oPhase, Packet $oAmplitude) : Packet {
+        $fPhaseSize = $this->oGenerator->getPeriod();
+        $oValues    = $this->oGeneratorInput->getValues();
+        $oModulator = $oPhase->getValues();
+        foreach ($oValues as $i => $fValue) {
+            $oValues[$i] = ($this->fScaleVal * $this->iSamplePosition++) + ($fPhaseSize * $oModulator[$i]);
+        }
+        return $this->oGenerator->map($this->oGeneratorInput)->modulateWith($oAmplitude);
     }
 }

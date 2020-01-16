@@ -38,6 +38,14 @@ interface ISingleInput {
 }
 
 /**
+ * Interface for simple output only oscillators
+ */
+interface IDualInput {
+    public function emit(Packet $oInput1, Packet $oInput2) : Packet;
+}
+
+
+/**
  * Base class for Oscillator implementations
  */
 abstract class Base {

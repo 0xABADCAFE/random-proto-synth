@@ -13,19 +13,25 @@ $oLFO = new Oscillator\Basic(
     0.1
 );
 
-$oModulator = new Oscillator\AM(
+$oLFO2 = new Oscillator\Basic(
+    new Signal\Generator\SawDown(0, 1),
+    4
+);
+
+
+$oModulator = new Oscillator\AmplitudeModulated(
     $oGenerator,
     55
 );
 
-$oCarrier = new Oscillator\FM(
+$oCarrier = new Oscillator\PhaseAndAmplitudeModulated(
     new Signal\Generator\Square(),
     220
 );
 
 $oOutput = new Output\Wav;
 
-$oOutput->open('test_simple_fm.wav');
+$oOutput->open('output/test_fm.wav');
 
 $fStart = microtime(true);
 do {
@@ -33,7 +39,8 @@ do {
         $oCarrier->emit(
             $oModulator->emit(
                 $oLFO->emit()
-            )
+            ),
+            $oLFO2->emit()
         )
     );
 } while ($oCarrier->getPosition() < $iOneSecond * 5);

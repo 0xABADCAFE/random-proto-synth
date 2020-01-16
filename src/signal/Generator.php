@@ -47,7 +47,7 @@ interface IGenerator {
  *
  * Maps to a fixed value, irrespective of input
  */
-class DC implements IGenerator {
+class Flat implements IGenerator {
 
     const F_PERIOD = 1.0;
 
@@ -72,7 +72,7 @@ class DC implements IGenerator {
      * @param  float $fLevel
      * @return DC fluent
      */
-    public function setLevel(float $fLevel) : DC {
+    public function setLevel(float $fLevel) : self {
         $this->oPacket->fillWith($fLevel);
         return $this;
     }
@@ -105,6 +105,23 @@ class Sine implements IGenerator {
 
     const F_PERIOD = 2.0 * M_PI;
 
+    private
+        $fMinLevel,
+        $fScaleLevel
+    ;
+
+    /**
+     * @param float $fMinLevel
+     * @param float $fMaxLevel
+     */
+    public function __construct(
+        float $fMinLevel = ILimits::F_MIN_LEVEL_NO_CLIP,
+        float $fMaxLevel = ILimits::F_MAX_LEVEL_NO_CLIP
+    ) {
+        $this->fMinLevel   = ($fMaxLevel + $fMinLevel)/2;
+        $this->fScaleLevel = ($fMaxLevel - $fMinLevel)/2;
+    }
+
     /**
      * @inheritdoc
      */
@@ -119,7 +136,7 @@ class Sine implements IGenerator {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = sin($fValue);
+            $oValues[$i] = ($this->fScaleLevel * sin($fValue)) + $this->fMinLevel;
         }
         return $oOutput;
     }
@@ -137,6 +154,23 @@ class Square implements IGenerator {
 
     const F_PERIOD = 2.0;
 
+    private
+        $fMinLevel,
+        $fMaxLevel
+    ;
+
+    /**
+     * @param float $fMinLevel
+     * @param float $fMaxLevel
+     */
+    public function __construct(
+        float $fMinLevel = ILimits::F_MIN_LEVEL_NO_CLIP,
+        float $fMaxLevel = ILimits::F_MAX_LEVEL_NO_CLIP
+    ) {
+        $this->fMinLevel = $fMinLevel;
+        $this->fMaxLevel = $fMaxLevel;
+    }
+
     /**
      * @inheritdoc
      */
@@ -151,7 +185,7 @@ class Square implements IGenerator {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = floor($fValue) & 1 ? ILimits::F_MIN_LEVEL_NO_CLIP : ILimits::F_MAX_LEVEL_NO_CLIP;
+            $oValues[$i] = floor($fValue) & 1 ? $this->fMinLevel : $this->fMaxLevel;
         }
         return $oOutput;
     }
@@ -160,12 +194,29 @@ class Square implements IGenerator {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Saw - series of frequencies
+ * SawUp - series of frequencies
  *
- * Maps input values to a sawtooth output.
+ * Maps input values to a upwards sawtooth output.
  */
-class Saw implements IGenerator {
-    const F_PERIOD = 1.0;
+class SawUp implements IGenerator {
+    const F_PERIOD  = 1.0;
+
+    protected
+        $fMinLevel,
+        $fScaleLevel
+    ;
+
+    /**
+     * @param float $fMinLevel
+     * @param float $fMaxLevel
+     */
+    public function __construct(
+        float $fMinLevel = ILimits::F_MIN_LEVEL_NO_CLIP,
+        float $fMaxLevel = ILimits::F_MAX_LEVEL_NO_CLIP
+    ) {
+        $this->fMinLevel   = $fMinLevel;
+        $this->fScaleLevel = $fMaxLevel - $fMinLevel;
+    }
 
     /**
      * @inheritdoc
@@ -181,10 +232,34 @@ class Saw implements IGenerator {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = ILimits::F_P2P_LEVEL_NO_CLIP * ($fValue - floor($fValue) - 0.5);
+            $oValues[$i] = $this->fScaleLevel * ($fValue - floor($fValue)) + $this->fMinLevel;
         }
         return $oOutput;
     }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * SawUp - series of frequencies
+ *
+ * Maps input values to a downwards sawtooth output.
+ */
+class SawDown extends SawUp {
+
+    /**
+     * @inheritdoc
+     */
+    public function map(Packet $oInput) : Packet {
+        $oOutput = clone $oInput;
+        $oValues = $oOutput->getValues();
+        foreach ($oValues as $i => $fValue) {
+            $oValues[$i] = -($this->fScaleLevel * ($fValue - floor($fValue)) + $this->fMinLevel);
+        }
+        return $oOutput;
+    }
+
 }
 
 
@@ -220,6 +295,28 @@ class Noise implements IGenerator {
         foreach($oValues as $i => $fValue) {
             $oValues[$i] = ILimits::F_MIN_LEVEL_NO_CLIP + mt_rand() * $fNormalize;
         }
+        return $oOutput;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * TODO
+ */
+class Table implements IGenerator {
+
+    const F_PERIOD = 1.0;
+
+    public function getPeriod() : float {
+        return self::F_PERIOD;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function map(Packet $oInput) : Packet {
+        $oOutput = clone $oInput;
         return $oOutput;
     }
 }
