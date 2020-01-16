@@ -36,9 +36,9 @@ do {
             )
         )
     );
-} while ($oCarrier->getPosition() < $iOneSecond);
+} while ($oCarrier->getPosition() < $iOneSecond * 5);
 $fElapsed = microtime(true) - $fStart;
 
 $oOutput->close();
 
-echo "Generated 1 second in ", $fElapsed, " seconds\n";
+echo "Generated 5 seconds in ", $fElapsed, " seconds\n";
