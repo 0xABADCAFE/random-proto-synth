@@ -33,3 +33,5 @@ interface IPCMOutput {
 }
 
 require_once 'output/Raw.php';
+require_once 'output/Wav.php';
+

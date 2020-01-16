@@ -27,6 +27,7 @@ $oOutput = new Output\Raw16BitLittle;
 
 $oOutput->open('test_simple_fm.bin');
 
+$fStart = microtime(true);
 do {
     $oOutput->write(
         $oCarrier->emit(
@@ -36,6 +37,8 @@ do {
         )
     );
 } while ($oCarrier->getPosition() < $iOneSecond);
-
+$fElapsed = microtime(true) - $fStart;
 
 $oOutput->close();
+
+echo "Generated 1 second in ", $fElapsed, " seconds\n";
