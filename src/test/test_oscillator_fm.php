@@ -3,9 +3,13 @@
 namespace ABadCafe\Synth;
 require_once '../Signal.php';
 require_once '../Oscillator.php';
+require_once '../Envelope.php';
 require_once '../Output.php';
 
-$iOneSecond = Signal\Context::get()->getProcessRate();
+const I_TIME = 6;
+
+$iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
+
 $oGenerator = new Signal\Generator\Sine();
 
 $oLFO = new Oscillator\Basic(
@@ -13,24 +17,36 @@ $oLFO = new Oscillator\Basic(
     0.1
 );
 
-$oLFO2 = new Oscillator\Basic(
-    new Signal\Generator\SawDown(0, 1),
-    4
-);
-
-
-$oModulator = new Oscillator\AmplitudeModulated(
+$oModulator = new Oscillator\PhaseModulated(
     $oGenerator,
     55
 );
 
-$oCarrier = new Oscillator\PhaseAndAmplitudeModulated(
+$oModulatorShape = new Envelope\Shape;
+$oModulatorShape
+    ->initial(0)
+    ->append(0.75, 0.3)
+    ->append(1.0,  0.2)
+    ->append(0.5, 0.5)
+    ->append(10, 3)
+    ->append(0, 2);
+$oModulatorEnvelope = new Envelope\Generator($oModulatorShape);
+
+$oCarrier = new Oscillator\PhaseModulated(
     new Signal\Generator\Square(),
     220
 );
 
-$oOutput = new Output\Wav;
+$oCarrierShape = new Envelope\Shape;
+$oCarrierShape
+    ->initial(0.5)            // Initial Level
+    ->append(1, 0.01)
+    ->append(0.75, 2)
+    ->append(0.5, 5);
 
+$oCarrierEnvelope = new Envelope\Generator($oCarrierShape);
+
+$oOutput = new Output\Wav;
 $oOutput->open('output/test_fm.wav');
 
 $fStart = microtime(true);
@@ -39,13 +55,16 @@ do {
         $oCarrier->emit(
             $oModulator->emit(
                 $oLFO->emit()
-            ),
-            $oLFO2->emit()
+            )->modulateWith(
+                $oModulatorEnvelope->emit()
+            )
+        )->modulateWith(
+            $oCarrierEnvelope->emit()
         )
     );
-} while ($oCarrier->getPosition() < $iOneSecond * 5);
+} while ($oCarrier->getPosition() < $iMaxSamples);
 $fElapsed = microtime(true) - $fStart;
 
 $oOutput->close();
 
-echo "Generated 5 seconds in ", $fElapsed, " seconds\n";
+echo "Generated ", I_TIME, " seconds in ", $fElapsed, " seconds\n";

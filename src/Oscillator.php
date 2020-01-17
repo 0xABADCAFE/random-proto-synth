@@ -6,6 +6,7 @@ use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Signal\Generator\IGenerator;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * ILimits
@@ -23,131 +24,52 @@ interface ILimits {
     ;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * Interface for simple output only oscillators
+ * Interface for simple output only oscillators, for example basic wave generators or LFO implementations.
  */
 interface IOutputOnly {
+
+    /**
+     * Emit the next signal packet.
+     *
+     * @return Packet
+     */
     public function emit() : Packet;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * Interface for simple output only oscillators
+ * Interface for single input oscillators. The input modulates some property of the waveform, for example amplitude or phase.
  */
 interface ISingleInput {
+
+    /**
+     * Emit the next signal packet.
+     *
+     * @param  Packet $oInput
+     * @return Packet
+     */
     public function emit(Packet $oInput) : Packet;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * Interface for simple output only oscillators
+ * Interface for dual input oscillators. Generally one input will modulate phase and the other amplitude.
  */
 interface IDualInput {
+
+    /**
+     * Emit the next signal packet.
+     *
+     * @param  Packet $oInput1
+     * @param  Packet $oInput2
+     * @return Packet
+     */
     public function emit(Packet $oInput1, Packet $oInput2) : Packet;
-}
-
-
-/**
- * Base class for Oscillator implementations
- */
-abstract class Base {
-    protected
-        /** @var IGenerator $oGenerator */
-        $oGenerator,
-
-        /** @var Paclet */
-        $oGeneratorInput,
-
-        /** @var int $iSamplePosition */
-        $iSamplePosition = 0,
-
-        /** @var float $fFrequency */
-        $fFrequency,
-
-        /** @var float $fScaleVal */
-        $fScaleVal
-    ;
-
-    /**
-     * Constructor. Set default sample rate and frequency here. Sample rate is immutable once set.
-     *
-     * @param IGenerator $oGenerator
-     * @param float      $fFrequency
-     */
-    public function __construct(
-        IGenerator $oGenerator,
-        float      $fFrequency  = ILimits::F_DEF_FREQ
-    ) {
-        $this->oGenerator      = $oGenerator;
-        $this->oGeneratorInput = new Packet();
-        $this->setFrequency($fFrequency);
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString() : string {
-        return sprintf(
-            "%s [%s freq:%.3fHz rate:%dHz, pos:%d]",
-            static::class,
-            get_class($this->oGenerator),
-            $this->fFrequency,
-            Context::get()->getProcessRate(),
-            $this->iSamplePosition
-        );
-    }
-
-    /**
-     * Get the oscillator sample position, which is the total number of samples generated since
-     * instantiation or the last call to reset().
-     *
-     * @return int
-     */
-    public function getPosition() : int {
-        return $this->iSamplePosition;
-    }
-
-    /**
-     * Get the oscillator signal frequency
-     *
-     * @return int
-     */
-    public function getFrequency() : float {
-        return $this->fFrequency;
-    }
-
-    /**
-     * Reset the duty cycle
-     *
-     * @param  float $fFrequency
-     * @return self
-     */
-    public function reset() : self {
-        $this->iSamplePosition = 0;
-        return $this;
-    }
-
-    /**
-     * Set the oscillator signal frequency
-     *
-     * @param  float $fFrequency
-     * @return self
-     */
-    public function setFrequency(float $fFrequency) : self {
-        $this->fFrequency = $this->clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
-        $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency / (float)Context::get()->getProcessRate();
-        return $this;
-    }
-
-    /**
-     * Clamp some numeric vale between a minimum and maximum
-     *
-     * @param  float|int $mValue
-     * @param  float|int $mMin
-     * @param  float|int $mMax
-     * @return float|int
-     */
-    protected function clamp($mValue, $mMin, $mMax) {
-        return max(min($mValue, $mMax), $mMin);
-    }
 }
 
 require_once 'oscillator/Basic.php';
