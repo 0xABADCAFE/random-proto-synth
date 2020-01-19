@@ -86,6 +86,14 @@ class LinearInterpolated {
             ];
         }
         $oLastPoint = end($this->aProcessPoints);
+
+        // Pad on the last point again with a slight time offset. This ensures th interpolant code is always acting between a pair
+        // of points and avoids wandering off the end of the array.
+        $this->aProcessPoints[$i] = (object)[
+            'iStart' => $oLastPoint->iStart + 16,
+            'fLevel' => $oLastPoint->fLevel
+        ];
+
         $this->iLastPosition = $oLastPoint->iStart;
         $this->oFinalPacket->fillWith($oLastPoint->fLevel);
         return $this;
