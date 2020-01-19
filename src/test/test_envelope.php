@@ -16,7 +16,7 @@ $oShape
     ->append(0.5, 0.5)    // 75%  Level after another 0.5 seconds
     ->append(0, 4);
 
-$oEnvelopeGenerator = new Envelope\Generator($oShape);
+$oEnvelopeGenerator = new Envelope\Generator\LinearInterpolated($oShape);
 
 
 $oOutput = new Output\Wav;

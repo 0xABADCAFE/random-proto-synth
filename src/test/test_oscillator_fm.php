@@ -30,7 +30,7 @@ $oModulatorShape
     ->append(0.5, 0.5)
     ->append(10, 3)
     ->append(0, 2);
-$oModulatorEnvelope = new Envelope\Generator($oModulatorShape);
+$oModulatorEnvelope = new Envelope\Generator\LinearInterpolated($oModulatorShape);
 
 $oCarrier = new Oscillator\PhaseModulated(
     new Signal\Generator\Square(),
@@ -44,7 +44,7 @@ $oCarrierShape
     ->append(0.75, 2)
     ->append(0.5, 5);
 
-$oCarrierEnvelope = new Envelope\Generator($oCarrierShape);
+$oCarrierEnvelope = new Envelope\Generator\LinearInterpolated($oCarrierShape);
 
 $oOutput = new Output\Wav;
 $oOutput->open('output/test_fm.wav');
