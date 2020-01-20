@@ -27,49 +27,34 @@ interface ILimits {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Interface for simple output only oscillators, for example basic wave generators or LFO implementations.
+ * Interface for Oscillators 
  */
-interface IOutputOnly {
+interface IOscillator {
+    /**
+     * Get the oscillator frequency in Hz
+     *
+     * @return float
+     */
+    public function getFrequency() : float;
 
     /**
-     * Emit the next signal packet.
+     * Set a new frequency for the oscillator, in Hz
      *
-     * @return Packet
+     * @param float $fFrequecny
+     * @return self
+     */
+    public function setFrequency(float $fFrequency) : self;
+
+    /**
+     * Generate a Packet of signal
      */
     public function emit() : Packet;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Interface for single input oscillators. The input modulates some property of the waveform, for example amplitude or phase.
- */
-interface ISingleInput {
 
     /**
-     * Emit the next signal packet.
-     *
-     * @param  Packet $oInput
-     * @return Packet
+     * Generate a Packet of signal, applying the input Packet of phase modulation to the
+     * internal generator
      */
-    public function emit(Packet $oInput) : Packet;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Interface for dual input oscillators. Generally one input will modulate phase and the other amplitude.
- */
-interface IDualInput {
-
-    /**
-     * Emit the next signal packet.
-     *
-     * @param  Packet $oInput1
-     * @param  Packet $oInput2
-     * @return Packet
-     */
-    public function emit(Packet $oInput1, Packet $oInput2) : Packet;
+    public function emitPhaseModulated(Packet $iPhase) : Packet;
 }
 
 require_once 'oscillator/Basic.php';

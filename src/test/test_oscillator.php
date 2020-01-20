@@ -20,7 +20,7 @@ $iOneSecond = Signal\Context::get()->getProcessRate();
 $oOutput    = new Output\Wav;
 
 foreach ($aGenerators as $sName => $oGenerator) {
-    $oOscillator = new Oscillator\Basic(
+    $oOscillator = new Oscillator\Simple(
         $oGenerator,
         440
     );

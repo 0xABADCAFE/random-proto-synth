@@ -11,7 +11,7 @@ use ABadCafe\Synth\Signal\Packet;
 /**
  * Base class for Oscillator implementations
  */
-abstract class Base {
+abstract class Base implements IOscillator {
     protected
         /** @var IGenerator $oGenerator */
         $oGenerator,
@@ -82,7 +82,7 @@ abstract class Base {
      *
      * @return self
      */
-    public function reset() : self {
+    public function reset() : IOscillator {
         $this->iSamplePosition = 0;
         return $this;
     }
@@ -93,7 +93,7 @@ abstract class Base {
      * @param  float $fFrequency
      * @return self
      */
-    public function setFrequency(float $fFrequency) : self {
+    public function setFrequency(float $fFrequency) : IOscillator {
         $this->fFrequency = $this->clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
         $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency / (float)Context::get()->getProcessRate();
         return $this;
@@ -117,7 +117,7 @@ abstract class Base {
 /**
  * Basic
  */
-class Basic extends Base implements IOutputOnly {
+class Simple extends Base {
 
     /**
      * @inheritdoc
@@ -129,38 +129,11 @@ class Basic extends Base implements IOutputOnly {
         }
         return $this->oGenerator->map($this->oGeneratorInput);
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * AmplitudeModulated
- */
-class AmplitudeModulated extends Base implements ISingleInput {
 
     /**
      * @inheritdoc
      */
-    public function emit(Packet $oAmplitude) : Packet {
-        $oValues = $this->oGeneratorInput->getValues();
-        foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = $this->fScaleVal * $this->iSamplePosition++;
-        }
-        return $this->oGenerator->map($this->oGeneratorInput)->modulateWith($oAmplitude);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * PhaseModulated
- */
-class PhaseModulated extends Base implements ISingleInput {
-
-    /**
-     * @inheritdoc
-     */
-    public function emit(Packet $oPhase) : Packet {
+    public function emitPhaseModulated(Packet $oPhase) : Packet {
         $fPhaseSize = $this->oGenerator->getPeriod();
         $oValues    = $this->oGeneratorInput->getValues();
         $oModulator = $oPhase->getValues();
@@ -168,26 +141,5 @@ class PhaseModulated extends Base implements ISingleInput {
             $oValues[$i] = ($this->fScaleVal * $this->iSamplePosition++) + ($fPhaseSize * $oModulator[$i]);
         }
         return $this->oGenerator->map($this->oGeneratorInput);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * PhaseAndAmplitudeModulated
- */
-class PhaseAndAmplitudeModulated extends Base implements IDualInput {
-
-    /**
-     * @inheritdoc
-     */
-    public function emit(Packet $oPhase, Packet $oAmplitude) : Packet {
-        $fPhaseSize = $this->oGenerator->getPeriod();
-        $oValues    = $this->oGeneratorInput->getValues();
-        $oModulator = $oPhase->getValues();
-        foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = ($this->fScaleVal * $this->iSamplePosition++) + ($fPhaseSize * $oModulator[$i]);
-        }
-        return $this->oGenerator->map($this->oGeneratorInput)->modulateWith($oAmplitude);
     }
 }
