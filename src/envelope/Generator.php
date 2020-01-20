@@ -2,6 +2,7 @@
 
 namespace ABadCafe\Synth\Envelope\Generator;
 
+use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Envelope\Shape;
@@ -11,7 +12,7 @@ use ABadCafe\Synth\Envelope\Shape;
  *
  * Calculates the continuous signal packet stream for an envelope defined by a given Shape
  */
-class LinearInterpolated {
+class LinearInterpolated implements IStream {
 
     private
         /** @var Shape $oShape : input Shape */
@@ -70,7 +71,7 @@ class LinearInterpolated {
      *
      * @return self
      */
-    public function reset() : self {
+    public function reset() : IStream {
         $this->iSamplePosition = 0;
         $this->aProcessPoints  = [];
         $iProcessRate = Context::get()->getProcessRate();
@@ -86,6 +87,14 @@ class LinearInterpolated {
             ];
         }
         $oLastPoint = end($this->aProcessPoints);
+
+        // Pad on the last point again with a slight time offset. This ensures th interpolant code is always acting between a pair
+        // of points and avoids wandering off the end of the array.
+        $this->aProcessPoints[$i] = (object)[
+            'iStart' => $oLastPoint->iStart + 16,
+            'fLevel' => $oLastPoint->fLevel
+        ];
+
         $this->iLastPosition = $oLastPoint->iStart;
         $this->oFinalPacket->fillWith($oLastPoint->fLevel);
         return $this;

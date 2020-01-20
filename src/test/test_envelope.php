@@ -6,6 +6,8 @@ require_once '../Oscillator.php';
 require_once '../Envelope.php';
 require_once '../Output.php';
 
+error_reporting(-1);
+
 $iOneSecond = Signal\Context::get()->getProcessRate();
 
 $oShape = new Envelope\Shape;

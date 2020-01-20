@@ -12,12 +12,12 @@ $iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
 
 $oGenerator = new Signal\Generator\Sine();
 
-$oLFO = new Oscillator\Basic(
+$oLFO = new Oscillator\Simple(
     $oGenerator,
     0.1
 );
 
-$oModulator = new Oscillator\PhaseModulated(
+$oModulator = new Oscillator\Simple(
     $oGenerator,
     55
 );
@@ -32,7 +32,7 @@ $oModulatorShape
     ->append(0, 2);
 $oModulatorEnvelope = new Envelope\Generator\LinearInterpolated($oModulatorShape);
 
-$oCarrier = new Oscillator\PhaseModulated(
+$oCarrier = new Oscillator\Simple(
     new Signal\Generator\Square(),
     220
 );
@@ -52,8 +52,8 @@ $oOutput->open('output/test_fm.wav');
 $fStart = microtime(true);
 do {
     $oOutput->write(
-        $oCarrier->emit(
-            $oModulator->emit(
+        $oCarrier->emitPhaseModulated(
+            $oModulator->emitPhaseModulated(
                 $oLFO->emit()
             )->modulateWith(
                 $oModulatorEnvelope->emit()
