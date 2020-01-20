@@ -40,19 +40,24 @@ interface IOscillator {
     /**
      * Set a new frequency for the oscillator, in Hz
      *
-     * @param float $fFrequecny
+     * @param  float $fFrequecny
      * @return self
      */
     public function setFrequency(float $fFrequency) : self;
 
     /**
      * Generate a Packet of signal
+     *
+     * @return Packet
      */
     public function emit() : Packet;
 
     /**
      * Generate a Packet of signal, applying the input Packet of phase modulation to the
-     * internal generator
+     * internal generator.
+     *
+     * @param  Packet $iPhase
+     * @return Packet
      */
     public function emitPhaseModulated(Packet $iPhase) : Packet;
 }

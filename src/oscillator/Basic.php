@@ -2,6 +2,7 @@
 
 namespace ABadCafe\Synth\Oscillator;
 
+use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Generator\IGenerator;
 use ABadCafe\Synth\Signal\Packet;
@@ -11,7 +12,7 @@ use ABadCafe\Synth\Signal\Packet;
 /**
  * Base class for Oscillator implementations
  */
-abstract class Base implements IOscillator {
+abstract class Base implements IOscillator, IStream {
     protected
         /** @var IGenerator $oGenerator */
         $oGenerator,
@@ -82,7 +83,7 @@ abstract class Base implements IOscillator {
      *
      * @return self
      */
-    public function reset() : IOscillator {
+    public function reset() : IStream {
         $this->iSamplePosition = 0;
         return $this;
     }

@@ -31,6 +31,28 @@ interface ILimits {
         I_MAX_PACKET_LENGTH = 256
     ;
 }
+
+/**
+ * IStream
+ *
+ * Interface for components that generate a continuous stream of signal data,
+ * such as oscillators and envelope generators.
+ *
+ */
+interface IStream {
+    /**
+     * Get the current stream position
+     *
+     * @return int
+     */
+    public function getPosition() : int;
+
+    /**
+     * Reset the stream
+     */
+    public function reset() : self;
+}
+
 require_once 'signal/Context.php';
 require_once 'signal/Packet.php';
 require_once 'signal/Generator.php';
