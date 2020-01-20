@@ -50,7 +50,7 @@ class LinearInterpolated implements IStream {
      * Constructor
      */
     public function __construct(Shape $oShape) {
-        $this->oShape = $oShape;
+        $this->oShape        = $oShape;
         $this->oOutputPacket = new Packet();
         $this->oFinalPacket  = new Packet();
         $this->reset();
@@ -129,15 +129,13 @@ class LinearInterpolated implements IStream {
 
     /**
      * Calculate the interpolants for the current phase of the envelope
-     *
-     * @return Packet
      */
     private function updateInterpolants() {
         $iIndex  = $this->aProcessIndexes[$this->iSamplePosition];
         $oPointA = $this->aProcessPoints[$iIndex];
         $oPointB = $this->aProcessPoints[$iIndex + 1];
         $this->fGradient = ($oPointB->fLevel - $oPointA->fLevel) / (float)($oPointB->iStart - $oPointA->iStart);
-        $this->fYOffset   = $oPointA->fLevel;
-        $this->iXOffset   = $oPointA->iStart;
+        $this->fYOffset  = $oPointA->fLevel;
+        $this->iXOffset  = $oPointA->iStart;
     }
 }

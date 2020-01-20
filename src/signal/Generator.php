@@ -6,15 +6,6 @@ use ABadCafe\Synth\Signal\ILimits;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 
-class PacketHelper extends Packet {
-
-    public static function cloneFrom(Packet $oInput, array $aValues) : Packet {
-        $oOutput = clone $oInput;
-        $oOutput->aSamples = $aValues;
-        return $oOutput;
-    }
-}
-
 /**
  * IGenerator
  *
@@ -262,6 +253,35 @@ class SawDown extends SawUp {
 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Basic triangle generator
+ */
+class Triangle implements IGenerator {
+
+    const F_PERIOD = 1.0;
+
+    /**
+     * @inheritdoc
+     */
+    public function getPeriod() : float {
+        return self::F_PERIOD;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function map(Packet $oInput) : Packet {
+        // TODO - actual triangle generator
+        $oOutput = clone $oInput;
+        $oValues = $oOutput->getValues();
+        foreach ($oValues as $i => $fValue) {
+            $oValues[$i] = -($this->fScaleLevel * ($fValue - floor($fValue)) + $this->fMinLevel);
+        }
+        return $oOutput;
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -308,6 +328,9 @@ class Table implements IGenerator {
 
     const F_PERIOD = 1.0;
 
+    /**
+     * @inheritdoc
+     */
     public function getPeriod() : float {
         return self::F_PERIOD;
     }

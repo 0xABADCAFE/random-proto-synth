@@ -6,6 +6,8 @@ use \Countable;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * ILimits
  *
@@ -17,6 +19,8 @@ interface ILimits {
         F_MAX_TIME = 100.0
     ;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Basic shape definition. Defines a list of points and levels.
@@ -51,7 +55,6 @@ class Shape implements Countable {
             $fLevel,
             min(max($fTime, ILimits::F_MIN_TIME), ILimits::F_MAX_TIME)
         ];
-
         return $this;
     }
 

@@ -27,7 +27,7 @@ interface ILimits {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Interface for Oscillators 
+ * Interface for Oscillators
  */
 interface IOscillator {
     /**
@@ -62,4 +62,7 @@ interface IOscillator {
     public function emitPhaseModulated(Packet $iPhase) : Packet;
 }
 
-require_once 'oscillator/Basic.php';
+require_once 'oscillator/Base.php';
+require_once 'oscillator/Simple.php';
+require_once 'oscillator/Morphing.php';
+

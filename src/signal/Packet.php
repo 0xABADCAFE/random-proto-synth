@@ -126,13 +126,8 @@ class Packet {
     public function quantize(int $iScaleValue, int $iMinValue, int $iMaxValue) : SPLFixedArray {
         $oResult = clone $this->oValues;
         foreach ($oResult as $i => $mValue) {
-            $oResult[$i] = min(
-                max(
-                    (int)($mValue * $iScaleValue),
-                    $iMinValue
-                ),
-                $iMaxValue
-            );
+            $mValue = (int)($mValue * $iScaleValue);
+            $oResult[$i] = $mValue < $iMinValue ? $iMinValue : ($mValue > $iMaxValue ? $iMaxValue : $mValue);
         }
         return $oResult;
     }
