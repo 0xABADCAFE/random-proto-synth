@@ -5,6 +5,7 @@ namespace ABadCafe\Synth\Signal\Generator;
 use ABadCafe\Synth\Signal\ILimits;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
+use \SPLFixedArray;
 
 /**
  * IGenerator
@@ -132,7 +133,6 @@ class Sine implements IGenerator {
         return $oOutput;
     }
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -320,6 +320,56 @@ class Noise implements IGenerator {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * SineQuick - single frequency
+ *
+ * This is slower than actual Sine() generator but will be useful for the Table
+ */
+class LookupTest implements IGenerator {
+
+    const I_SIZE_EXP = 8;
+    const I_PERIOD   = 1 << self::I_SIZE_EXP;
+    const I_MASK     = self::I_PERIOD - 1;
+
+    private static $oTable = null;
+
+    /**
+     *
+     */
+    public function __construct() {
+        if (!self::$oTable) {
+            $iSize = self::I_PERIOD + 1;
+            self::$oTable = new SPLFixedArray($iSize);
+            $fScale = 2.0 * M_PI / self::I_PERIOD;
+            for ($i = 0; $i < $iSize; $i++) {
+                self::$oTable[$i] = sin($fScale * $i);
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPeriod() : float {
+        return (float)self::I_PERIOD;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function map(Packet $oInput) : Packet {
+        $oOutput = clone $oInput;
+        $oValues = $oOutput->getValues();
+        foreach ($oValues as $i => $fValue) {
+            $iIndex      = (int)floor($fValue);
+            $fInterp     = $fValue - $iIndex;
+            $iIndex     &= self::I_MASK;
+            $oValues[$i] = ((1.0 - $fInterp) * self::$oTable[$iIndex]) + ($fInterp * self::$oTable[$iIndex + 1]);
+        }
+        return $oOutput;
+    }
+}
 
 /**
  * TODO

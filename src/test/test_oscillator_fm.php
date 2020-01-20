@@ -6,7 +6,7 @@ require_once '../Oscillator.php';
 require_once '../Envelope.php';
 require_once '../Output.php';
 
-const I_TIME = 6;
+const I_TIME = 8;
 
 $iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
 
@@ -29,7 +29,7 @@ $oModulatorShape
     ->append(1.0,  0.2)
     ->append(0.5, 0.5)
     ->append(10, 3)
-    ->append(0, 2);
+    ->append(0, 4);
 $oModulatorEnvelope = new Envelope\Generator\LinearInterpolated($oModulatorShape);
 
 $oCarrier = new Oscillator\Simple(

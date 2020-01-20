@@ -7,12 +7,16 @@ use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Envelope\Shape;
 
+interface IGenerator {
+    public function emit() : Packet;
+}
+
 /**
  * Generator
  *
  * Calculates the continuous signal packet stream for an envelope defined by a given Shape
  */
-class LinearInterpolated implements IStream {
+class LinearInterpolated implements IGenerator, IStream {
 
     private
         /** @var Shape $oShape : input Shape */

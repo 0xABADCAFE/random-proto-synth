@@ -81,12 +81,25 @@ use ABadCafe\Synth\Signal\ILimits as SignalLimits;
      * @inheritdoc
      */
     public function emitPhaseModulated(Packet $oPhase) : Packet {
-        $fPhaseSize = $this->oGenerator->getPeriod();
-        $oValues    = $this->oGeneratorInput->getValues();
-        $oModulator = $oPhase->getValues();
+        $oValues             = $this->oGeneratorInput->getValues();
+        $oSecondaryValues    = $this->oSecondaryInput->getValues();
+        $oMixingValues       = $this->oMixingInput->getValues();
+        $fPhaseSize          = $this->oGenerator->getPeriod();
+        $fSecondaryPhaseSize = $this->oSecondaryGenerator->getPeriod();
+        $oModulator          = $oPhase->getValues();
         foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = ($this->fScaleVal * $this->iSamplePosition++) + ($fPhaseSize * $oModulator[$i]);
+            $oValues[$i]          = ($this->fScaleVal          * $this->iSamplePosition) + ($fPhaseSize * $oModulator[$i]);
+            $oSecondaryValues[$i] = ($this->fSecondaryScaleVal * $this->iSamplePosition) + ($fSecondaryPhaseSize * $oModulator[$i]);
+            $oMixingValues[$i]    = $this->fMixingScaleVal     * $this->iSamplePosition++;
         }
-        return $this->oGenerator->map($this->oGeneratorInput);
+        $oOutputPacket    = $this->oGenerator->map($this->oGeneratorInput);
+        $oSecondaryValues = $this->oSecondaryGenerator->map($this->oSecondaryInput)->getValues();
+        $oMixingValues    = $this->oMixingGenerator->map($this->oMixingInput)->getValues();
+        $oOutputValues    = $oOutputPacket->getValues();
+        foreach ($oOutputValues as $i => $fPrimary) {
+            $fMixValue = 0.5 * ($oMixingValues[$i] + SignalLimits::F_MAX_LEVEL_NO_CLIP);
+            $oOutputValues[$i] = ($fPrimary * $fMixValue) + ((1.0 - $fMixValue)*$oSecondaryValues[$i]);
+        }
+        return $oOutputPacket;
     }
  }
