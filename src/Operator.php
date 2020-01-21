@@ -15,6 +15,22 @@ use ABadCafe\Synth\Envelope\Generator\IGenerator as IEnvelopeGenerator;
  */
 interface IOperator {
 
+    /**
+     * Attach an Operator as an amplitude modulator. The overall strength of the modulation is controlled by the index
+     *
+     * @param  IOperator $oOperator
+     * @param  float     $fIndex
+     * @return IOperator
+     */
+    public function attachAmplitudeModulator(self $oOperator, float $fIndex) : self;
+
+    /**
+     * Attach an Operator as a phase modulator. The overall strength of the modulation is controlled by the index
+     *
+     * @param  IOperator $oOperator
+     * @param  float     $fIndex
+     * @return IOperator
+     */
     public function attachPhaseModulator(self $oOperator, float $fIndex) : self;
 
 }
@@ -24,9 +40,15 @@ interface IOperator {
 class Standard implements IOperator, IStream {
 
     protected
+        $iInstance,
         $oOscillator,
-        $oEnvelope
+        $oEnvelope,
+        $aModulators               = [],
+        $aPhaseModulationIndex     = [],
+        $aAmplitudeModulationIndex = []
     ;
+
+    protected static $iNextInstance = 0;
 
     public function __construct(
         IOscillator        $oOscillator,
@@ -34,6 +56,7 @@ class Standard implements IOperator, IStream {
     ) {
         $this->oOscillator = $oOscillator;
         $this->oEnvelope   = $oEnvelope;
+        $this->iInstance   = self::$iNextInstance++;
     }
 
     /**
@@ -50,5 +73,38 @@ class Standard implements IOperator, IStream {
         $this->oOscillator->reset();
         $this->oEnvelope->reset();
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attachAmplitudeModulator(
+        IOperator $oOperator,
+        float $fIndex
+    ) : IOperator {
+        $this->aModulators[$oOperator->iInstance] = $oOperator;
+        $this->aAmplitudeModulationIndex[$oOperator->iInstance] = $fIndex;
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attachPhaseModulator(
+        IOperator $oOperator,
+        float $fIndex
+    ) : IOperator {
+        $this->aModulators[$oOperator->iInstance] = $oOperator;
+        $this->aPhaseModulationIndex[$oOperator->iInstance] = $fIndex;    
+        return $this;
+    }
+
+
+    public function emit() : Packet {
+        $oPhaseAccumulator     = new Packet();
+        $oAmplitudeAccumulator = new Packet();
+        foreach ($this->aModulators as $iInstance => $oOperator) {
+            $oPacket = $oOperator->emit();
+        }
     }
 }
