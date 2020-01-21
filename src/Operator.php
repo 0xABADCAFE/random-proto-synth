@@ -6,7 +6,7 @@ use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Oscillator\IOscillator;
-use ABadCafe\Synth\Envelope\Generator\IGenerator as IEnvelopeGenerator;
+use ABadCafe\Synth\Envelope\IGenerator as IEnvelopeGenerator;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,7 +37,7 @@ interface IOperator {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Standard implements IOperator, IStream {
+class Simple implements IOperator, IStream {
 
     protected
         $iInstance,
@@ -95,16 +95,27 @@ class Standard implements IOperator, IStream {
         float $fIndex
     ) : IOperator {
         $this->aModulators[$oOperator->iInstance] = $oOperator;
-        $this->aPhaseModulationIndex[$oOperator->iInstance] = $fIndex;    
+        $this->aPhaseModulationIndex[$oOperator->iInstance] = $fIndex;
         return $this;
     }
 
-
+    /**
+     * Emit a packet
+     */
     public function emit() : Packet {
-        $oPhaseAccumulator     = new Packet();
-        $oAmplitudeAccumulator = new Packet();
+        $oPhaseAccumulator     = empty($this->aPhaseModulationIndex)     ? null : new Packet();
+        $oAmplitudeAccumulator = empty($this->aAmplitudeModulationIndex) ? null : new Packet();
         foreach ($this->aModulators as $iInstance => $oOperator) {
             $oPacket = $oOperator->emit();
+            if (isset($this->aPhaseModulationIndex[$iInstance])) {
+                $oPhaseAccumulator->accumulate($oPacket, $this->aPhaseModulationIndex[$iInstance]);
+            }
+            if (isset($this->aAmplitudeModulationIndex[$iInstance])) {
+                $oAmplitudeAccumulator->accumulate($oPacket, $this->aAmplitudeModulationIndex[$iInstance]);
+            }
         }
+        $oOscillatorPacket = $oPhaseAccumulator     ? $this->oOscillator->emitPhaseModulated($oPhaseAccumulator) : $this->oOscillator->emit();
+        $oEnvelopePacket   = $oAmplitudeAccumulator ? $this->oEnvelope->emit()->modulateWith($oPhaseAccumulator) : $this->oEnvelope->emit();
+        return $oOscillatorPacket->modulateWith($this->oEnvelope->emit());
     }
 }

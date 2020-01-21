@@ -1,6 +1,9 @@
 <?php
 
 namespace ABadCafe\Synth;
+
+//include_once 'profiling.php';
+
 require_once '../Signal.php';
 require_once '../Oscillator.php';
 require_once '../Envelope.php';

@@ -5,21 +5,20 @@ namespace ABadCafe\Synth\Envelope\Generator;
 use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Envelope\Shape;
+use ABadCafe\Synth\Envelope\IShape;
+use ABadCafe\Synth\Envelope\IGenerator;
 
-interface IGenerator {
-    public function emit() : Packet;
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Generator
  *
- * Calculates the continuous signal packet stream for an envelope defined by a given Shape
+ * Calculates the continuous signal packet stream for an envelope defined by a given IShape
  */
 class LinearInterpolated implements IGenerator, IStream {
 
     private
-        /** @var Shape $oShape : input Shape */
+        /** @var IShape $oShape : input IShape */
         $oShape          = null,
 
         /** @var Packet $oOutputPacket : Buffer for signal */
@@ -28,7 +27,7 @@ class LinearInterpolated implements IGenerator, IStream {
         /** @var Packet $oFinalPacket : Fixed packet filled with the final envelope value */
         $oFinalPacket    = null,
 
-        /** @var {int, float}[] $aProcessPoints : Envelope Shape points, converted into Sample Position => Level pairs */
+        /** @var {int, float}[] $aProcessPoints : Envelope IShape points, converted into Sample Position => Level pairs */
         $aProcessPoints  = [],
 
         /** @var int[] $aProcessPoints : Indexes to the Process Points array, keyed by the Sample Position they start at  */
@@ -53,7 +52,7 @@ class LinearInterpolated implements IGenerator, IStream {
     /**
      * Constructor
      */
-    public function __construct(Shape $oShape) {
+    public function __construct(IShape $oShape) {
         $this->oShape        = $oShape;
         $this->oOutputPacket = new Packet();
         $this->oFinalPacket  = new Packet();
@@ -71,7 +70,7 @@ class LinearInterpolated implements IGenerator, IStream {
     }
 
     /**
-     * Reset the envelope. This resets the sample output position and re-evaluates the Shape in case of any changes.
+     * Reset the envelope. This resets the sample output position and re-evaluates the IShape in case of any changes.
      *
      * @return self
      */

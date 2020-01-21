@@ -3,7 +3,6 @@
 namespace ABadCafe\Synth\Envelope;
 
 use \Countable;
-use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,50 +21,41 @@ interface ILimits {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Basic shape definition. Defines a list of points and levels.
- */
-class Shape implements Countable {
-
-    private $aPoints = [
-        0 => [0, 0]
-    ];
+interface IShape extends Countable {
 
     /**
-     * @inheritdoc
+     * Set the initial envelope level
+     *
+     * @param  float $fLevel
+     * @return self  fluent
      */
-    public function count() : int {
-        return count($this->aPoints);
-    }
-
-    public function initial(float $fLevel) : self {
-        $this->aPoints[0][0] = $fLevel;
-        return $this;
-    }
+    public function initial(float $fLevel) : IShape;
 
     /**
      * Appends a new control point to the envelope as a level/time pair. The time dictates how long, in seconds, it takes
      * to reach the new level. This value is clamped between the limits specified in ILimits
      *
-     * @param float $fLevel - the level to reach
-     * @param float $fTime  - the time, in seconds, required to reach the new level
+     * @param  float $fLevel - the level to reach
+     * @param  float $fTime  - the time, in seconds, required to reach the new level
+     * @return self          - fluent
      */
-    public function append(float $fLevel, float $fTime) : self {
-        $this->aPoints[] = [
-            $fLevel,
-            min(max($fTime, ILimits::F_MIN_TIME), ILimits::F_MAX_TIME)
-        ];
-        return $this;
-    }
+    public function append(float $fLevel, float $fTime) : IShape;
 
     /**
      * Returns the set of control points
      *
-     * @return float[][]
+     * @return float[][2]
      */
-    public function getAll() : array {
-        return $this->aPoints;
-    }
+    public function getAll() : array;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+interface IGenerator {
+    public function emit() : Packet;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+require_once 'envelope/Shape.php';
 require_once 'envelope/Generator.php';

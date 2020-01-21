@@ -25,14 +25,14 @@ class Context {
      * Throws if called more than once as the initialisation is global and should not be changed.
      *
      * @param  int $iProcessRate
-     * @param  int $iPacketLength
+     * @param  int $iPacketLengthExp
      * @throws LogicException
      */
-    public static function init(int $iProcessRate, int $iPacketLength) {
+    public static function init(int $iProcessRate, int $iPacketLengthExp) {
         if (self::$oInstance) {
             throw new LogicException('Context already initialised');
         }
-        self::$oInstance = new self($iProcessRate, $iPacketLength);
+        self::$oInstance = new self($iProcessRate, 1<<$iPacketLengthExp);
     }
 
     /**

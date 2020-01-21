@@ -99,6 +99,20 @@ class Packet {
     }
 
     /**
+     * Sum the values in this packet with the values in another, premultiplied by the scale
+     *
+     * @param  Packet $oPacket
+     * @param  float  $fScale
+     * @return Packet fluent
+     */
+    public function accumulate(Packet $oPacket, float $fScale) : self {
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue + $oPacket->oValues[$i] * $fScale;
+        }
+        return $this;
+    }
+
+    /**
      * Subtract the values in the provided packed with those in this packet
      *
      * @param  Packet $oPacket
