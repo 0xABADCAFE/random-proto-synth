@@ -46,13 +46,6 @@ interface IOscillator {
     public function setFrequency(float $fFrequency) : self;
 
     /**
-     * Generate a Packet of signal
-     *
-     * @return Packet
-     */
-    public function emit() : Packet;
-
-    /**
      * Generate a Packet of signal, applying the input Packet of phase modulation to the
      * internal generator.
      *

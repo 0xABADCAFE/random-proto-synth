@@ -1,0 +1,69 @@
+	.file	"vec.cpp"
+	.section	.rodata
+.LC1:
+	.string	"Allocated %d at %p\n"
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB2:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	pushq	%rbx
+	subq	$24, %rsp
+	.cfi_offset 3, -24
+	movl	$256, %edi
+	call	_Znwm
+	movq	%rax, %rbx
+	pxor	%xmm0, %xmm0
+	movq	%rbx, %rdi
+	call	_ZN6PacketILi64EEC1Ef
+	movq	%rbx, -24(%rbp)
+	movl	$256, %ecx
+	movq	-24(%rbp), %rax
+	movq	%rax, %rdx
+	movl	%ecx, %esi
+	movl	$.LC1, %edi
+	movl	$0, %eax
+	call	printf
+	movq	-24(%rbp), %rax
+	movq	%rax, %rdi
+	call	_ZdlPv
+	movl	$0, %eax
+	addq	$24, %rsp
+	popq	%rbx
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE2:
+	.size	main, .-main
+	.section	.text._ZN6PacketILi64EEC2Ef,"axG",@progbits,_ZN6PacketILi64EEC5Ef,comdat
+	.align 2
+	.weak	_ZN6PacketILi64EEC2Ef
+	.type	_ZN6PacketILi64EEC2Ef, @function
+_ZN6PacketILi64EEC2Ef:
+.LFB4:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movq	%rdi, -8(%rbp)
+	movss	%xmm0, -12(%rbp)
+	nop
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE4:
+	.size	_ZN6PacketILi64EEC2Ef, .-_ZN6PacketILi64EEC2Ef
+	.weak	_ZN6PacketILi64EEC1Ef
+	.set	_ZN6PacketILi64EEC1Ef,_ZN6PacketILi64EEC2Ef
+	.ident	"GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20160609"
+	.section	.note.GNU-stack,"",@progbits

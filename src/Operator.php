@@ -3,17 +3,13 @@
 namespace ABadCafe\Synth\Operator;
 
 use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Oscillator\IOscillator;
-use ABadCafe\Synth\Envelope\IGenerator as IEnvelopeGenerator;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Interface for Operators. Operators combine Oscillators and Envelopes along with the notion of input modulators.
  */
-interface IOperator {
+interface IOperator extends IStream {
 
     /**
      * Attach an Operator as an amplitude modulator. The overall strength of the modulation is controlled by the index
@@ -37,85 +33,16 @@ interface IOperator {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Simple implements IOperator, IStream {
-
-    protected
-        $iInstance,
-        $oOscillator,
-        $oEnvelope,
-        $aModulators               = [],
-        $aPhaseModulationIndex     = [],
-        $aAmplitudeModulationIndex = []
-    ;
-
-    protected static $iNextInstance = 0;
-
-    public function __construct(
-        IOscillator        $oOscillator,
-        IEnvelopeGenerator $oEnvelope
-    ) {
-        $this->oOscillator = $oOscillator;
-        $this->oEnvelope   = $oEnvelope;
-        $this->iInstance   = self::$iNextInstance++;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPosition() : int {
-        return $this->oOscillator->getPosition();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function reset() : IStream {
-        $this->oOscillator->reset();
-        $this->oEnvelope->reset();
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attachAmplitudeModulator(
-        IOperator $oOperator,
-        float $fIndex
-    ) : IOperator {
-        $this->aModulators[$oOperator->iInstance] = $oOperator;
-        $this->aAmplitudeModulationIndex[$oOperator->iInstance] = $fIndex;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attachPhaseModulator(
-        IOperator $oOperator,
-        float $fIndex
-    ) : IOperator {
-        $this->aModulators[$oOperator->iInstance] = $oOperator;
-        $this->aPhaseModulationIndex[$oOperator->iInstance] = $fIndex;
-        return $this;
-    }
-
-    /**
-     * Emit a packet
-     */
-    public function emit() : Packet {
-        $oPhaseAccumulator     = empty($this->aPhaseModulationIndex)     ? null : new Packet();
-        $oAmplitudeAccumulator = empty($this->aAmplitudeModulationIndex) ? null : new Packet();
-        foreach ($this->aModulators as $iInstance => $oOperator) {
-            $oPacket = $oOperator->emit();
-            if (isset($this->aPhaseModulationIndex[$iInstance])) {
-                $oPhaseAccumulator->accumulate($oPacket, $this->aPhaseModulationIndex[$iInstance]);
-            }
-            if (isset($this->aAmplitudeModulationIndex[$iInstance])) {
-                $oAmplitudeAccumulator->accumulate($oPacket, $this->aAmplitudeModulationIndex[$iInstance]);
-            }
-        }
-        $oOscillatorPacket = $oPhaseAccumulator     ? $this->oOscillator->emitPhaseModulated($oPhaseAccumulator) : $this->oOscillator->emit();
-        $oEnvelopePacket   = $oAmplitudeAccumulator ? $this->oEnvelope->emit()->modulateWith($oPhaseAccumulator) : $this->oEnvelope->emit();
-        return $oOscillatorPacket->modulateWith($this->oEnvelope->emit());
-    }
+/**
+ * Interface for output Operators. These handle the terminating carrier operators and sum their outputs.
+ */
+interface IOutputOperator extends IStream {
+    public function attachOperator(IOperator $oOperator, float $fLevel) : self;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+require_once 'Utility.php';
+require_once 'operator/Simple.php';
+require_once 'operator/Output.php';
+

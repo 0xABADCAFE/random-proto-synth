@@ -51,6 +51,11 @@ interface IStream {
      * Reset the stream
      */
     public function reset() : self;
+
+    /**
+     * Emit a Packet
+     */
+    public function emit() : Packet;
 }
 
 require_once 'signal/Context.php';
