@@ -27,7 +27,13 @@ abstract class Base implements IOscillator, IStream {
         $fFrequency,
 
         /** @var float $fScaleVal */
-        $fScaleVal
+        $fScaleVal,
+
+        /** @var SPLFixedArray $oPhaseShift */
+        $oPhaseShift,
+
+        /** @var SPLFixedArray $oPitchShift */
+        $oPitchShift
     ;
 
     /**
@@ -85,6 +91,8 @@ abstract class Base implements IOscillator, IStream {
      */
     public function reset() : IStream {
         $this->iSamplePosition = 0;
+        $this->oPhaseShift     = null;
+        $this->oPitchShift     = null;
         return $this;
     }
 
@@ -97,6 +105,38 @@ abstract class Base implements IOscillator, IStream {
     public function setFrequency(float $fFrequency) : IOscillator {
         $this->fFrequency = $this->clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
         $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency / (float)Context::get()->getProcessRate();
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPitchModulation(Packet $oPitch = null) : IOscillator {
+        if ($oPitch) {
+            $this->oPitchShift = clone $oPitch->getValues();
+            foreach ($this->oPitchShift as $i => $fValue) {
+                $this->oPitchShift[$i] = $this->fScaleVal * (2 ** $fValue);
+            }
+        } else {
+            $this->oPitchShift = null;
+        }
+        return $this;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function setPhaseModulation(Packet $oPhase = null) : IOscillator {
+        if ($oPhase) {
+            $fPhaseSize = $this->oGenerator->getPeriod();
+            $this->oPhaseShift = clone $oPhase->getValues();
+            foreach ($this->oPhaseShift as $i => $fValue) {
+                $this->oPhaseShift[$i] = $fValue * $fPhaseSize;
+            }
+        } else {
+            $this->oPhaseShift = null;
+        }
         return $this;
     }
 

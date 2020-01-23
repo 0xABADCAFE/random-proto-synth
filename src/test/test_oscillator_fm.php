@@ -52,14 +52,19 @@ $oOutput->open('output/test_fm.wav');
 
 $fStart = microtime(true);
 do {
-    $oOutput->write(
-        $oCarrier->emitPhaseModulated(
-            $oModulator->emitPhaseModulated(
-                $oLFO->emit()
-            )->modulateWith(
+    $oModulator->setPhaseModulation(
+        $oLFO->emit()
+    );
+    $oCarrier->setPhaseModulation(
+        $oModulator
+            ->emit()
+            ->modulateWith(
                 $oModulatorEnvelope->emit()
             )
-        )->modulateWith(
+    );
+
+    $oOutput->write(
+        $oCarrier->emit()->modulateWith(
             $oCarrierEnvelope->emit()
         )
     );

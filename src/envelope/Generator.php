@@ -51,6 +51,8 @@ class LinearInterpolated implements IGenerator, IStream {
 
     /**
      * Constructor
+     *
+     * @param IShape $oShape
      */
     public function __construct(IShape $oShape) {
         $this->oShape        = $oShape;
@@ -72,7 +74,7 @@ class LinearInterpolated implements IGenerator, IStream {
     /**
      * Reset the envelope. This resets the sample output position and re-evaluates the IShape in case of any changes.
      *
-     * @return self
+     * @return IStream
      */
     public function reset() : IStream {
         $this->iSamplePosition = 0;
@@ -91,7 +93,7 @@ class LinearInterpolated implements IGenerator, IStream {
         }
         $oLastPoint = end($this->aProcessPoints);
 
-        // Pad on the last point again with a slight time offset. This ensures th interpolant code is always acting between a pair
+        // Pad on the last point again with a slight time offset. This ensures the interpolant code is always acting between a pair
         // of points and avoids wandering off the end of the array.
         $this->aProcessPoints[$i] = (object)[
             'iStart' => $oLastPoint->iStart + 16,

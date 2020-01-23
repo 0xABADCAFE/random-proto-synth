@@ -46,13 +46,30 @@ interface IOscillator {
     public function setFrequency(float $fFrequency) : self;
 
     /**
-     * Generate a Packet of signal, applying the input Packet of phase modulation to the
-     * internal generator.
+     * Set a pitch shift, per sample to be applied to the basic frequency. This is applied in subsequent calls to emit().
+     * The intent here is to support pitch envelope generators. However, as this is applied per sample point, we can use
+     * it to do some extreme FM effects too.
      *
-     * @param  Packet $iPhase
-     * @return Packet
+     * The Packet data points are interpreted as octaves to shift by, for example, -1 is an octave down, +1 is an octave up.
+     *
+     * @param  Packet $oPitch
+     * @return self
      */
-    public function emitPhaseModulated(Packet $iPhase) : Packet;
+    public function setPitchModulation(Packet $oPitch = null) : self;
+
+
+    /**
+     * Set a phase moulation, per sample, to be applied to the basic waveform. This is applied in subseuent calls to emit().
+     * The intent here is to allow Phase Modulation based FM synthesis.
+     *
+     * The packet data points are interpreted as duty cycle values to shift by. For example, -1 is one full period behind, +1 is
+     * one full period ahead.
+     *
+     * @param Packet $oPitch
+     * @return self
+     */
+    public function setPhaseModulation(Packet $oPhase = null) : self;
+
 }
 
 require_once 'oscillator/Base.php';

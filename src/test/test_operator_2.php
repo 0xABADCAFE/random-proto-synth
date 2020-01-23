@@ -74,6 +74,17 @@ $oCarrier1 = new Operator\Simple(
                 [ 0, 1]
             ]
         )
+    ),
+
+    // Pitch Envelope
+    new Envelope\Generator\LinearInterpolated(
+        new Envelope\Shape(
+            0,              // Initial Level
+            [                 // Level / Time Pairs
+                [1, 0.5],
+                [0, 0.5]
+            ]
+        )
     )
 );
 

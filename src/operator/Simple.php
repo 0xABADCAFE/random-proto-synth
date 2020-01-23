@@ -20,8 +20,11 @@ class Simple implements IOperator, IEnumeratedInstance {
         /** @var IOscillator $oOscillator */
         $oOscillator,
 
-        /** @var IEnvelopeGenerator $oEnvelope */
-        $oEnvelope,
+        /** @var IEnvelopeGenerator $oAmplitudeEnvelope */
+        $oAmplitudeEnvelope,
+
+        /** @var IEnvelopeGenerator $oPitchEnvelope */
+        $oPitchEnvelope,
 
         /** @var Packet $oLastPacket */
         $oLastPacket,
@@ -39,12 +42,21 @@ class Simple implements IOperator, IEnumeratedInstance {
         $iPacketIndex              = 0
     ;
 
+    /**
+     * Constructor
+     *
+     * @param IOscillator             $oOscillator        : Waveform generator to use    (required)
+     * @param IEnvelopeGenerator      $oAmplitudeEnvelope : Amplitude Envelope Generator (required)
+     * @param IEnvelopeGenerator|null $oPitchEnvelope     : Pitch Envelope Generator     (optional)
+     */
     public function __construct(
         IOscillator        $oOscillator,
-        IEnvelopeGenerator $oEnvelope
+        IEnvelopeGenerator $oAmplitudeEnvelope,
+        IEnvelopeGenerator $oPitchEnvelope = null
     ) {
-        $this->oOscillator = $oOscillator;
-        $this->oEnvelope   = $oEnvelope;
+        $this->oOscillator        = $oOscillator;
+        $this->oAmplitudeEnvelope = $oAmplitudeEnvelope;
+        $this->oPitchEnvelope     = $oPitchEnvelope;
         $this->assignInstanceID();
     }
 
@@ -60,7 +72,7 @@ class Simple implements IOperator, IEnumeratedInstance {
      */
     public function reset() : IStream {
         $this->oOscillator->reset();
-        $this->oEnvelope->reset();
+        $this->oAmplitudeEnvelope->reset();
         $this->iPacketIndex = 0;
         return $this;
     }
@@ -124,10 +136,19 @@ class Simple implements IOperator, IEnumeratedInstance {
                 $oAmplitudeAccumulator->accumulate($oPacket, $this->aAmplitudeModulationIndex[$iInstanceID]);
             }
         }
-        $oOscillatorPacket  = $oPhaseAccumulator     ? $this->oOscillator->emitPhaseModulated($oPhaseAccumulator) : $this->oOscillator->emit();
-        $oEnvelopePacket    = $oAmplitudeAccumulator ? $this->oEnvelope->emit()->modulateWith($oPhaseAccumulator) : $this->oEnvelope->emit();
-        $this->oLastPacket  = $oOscillatorPacket->modulateWith($this->oEnvelope->emit());
-        $this->iPacketIndex = $iPacketIndex;
+
+        if ($oPhaseAccumulator) {
+            $this->oOscillator->setPhaseModulation($oPhaseAccumulator);
+        }
+
+        if ($this->oPitchEnvelope) {
+            $this->oOscillator->setPitchModulation($this->oPitchEnvelope->emit());
+        }
+
+        $oOscillatorPacket        = $this->oOscillator->emit();
+        $oAmplitudeEnvelopePacket = $oAmplitudeAccumulator ? $this->oAmplitudeEnvelope->emit()->modulateWith($oAmplitudeAccumulator) : $this->oAmplitudeEnvelope->emit();
+        $this->oLastPacket        = $oOscillatorPacket->modulateWith($this->oAmplitudeEnvelope->emit());
+        $this->iPacketIndex       = $iPacketIndex;
         return $this->oLastPacket;
     }
 }
