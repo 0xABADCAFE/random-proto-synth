@@ -20,6 +20,10 @@ class Simple extends Base {
         $oValues = $this->oGeneratorInput->getValues();
         // This is a bit messy
         if ($this->oPitchShift) {
+
+            $fValue1   = $this->oPitchShift[0];
+            $fTimeStep = 1.0 / Context::get()->getProcessRate();
+            $fPeriod   = $this->oGenerator->getPeriod();
             if ($this->oPhaseShift) {
                 // Apply Pitch shift and Phase modulation. Note that the Pitch Shift array already factors in fScaleVal
                 foreach ($oValues as $i => $fValue) {
@@ -27,8 +31,16 @@ class Simple extends Base {
                 }
             } else {
                 // Apply pitch shift only
-                foreach ($oValues as $i => $fValue) {
-                    $oValues[$i] = ($this->oPitchShift[$i] * $this->iSamplePosition++);
+                foreach ($oValues as $i => $fDummy) {
+                    $fValue2 = $this->oPitchShift[$i];
+                    $fTime = $this->iSamplePosition++ * $fTimeStep;
+                    $fDiff = $fValue2 - $fValue1;
+
+                    $oValues[$i] = $fPeriod * (
+                        ($fTime * $fValue1) +
+                        ($fDiff * $fTime * $fTime / 2 * $fTimeStep)
+                    );
+                    $fValue1 = $fValue2;
                 }
             }
         } else if ($this->oPhaseShift) {

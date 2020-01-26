@@ -115,7 +115,7 @@ abstract class Base implements IOscillator, IStream {
         if ($oPitch) {
             $this->oPitchShift = clone $oPitch->getValues();
             foreach ($this->oPitchShift as $i => $fValue) {
-                $this->oPitchShift[$i] = $this->fScaleVal * (2 ** $fValue);
+                $this->oPitchShift[$i] = $this->fFrequency * (2 ** $fValue);
             }
         } else {
             $this->oPitchShift = null;
