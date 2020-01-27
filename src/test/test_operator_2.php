@@ -14,9 +14,8 @@ const I_TIME = 4;
 
 $iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
 
-
 // Specify a simple sinewave based operator at 55Hz
-$oModulator1 = new Operator\Simple(
+$oModulator1 = new Operator\ModulatedOscillator(
     // Oscillator
 
     new Oscillator\Simple(
@@ -40,7 +39,7 @@ $oModulator1 = new Operator\Simple(
 );
 
 // Specify a simple sinewave based operator at 3Hz for some vibrato
-$oModulator2 = new Operator\Simple(
+$oModulator2 = new Operator\ModulatedOscillator(
     // Oscillator
 
     new Oscillator\Simple(
@@ -57,7 +56,7 @@ $oModulator2 = new Operator\Simple(
 );
 
 // Specify a carrier operator using a morphing wave oscillator that changes from sine to square, at 220Hz.
-$oCarrier1 = new Operator\Simple(
+$oCarrier1 = new Operator\ModulatedOscillator(
 
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
@@ -89,7 +88,7 @@ $oCarrier1 = new Operator\Simple(
 );
 
 // Specify a carrier operator using a morphing wave oscillator that changes from sine to square, at 220Hz.
-$oCarrier2 = new Operator\Simple(
+$oCarrier2 = new Operator\ModulatedOscillator(
 
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
@@ -109,27 +108,28 @@ $oCarrier2 = new Operator\Simple(
     )
 );
 
+
 $oModulator1
-    ->attachPhaseModulator($oModulator2, 10);
+    ->attachPhaseModulatorInput($oModulator2, 10);
 
 // Define the Algorithm...
 $oCarrier1
-    ->attachPhaseModulator($oModulator1, 0.5)
-    ->attachPhaseModulator($oModulator2, 0.2)
+    ->attachPhaseModulatorInput($oModulator1, 0.5)
+    ->attachPhaseModulatorInput($oModulator2, 0.2)
 ;
 
 // Define the Algorithm...
 $oCarrier2
-    ->attachPhaseModulator($oModulator1, 0.2)
-    ->attachPhaseModulator($oModulator2, 0.5)
+    ->attachPhaseModulatorInput($oModulator1, 0.2)
+    ->attachPhaseModulatorInput($oModulator2, 0.5)
 ;
 
-// Define the final summing
+// Define the final summing output
 $oOutput = new Operator\PCMOutput(new Output\Wav);
 $oOutput
-    ->attachOperator($oModulator1, 0.1) // For fun, let's include a 10% mix of the direct output of this operator
-    ->attachOperator($oCarrier1, 0.65)
-    ->attachOperator($oCarrier2, 0.25)
+    ->attachSignalInput($oModulator1, 0.1) // For fun, let's include a 10% mix of the direct output of this operator
+    ->attachSignalInput($oCarrier1, 0.65)
+    ->attachSignalInput($oCarrier2, 0.25)
 ;
 
 $oOutput->open('output/operator2.wav');
