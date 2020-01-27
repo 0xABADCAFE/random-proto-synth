@@ -20,23 +20,23 @@ $oOscillator = new Oscillator\Morphing(
 );
 
 
-$oFreqEnvelope = new Envelope\Generator\LinearInterpolated(
+$oCutoffEnvelope = new Envelope\Generator\LinearInterpolated(
     new Envelope\Shape(
-    	    0.5, [
-    	        [0.99, 0.05],
-    	        [0.1, 0.2],
-    	    	   [0.01, 2],
-    	    	   [1, 1],
-    	    	   [0.05, 1]
-    	    ]
+        0.5, [
+            [0.99, 0.05],
+            [0.1, 0.2],
+                [0.01, 2],
+                [1, 1],
+                [0.05, 1]
+        ]
     )
 );
 
-$oResEnvelope = new Envelope\Generator\LinearInterpolated(
+$oResonanceEnvelope = new Envelope\Generator\LinearInterpolated(
     new Envelope\Shape(
-    	    2, [
-    	        [3.8, 2]
-    	    ]
+        0.5, [
+            [0.9, 2]
+        ]
     )
 );
 
@@ -48,13 +48,14 @@ $oOutput->open('output/test_filter.wav');
 $oFilter = new Signal\Filter\ResonantLowPass;
 
 do {
-   $oOutput->write(
-       $oFilter->filter(
-           $oOscillator->emit(),
-           $oFreqEnvelope->emit(),
-           $oResEnvelope->emit()
-       )
-   );
+    $oFilter
+        ->setCutoffControl($oCutoffEnvelope->emit())
+        ->setResonanceControl($oResonanceEnvelope->emit());
+    $oOutput->write(
+        $oFilter->filter(
+            $oOscillator->emit()
+        )
+    );
 } while ($oOscillator->getPosition() < $iMaxSamples);
 
 $oOutput->close();

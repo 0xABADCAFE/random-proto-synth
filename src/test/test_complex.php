@@ -21,36 +21,16 @@ $oModulator1 = new Operator\ModulatedOscillator(
 
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
-        1987
+        55
     ),
     // Envelope
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
-            1,                // Initial Level
+            0,                // Initial Level
             [
-                [ 1/2, 0.5],
-                [ 1/4, 0.5],
-                [ 1/8, 0.5],
-                [ 1/16, 0.5],
-                [ 1/32, 0.5],
+                [1, 4],
+                [0, 4]
             ]
-        )
-    )
-);
-
-// Specify a simple sinewave based operator at 3Hz for some vibrato
-$oModulator2 = new Operator\ModulatedOscillator(
-    // Oscillator
-
-    new Oscillator\Simple(
-        new Signal\Generator\Sine(),
-        3
-    ),
-    // Envelope
-    new Envelope\Generator\LinearInterpolated(
-        new Envelope\Shape(
-            1,                // Initial Level
-            []
         )
     )
 );
@@ -59,43 +39,56 @@ $oModulator2 = new Operator\ModulatedOscillator(
 $oCarrier = new Operator\ModulatedOscillator(
 
     new Oscillator\Simple(
-        new Signal\Generator\Sine(),
-        440
+        new Signal\Generator\Square(),
+        220
     ),
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             1,              // Initial Level
             [                 // Level / Time Pairs
-                [ 1/2, 1],
-                [ 1/4, 1],
-                [ 1/8, 1],
-                [ 1/16, 1],
-                [ 0, 1]
+                [0.5, 5]
             ]
         )
     )
 );
 
+$oFilter = new Operator\EnvelopedFilter(
+    new Signal\Filter\ResonantLowPass(),
+    // Envelope
+    new Envelope\Generator\LinearInterpolated(
+        new Envelope\Shape(
+            0.1,// Initial Level
+            [
+                [0.5, 4],
+                [0.1, 4]
+            ]
+        )
+    ),
+    new Envelope\Generator\LinearInterpolated(
+        new Envelope\Shape(
+            0,// Initial Level
+            [
+                [0.5, 1],
+            ]
+        )
+    )
+);
 
 // Define the Algorithm...
-$oCarrier
-    ->attachPhaseModulatorInput($oModulator1, 0.5)
-    ->attachPhaseModulatorInput($oModulator2, 0.2)
-;
+$oCarrier->attachPhaseModulatorInput($oModulator1, 1);
+$oFilter->attachSignalInput($oCarrier, 1);
 
 // Define the final summing output
 $oOutput = new Operator\PCMOutput(new Output\Wav);
 $oOutput
-    ->attachSignalInput($oCarrier, 1)
+    ->attachSignalInput($oFilter, 1.0)
+    ->open('output/test_complex.wav')
 ;
-$oOutput->open('output/operator.wav');
 
 $fStart = microtime(true);
-
 do {
     $oOutput->emit();
-} while ($oOutput->getPosition() < $iMaxSamples);
-
+} while ($oFilter->getPosition() < $iMaxSamples);
 $fElapsed = microtime(true) - $fStart;
 
 $oOutput->close();

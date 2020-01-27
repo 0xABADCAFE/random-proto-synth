@@ -28,5 +28,8 @@ Envelopes are used to control the output level of an Oscillator over time. Envel
 
 Envelopes are applied to oscillator output by using the Packet modulate behaviour.
 
-### Outputs
-Outputs represent render targets for signal data, such as a PCM stream. It is at the output stage where final signal quantisation to some integer sample format is performed.
+### Operators
+Operators are interconnectable units for generation and processing of signals.
+- Summing Outputs : Combine the output of multiple operators into a single channel
+- Filters : Combines the output of multiple operators and passes through envelope controlled filters
+- Modulated Oscillators : Combines the output of multiple operators to be used as amplitue or phase modulation to an envelope controlled oscillator.
