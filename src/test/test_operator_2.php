@@ -14,7 +14,7 @@ const I_TIME = 4;
 
 $iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
 
-// Specify a simple sinewave based operator at 55Hz
+// Specify a simple sinewave based operator at some unrelated frequency for the metallics.
 $oModulator1 = new Operator\ModulatedOscillator(
     // Oscillator
 
@@ -80,8 +80,8 @@ $oCarrier1 = new Operator\ModulatedOscillator(
         new Envelope\Shape(
             0,              // Initial Level
             [                 // Level / Time Pairs
-                [1, 0.5],
-                [0, 0.5]
+                [1/12, 2],
+                [0, 2]
             ]
         )
     )

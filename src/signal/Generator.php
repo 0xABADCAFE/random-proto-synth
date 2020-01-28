@@ -260,7 +260,25 @@ class SawDown extends SawUp {
  */
 class Triangle implements IGenerator {
 
-    const F_PERIOD = 1.0;
+    const F_PERIOD = 2.0;
+
+    protected
+        $fMinLevel,
+        $fScaleLevel
+    ;
+
+    /**
+     * @param float $fMinLevel
+     * @param float $fMaxLevel
+     */
+    public function __construct(
+        float $fMinLevel = ILimits::F_MIN_LEVEL_NO_CLIP,
+        float $fMaxLevel = ILimits::F_MAX_LEVEL_NO_CLIP
+    ) {
+        $this->fMinLevel   = $fMinLevel;
+        $this->fScaleLevel = $fMaxLevel - $fMinLevel;
+    }
+
 
     /**
      * @inheritdoc
@@ -273,11 +291,13 @@ class Triangle implements IGenerator {
      * @inheritdoc
      */
     public function map(Packet $oInput) : Packet {
-        // TODO - actual triangle generator
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = -($this->fScaleLevel * ($fValue - floor($fValue)) + $this->fMinLevel);
+            $fValue -= 0.5;
+            $fFloor = floor($fValue);
+            $fSign  = (int)$fFloor & 1 ? 1 : -1;
+            $oValues[$i] = $fSign*($this->fScaleLevel * ($fValue - $fFloor) + $this->fMinLevel);
         }
         return $oOutput;
     }
