@@ -23,8 +23,14 @@ abstract class Base implements IOscillator, IStream {
         /** @var int $iSamplePosition */
         $iSamplePosition = 0,
 
-        /** @var float $fFrequency */
+        /** @var float $fFrequency - The base frequency */
         $fFrequency,
+
+        /** @var float $fCurrentFequency - The present instantaneous frequency considering any pitch control */
+        $fCurrentFrequency,
+
+        /** @var float $fPhaseCorrection - The accumulated phase difference as a result of pitch control */
+        $fPhaseCorrection,
 
         /** @var float $fScaleVal */
         $fScaleVal,
@@ -90,9 +96,11 @@ abstract class Base implements IOscillator, IStream {
      * @return self
      */
     public function reset() : IStream {
-        $this->iSamplePosition = 0;
-        $this->oPhaseShift     = null;
-        $this->oPitchShift     = null;
+        $this->iSamplePosition  = 0;
+        $this->oPhaseShift      = null;
+        $this->oPitchShift      = null;
+        $this->fCurrentFreqency = $this->fFrequency;
+        $this->fPhaseAdjustment = 0;
         return $this;
     }
 
@@ -104,7 +112,7 @@ abstract class Base implements IOscillator, IStream {
      */
     public function setFrequency(float $fFrequency) : IOscillator {
         $this->fFrequency = $this->clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
-        $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency / (float)Context::get()->getProcessRate();
+        $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency * Context::get()->getSamplePeriod();
         return $this;
     }
 
@@ -113,9 +121,10 @@ abstract class Base implements IOscillator, IStream {
      */
     public function setPitchModulation(Packet $oPitch = null) : IOscillator {
         if ($oPitch) {
+            // Convert the linear octave based shifts into absolute multiples of the base frequency
             $this->oPitchShift = clone $oPitch->getValues();
             foreach ($this->oPitchShift as $i => $fValue) {
-                $this->oPitchShift[$i] = $this->fScaleVal * (2 ** $fValue);
+                $this->oPitchShift[$i] = $this->fFrequency * (2 ** $fValue);
             }
         } else {
             $this->oPitchShift = null;

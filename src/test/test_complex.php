@@ -12,7 +12,7 @@ require_once '../Output.php';
 
 const I_TIME = 4;
 
-$iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
+$iMaxSamples = (I_TIME * 2) * Signal\Context::get()->getProcessRate();
 
 
 // Specify a simple sinewave based operator at 55Hz
@@ -21,15 +21,26 @@ $oModulator1 = new Operator\ModulatedOscillator(
 
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
-        55
+        220
     ),
-    // Envelope
+    // Amplitude
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             0,                // Initial Level
             [
                 [1, 4],
-                [0, 4]
+                [0, 4],
+                [0.5, 6]
+            ]
+        )
+    ),
+
+    // Pitch
+    new Envelope\Generator\LinearInterpolated(
+        new Envelope\Shape(
+            0,              // Initial Level
+            [                 // Level / Time Pairs
+                [-3, I_TIME]
             ]
         )
     )
@@ -40,8 +51,9 @@ $oCarrier = new Operator\ModulatedOscillator(
 
     new Oscillator\Simple(
         new Signal\Generator\Square(),
-        220
+        440
     ),
+    // Amplitude
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             1,              // Initial Level
@@ -49,21 +61,59 @@ $oCarrier = new Operator\ModulatedOscillator(
                 [0.5, 5]
             ]
         )
+    ),
+    // Pitch
+    new Envelope\Generator\LinearInterpolated(
+        new Envelope\Shape(
+            0,              // Initial Level
+            [                 // Level / Time Pairs
+                [-3, I_TIME]
+            ]
+        )
+    )
+);
+
+// Specify a carrier operator using a morphing wave oscillator that changes from sine to square, at 220Hz.
+$oCarrier2 = new Operator\ModulatedOscillator(
+
+    new Oscillator\Simple(
+        new Signal\Generator\SawDown(),
+        444
+    ),
+    // Amplitude
+    new Envelope\Generator\LinearInterpolated(
+        new Envelope\Shape(
+            0.25,              // Initial Level
+            [                 // Level / Time Pairs
+                [0.75, I_TIME]
+            ]
+        )
+    ),
+    // Pitch
+    new Envelope\Generator\LinearInterpolated(
+        new Envelope\Shape(
+            0,              // Initial Level
+            [                 // Level / Time Pairs
+                [-3, I_TIME]
+            ]
+        )
     )
 );
 
 $oFilter = new Operator\EnvelopedFilter(
     new Signal\Filter\ResonantLowPass(),
-    // Envelope
+    // Cutoff
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             0.1,// Initial Level
             [
-                [0.5, 4],
-                [0.1, 4]
+                [1, 1],
+                [0.1, 4],
+                [0.01, 4]
             ]
         )
     ),
+    // Resonance
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             0,// Initial Level
@@ -75,8 +125,10 @@ $oFilter = new Operator\EnvelopedFilter(
 );
 
 // Define the Algorithm...
-$oCarrier->attachPhaseModulatorInput($oModulator1, 1);
-$oFilter->attachSignalInput($oCarrier, 1);
+$oCarrier->attachPhaseModulatorInput($oModulator1, 2);
+$oFilter
+    ->attachSignalInput($oCarrier, 1)
+    ->attachSignalInput($oCarrier2, 1);
 
 // Define the final summing output
 $oOutput = new Operator\PCMOutput(new Output\Wav);

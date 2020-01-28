@@ -17,7 +17,8 @@ class Context {
 
     private
         $iProcessRate,
-        $iPacketLength
+        $iPacketLength,
+        $fSamplePeriod
     ;
 
     /**
@@ -69,6 +70,15 @@ class Context {
     }
 
     /**
+     * Get the duration of a sample, in seconds (i.e. 1 / process rate)
+     * 
+     * @return float
+     */
+    public function getSamplePeriod() : float {
+        return $this->fSamplePeriod;
+    }
+
+    /**
      * Private constructor
      *
      * @param  int $iProcessRate
@@ -100,5 +110,6 @@ class Context {
         }
         $this->iProcessRate  = $iProcessRate;
         $this->iPacketLength = $iPacketLength;
+        $this->fSamplePeriod = 1.0 / (float)$iProcessRate;
     }
 }

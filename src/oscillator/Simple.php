@@ -18,29 +18,29 @@ class Simple extends Base {
     public function emit() : Packet {
 
         $oValues = $this->oGeneratorInput->getValues();
-        // This is a bit messy
-        if ($this->oPitchShift) {
-            if ($this->oPhaseShift) {
-                // Apply Pitch shift and Phase modulation. Note that the Pitch Shift array already factors in fScaleVal
-                foreach ($oValues as $i => $fValue) {
-                    $oValues[$i] = ($this->oPitchShift[$i] * $this->iSamplePosition++) + $this->oPhaseShift[$i];
-                }
-            } else {
-                // Apply pitch shift only
-                foreach ($oValues as $i => $fValue) {
-                    $oValues[$i] = ($this->oPitchShift[$i] * $this->iSamplePosition++);
-                }
-            }
-        } else if ($this->oPhaseShift) {
-            // Apply Phase modulation
-            foreach ($oValues as $i => $fValue) {
-                $oValues[$i] = ($this->fScaleVal * $this->iSamplePosition++) + $this->oPhaseShift[$i];
 
+        if ($this->oPitchShift) {
+            // Every sample point has a new frequency, we must also correct the phase for every sample point.
+            // The phase correction is accumulated, which is equivalent to integrating over the time step.
+            $fCyclePeriod  = $this->oGenerator->getPeriod();
+            $fSamplePeriod = Context::get()->getSamplePeriod();
+            foreach ($this->oPitchShift as $i => $fNextFrequency) {
+                $fTime                   = $fCyclePeriod * $fSamplePeriod * $this->iSamplePosition++;
+                $oValues[$i]             = ($this->fCurrentFrequency * $fTime) + $this->fPhaseCorrection;
+                $this->fPhaseCorrection += $fTime * ($this->fCurrentFrequency - $fNextFrequency);
+                $this->fCurrentFrequency = $fNextFrequency;
             }
         } else {
-            // No modulation at all
+            // Basic linear intervals, there is no phase adjustment
             foreach ($oValues as $i => $fValue) {
                 $oValues[$i] = $this->fScaleVal * $this->iSamplePosition++;
+            }
+        }
+
+        // Apply phase modulation
+        if ($this->oPhaseShift) {
+            foreach ($this->oPhaseShift as $i => $fPhase) {
+                $oValues[$i] += $fPhase;
             }
         }
 
@@ -48,4 +48,3 @@ class Simple extends Base {
     }
 
 }
-

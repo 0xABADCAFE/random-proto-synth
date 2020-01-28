@@ -56,6 +56,8 @@ use ABadCafe\Synth\Signal\ILimits as SignalLimits;
 
     /**
      * @inheritdoc
+     *
+     * @todo - Reimplement to apply pitch and phase modulation as in the Simple oscillator.
      */
     public function emit() : Packet {
         $oValues          = $this->oGeneratorInput->getValues();
@@ -79,6 +81,8 @@ use ABadCafe\Synth\Signal\ILimits as SignalLimits;
 
     /**
      * @inheritdoc
+     *
+     * @todo - remove. See emit()
      */
     public function emitPhaseModulated(Packet $oPhase) : Packet {
         $oValues             = $this->oGeneratorInput->getValues();
