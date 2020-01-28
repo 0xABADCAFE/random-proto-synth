@@ -61,3 +61,4 @@ interface IStream {
 require_once 'signal/Context.php';
 require_once 'signal/Packet.php';
 require_once 'signal/Generator.php';
+require_once 'signal/Filter.php';

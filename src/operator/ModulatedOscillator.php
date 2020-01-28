@@ -7,14 +7,15 @@ use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Oscillator\IOscillator;
 use ABadCafe\Synth\Envelope\IGenerator as IEnvelopeGenerator;
-use ABadCafe\Synth\Utility\IEnumeratedInstance;
-use ABadCafe\Synth\Utility\TEnumeratedInstance;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Simple implements IOperator, IEnumeratedInstance {
-
-    use TEnumeratedInstance;
+/**
+ * ModulatedOscillator
+ *
+ * Simple modulatable Operator implementation. Supports E_AMPLITUDE and E_PHASE modulation inputs.
+ */
+class ModulatedOscillator extends Base implements IAmplitudeModulated, IPhaseModulated {
 
     protected
         /** @var IOscillator $oOscillator */
@@ -26,9 +27,6 @@ class Simple implements IOperator, IEnumeratedInstance {
         /** @var IEnvelopeGenerator $oPitchEnvelope */
         $oPitchEnvelope,
 
-        /** @var Packet $oLastPacket */
-        $oLastPacket,
-
         /** @var IOperator[] $aModulators - keyed by instance ID */
         $aModulators               = [],
 
@@ -36,10 +34,8 @@ class Simple implements IOperator, IEnumeratedInstance {
         $aPhaseModulationIndex     = [],
 
         /** @var float[] $aAmplidudeModulationIndex - keyed by instance ID */
-        $aAmplitudeModulationIndex = [],
+        $aAmplitudeModulationIndex = []
 
-        /** @var int $iPacketIndex */
-        $iPacketIndex              = 0
     ;
 
     /**
@@ -79,37 +75,43 @@ class Simple implements IOperator, IEnumeratedInstance {
 
     /**
      * @inheritdoc
+     *
+     * This Operator only accepts modulating inputs. An E_SIGNAL input will be interpreted E_AMPLITUDE.
      */
-    public function attachAmplitudeModulator(
+    public function attachInput(
         IOperator $oOperator,
-        float $fIndex
+        float     $fLevel,
+        InputKind $oKind = null
     ) : IOperator {
-        $this->aModulators[$oOperator->iInstanceID] = $oOperator;
-        $this->aAmplitudeModulationIndex[$oOperator->iInstanceID] = $fIndex;
+        $iKind = $oKind ? $oKind->getValue() : InputKind::E_PHASE;
+        switch ($oKind->getValue()) {
+            case InputKind::E_SIGNAL;
+            case InputKind::E_AMPLITUDE:
+                return $this->attachAmplitudeModulatorInput($oOperator, $fLevel);
+            case InputKind::E_PHASE:
+                return $this->attachPhaseModulatorInput($oOperator, $fLevel);;
+        }
         return $this;
     }
 
     /**
      * @inheritdoc
+     * @see IAmplitudeModulated
      */
-    public function attachPhaseModulator(
-        IOperator $oOperator,
-        float $fIndex
-    ) : IOperator {
-        $this->aModulators[$oOperator->iInstanceID] = $oOperator;
-        $this->aPhaseModulationIndex[$oOperator->iInstanceID] = $fIndex;
+    public function attachAmplitudeModulatorInput(IOperator $oOperator, float $fLevel) : IAmplitudeModulated {
+        $this->aModulators[$oOperator->iInstanceID]               = $oOperator;
+        $this->aAmplitudeModulationIndex[$oOperator->iInstanceID] = $fLevel;
         return $this;
-    }
-
-    public function dump() {
-
     }
 
     /**
      * @inheritdoc
+     * @see IPhaseModulated
      */
-    public function emit() : Packet {
-        return $this->emitPacketForIndex($this->iPacketIndex + 1);
+    public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : IPhaseModulated {
+        $this->aModulators[$oOperator->iInstanceID]           = $oOperator;
+        $this->aPhaseModulationIndex[$oOperator->iInstanceID] = $fLevel;
+        return $this;
     }
 
     /**
@@ -146,7 +148,10 @@ class Simple implements IOperator, IEnumeratedInstance {
         }
 
         $oOscillatorPacket        = $this->oOscillator->emit();
-        $oAmplitudeEnvelopePacket = $oAmplitudeAccumulator ? $this->oAmplitudeEnvelope->emit()->modulateWith($oAmplitudeAccumulator) : $this->oAmplitudeEnvelope->emit();
+        $oAmplitudeEnvelopePacket = $oAmplitudeAccumulator ?
+            $this->oAmplitudeEnvelope->emit()->modulateWith($oAmplitudeAccumulator) :
+            $this->oAmplitudeEnvelope->emit()
+        ;
         $this->oLastPacket        = $oOscillatorPacket->modulateWith($this->oAmplitudeEnvelope->emit());
         $this->iPacketIndex       = $iPacketIndex;
         return $this->oLastPacket;

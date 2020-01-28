@@ -7,64 +7,18 @@ use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 use AbadCafe\Synth\Output\IPCMOutput;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////s
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Basic summing output implementation of IOutputOperator
+ * PCMOutput
+ *
+ * Extension of the basic Summing operator that pushes to an IPCMOutput stream.
  */
-class Output implements IOutputOperator {
-
-    /** @var IOperator[] $aOperators */
-    private $aOperators = [];
-
-    /** @var float[] $aLevels */
-    private $aLevels    = [];
-
-    /** @var int $iPosotion */
-    private $iPosition  = 0;
-
-    /**
-     * @inheritdoc
-     */
-    public function attachOperator(IOperator $oOperator, float $fLevel) : IOutputOperator {
-        $iInstanceID = $oOperator->getInstanceID();
-        $this->aOperators[$iInstanceID] = $oOperator;
-        $this->aLevels[$iInstanceID]    = $fLevel;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function emit() : Packet {
-        $oPacket = new Packet();
-        foreach ($this->aOperators as $iInstanceID => $oOperator) {
-            $oPacket->accumulate($oOperator->emit(), $this->aLevels[$iInstanceID]);
-        }
-        $this->iPosition += Context::get()->getPacketLength();
-        return $oPacket;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function reset() : IStream {
-        $this->iPosition = 0;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPosition() : int {
-        return $this->iPosition;
-    }
-
-}
-
-/**
- * Extension of the basic Output that uses an IPCMOutput stream for writing
- */
-class PCMOutput extends Output {
+class PCMOutput extends Summing {
 
     /** @var IPCMOutput $oOutput */
     private $oPCMOutput;
@@ -75,6 +29,7 @@ class PCMOutput extends Output {
      * @param IPCMOutput $oPCMOutput
      */
     public function __construct(IPCMOutput $oPCMOutput) {
+        parent::__construct();
         $this->oPCMOutput = $oPCMOutput;
     }
 
@@ -97,6 +52,7 @@ class PCMOutput extends Output {
 
     /**
      * @inheritdoc
+     * @see IStream
      */
     public function emit() : Packet {
         $oPacket = parent::emit();

@@ -20,13 +20,16 @@ trait TEnumeratedInstance {
 
     /** @var int */
     private static $iNextInstanceID = 0;
-    private $iInstanceID = 0;
+    protected $iInstanceID = 0;
 
-    private function assignInstanceID() {
+    protected function assignInstanceID() {
         $this->iInstanceID = ++self::$iNextInstanceID;
         echo self::class, ":", $this->iInstanceID, "\n";
     }
 
+    /**
+     * Get the instance ID associated with this entity
+     */
     public function getInstanceID() : int {
         return $this->iInstanceID;
     }
