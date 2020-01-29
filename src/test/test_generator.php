@@ -13,6 +13,7 @@ $aGenerators = [
     'square'   => new Signal\Generator\Square(),
     'saw_up'   => new Signal\Generator\SawUp(),
     'saw_down' => new Signal\Generator\SawDown(),
+    'triangle' => new Signal\Generator\Triangle()
 ];
 
 const I_STEPS = 16;

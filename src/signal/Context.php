@@ -5,6 +5,8 @@ namespace ABadCafe\Synth\Signal;
 use \LogicException;
 use \RangeException;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Context Singleton
  *
@@ -16,24 +18,33 @@ class Context {
     private static $oInstance = null;
 
     private
+        /** @var int $iProcessRate */
         $iProcessRate,
+
+        /** @var int $iPacketLength */
         $iPacketLength,
+
+        /** @var float $fSamplePeriod */
         $fSamplePeriod
     ;
 
     /**
-     * One time initialisation. If this is not called before we first obtain the context, the defaults will be used.
-     * Throws if called more than once as the initialisation is global and should not be changed.
+     * One-time initialisation. If this is not called before we first obtain the context, the defaults will be used.
+     * Throws if called more than once as the initialisation is global and should not be changed. The Packet length
+     * will be resized to an appropriate power of 2.
      *
-     * @param  int $iProcessRate
-     * @param  int $iPacketLengthExp
+     * @param  int $iProcessRate  (Hz)
+     * @param  int $iPacketLength (Samples)
      * @throws LogicException
      */
-    public static function init(int $iProcessRate, int $iPacketLengthExp) {
+    public static function init(int $iProcessRate, int $iPacketLength) {
         if (self::$oInstance) {
             throw new LogicException('Context already initialised');
         }
-        self::$oInstance = new self($iProcessRate, 1<<$iPacketLengthExp);
+        self::$oInstance = new self(
+            $iProcessRate,
+            1 << (int)round(log($iPacketLength, 2))
+        );
     }
 
     /**
@@ -71,7 +82,7 @@ class Context {
 
     /**
      * Get the duration of a sample, in seconds (i.e. 1 / process rate)
-     * 
+     *
      * @return float
      */
     public function getSamplePeriod() : float {

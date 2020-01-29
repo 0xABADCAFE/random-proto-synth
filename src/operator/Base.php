@@ -41,5 +41,5 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      * @return Packet
      */
     protected abstract function emitPacketForIndex(int $iPacketIndex) : Packet;
-}
 
+}

@@ -4,6 +4,7 @@ namespace ABadCafe\Synth\Oscillator;
 
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Generator\IGenerator;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,6 +15,7 @@ use ABadCafe\Synth\Signal\Generator\IGenerator;
  * Defines limits for oscillators data.
  */
 interface ILimits {
+
     const
         /**
          * Frequency Range
@@ -27,9 +29,12 @@ interface ILimits {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * IOscillator
+ *
  * Interface for Oscillators
  */
-interface IOscillator {
+interface IOscillator extends IStream {
+
     /**
      * Get the oscillator frequency in Hz
      *
@@ -57,7 +62,6 @@ interface IOscillator {
      */
     public function setPitchModulation(Packet $oPitch = null) : self;
 
-
     /**
      * Set a phase moulation, per sample, to be applied to the basic waveform. This is applied in subseuent calls to emit().
      * The intent here is to allow Phase Modulation based FM synthesis.
@@ -71,6 +75,8 @@ interface IOscillator {
     public function setPhaseModulation(Packet $oPhase = null) : self;
 
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 require_once 'oscillator/Base.php';
 require_once 'oscillator/Simple.php';

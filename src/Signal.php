@@ -2,12 +2,15 @@
 
 namespace ABadCafe\Synth\Signal;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * ILimits
  *
  * Defines limits for signal data.
  */
 interface ILimits {
+
     const
         /**
          * Level Limits
@@ -27,19 +30,22 @@ interface ILimits {
          * Packet Length Limits
          */
         I_MIN_PACKET_LENGTH = 8,
-        I_DEF_PACKET_LENGTH = 64,
-        I_MAX_PACKET_LENGTH = 256
+        I_DEF_PACKET_LENGTH = 128,
+        I_MAX_PACKET_LENGTH = 1024
     ;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * IStream
  *
- * Interface for components that generate a continuous stream of signal data,
- * such as oscillators and envelope generators.
+ * Interface for components that generate a continuous stream of signal data, such as oscillators and envelope
+ * generators.
  *
  */
 interface IStream {
+
     /**
      * Get the current stream position
      *
@@ -57,6 +63,8 @@ interface IStream {
      */
     public function emit() : Packet;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 require_once 'signal/Context.php';
 require_once 'signal/Packet.php';

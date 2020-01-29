@@ -7,25 +7,24 @@ use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Signal\Filter\IFilter;
 use ABadCafe\Synth\Signal\Filter\IResonant;
-use ABadCafe\Synth\Envelope\IGenerator as IEnvelopeGenerator;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Summing
+ * ControlledFilter
  *
  * Basic summing output implementation of IOperator. Acts as a fixed mixer.
  */
-class EnvelopedFilter extends Base implements IProcessor {
+class ControlledFilter extends Base implements IProcessor {
 
     /** @var IFilter $oFilter */
     private $oFilter;
 
-    /** @var IEnvelopeGenerator $oCutoffEnvelope */
-    private $oCutoffEnvelope    = null;
+    /** @var IStream $oCutoffControl */
+    private $oCutoffControl    = null;
 
-    /** @var IEnvelopeGenerator $oResonanceEnvelope */
-    private $oResonanceEnvelope = null;
+    /** @var IStream $oResonanceControl */
+    private $oResonanceControl = null;
 
     /** @var IOperator[] $aOperators */
     private $aOperators = [];
@@ -36,23 +35,22 @@ class EnvelopedFilter extends Base implements IProcessor {
     /** @var int $iPosotion */
     private $iPosition  = 0;
 
-
     /**
      * Constructor
      *
      * @param IFilter $oFilter
-     * @param IEnvelopeGenerator $oCutoffEnvelope    (optional)
-     * @param IEnvelopeGenerator $oResonanceEnvelope (optional)s
+     * @param IStream $oCutoffControl    (optional)
+     * @param IStream $oResonanceControl (optional)
      */
     public function __construct(
         IFilter $oFilter,
-        IEnvelopeGenerator $oCutoffEnvelope    = null,
-        IEnvelopeGenerator $oResonanceEnvelope = null
+        IStream $oCutoffControl    = null,
+        IStream $oResonanceControl = null
     ) {
-        $this->oFilter            = $oFilter;
-        $this->oLastPacket        = new Packet();
-        $this->oCutoffEnvelope    = $oCutoffEnvelope;
-        $this->oResonanceEnvelope = $oResonanceEnvelope;
+        $this->oFilter           = $oFilter;
+        $this->oLastPacket       = new Packet();
+        $this->oCutoffControl    = $oCutoffControl;
+        $this->oResonanceControl = $oResonanceControl;
         $this->assignInstanceID();
     }
 
@@ -85,11 +83,11 @@ class EnvelopedFilter extends Base implements IProcessor {
         $this->iPosition = 0;
         $this->oLastPacket->fillWith(0);
         $this->oFilter->reset();
-        if ($this->oCutoffEnvelope) {
-            $this->oCutoffEnvelope->reset();
+        if ($this->oCutoffControl) {
+            $this->oCutoffControl->reset();
         }
-        if ($this->oResonanceEnvelope) {
-            $this->oResonanceEnvelope->reset();
+        if ($this->oResonanceControl) {
+            $this->oResonanceControl->reset();
         }
         return $this;
     }
@@ -117,11 +115,11 @@ class EnvelopedFilter extends Base implements IProcessor {
             $this->oLastPacket->accumulate($oOperator->emitPacketForIndex($iPacketIndex), $this->aLevels[$iInstanceID]);
         }
 
-        if ($this->oCutoffEnvelope) {
-            $this->oFilter->setCutoffControl($this->oCutoffEnvelope->emit());
+        if ($this->oCutoffControl) {
+            $this->oFilter->setCutoffControl($this->oCutoffControl->emit());
         }
-        if ($this->oResonanceEnvelope && $this->oFilter instanceof IResonant) {
-            $this->oFilter->setResonanceControl($this->oResonanceEnvelope->emit());
+        if ($this->oResonanceControl && $this->oFilter instanceof IResonant) {
+            $this->oFilter->setResonanceControl($this->oResonanceControl->emit());
         }
 
         $this->oLastPacket = $this->oFilter->filter($this->oLastPacket);

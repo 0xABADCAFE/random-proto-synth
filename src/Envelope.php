@@ -4,6 +4,7 @@ namespace ABadCafe\Synth\Envelope;
 
 use \Countable;
 use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal\IStream;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -21,6 +22,11 @@ interface ILimits {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * IShape
+ *
+ * Basic interface for entities that define an Envelope Shape
+ */
 interface IShape extends Countable {
 
     /**
@@ -47,12 +53,33 @@ interface IShape extends Countable {
      * @return float[][2]
      */
     public function getAll() : array;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-interface IGenerator {
-    public function emit() : Packet;
+/**
+ * IGenerator
+ *
+ * Basic tag interface for Envelope Generators
+ */
+interface IGenerator extends IStream {
+
+    /**
+     * Set the envelope shape. Will trigger a reset.
+     *
+     * @param  IShape $oShape
+     * @return self   fluent
+     */
+    public function setShape(IShape $oShape) : self;
+
+    /**
+     * Get the envelope shape.
+     *
+     * @return IShape
+     */
+    public function getShape() : IShape;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -10,20 +10,18 @@ require_once '../Envelope.php';
 require_once '../Operator.php';
 require_once '../Output.php';
 
-const I_TIME = 4;
 
-$iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+$oModulator1 = new Operator\ModulatableOscillator(
 
-// Specify a simple sinewave based operator at 55Hz
-$oModulator1 = new Operator\ModulatedOscillator(
-    // Oscillator
-
+    // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
         1987
     ),
-    // Envelope
+
+    // Amplitude Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             1,                // Initial Level
@@ -38,34 +36,33 @@ $oModulator1 = new Operator\ModulatedOscillator(
     )
 );
 
-// Specify a simple sinewave based operator at 3Hz for some vibrato
-$oModulator2 = new Operator\ModulatedOscillator(
-    // Oscillator
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+$oModulator2 = new Operator\FixedOscillator(
+
+    // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
         3
-    ),
-    // Envelope
-    new Envelope\Generator\LinearInterpolated(
-        new Envelope\Shape(
-            1,                // Initial Level
-            []
-        )
     )
 );
 
-// Specify a carrier operator using a morphing wave oscillator that changes from sine to square, at 220Hz.
-$oCarrier = new Operator\ModulatedOscillator(
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Specify a carrier operator using a morphing wave oscillator that changes from sine to square, at 220Hz.
+$oCarrier = new Operator\ModulatableOscillator(
+
+    // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
         440
     ),
+
+    // Amplitude Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             1,              // Initial Level
-            [                 // Level / Time Pairs
+            [               // Level / Time Pairs
                 [ 1/2, 1],
                 [ 1/4, 1],
                 [ 1/8, 1],
@@ -76,6 +73,7 @@ $oCarrier = new Operator\ModulatedOscillator(
     )
 );
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Define the Algorithm...
 $oCarrier
@@ -83,21 +81,10 @@ $oCarrier
     ->attachPhaseModulatorInput($oModulator2, 0.2)
 ;
 
-// Define the final summing output
+// Define the final summing output and render
 $oOutput = new Operator\PCMOutput(new Output\Wav);
 $oOutput
-    ->attachSignalInput($oCarrier, 1)
-;
-$oOutput->open('output/operator.wav');
-
-$fStart = microtime(true);
-
-do {
-    $oOutput->emit();
-} while ($oOutput->getPosition() < $iMaxSamples);
-
-$fElapsed = microtime(true) - $fStart;
-
-$oOutput->close();
-
-echo "Generated ", I_TIME, " seconds in ", $fElapsed, " seconds\n";
+    ->attachSignalInput($oCarrier, 1.0)
+    ->open('output/operator.wav')
+    ->render(4.0)
+    ->close();

@@ -10,139 +10,149 @@ require_once '../Envelope.php';
 require_once '../Operator.php';
 require_once '../Output.php';
 
-const I_TIME = 4;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$iMaxSamples = (I_TIME * 2) * Signal\Context::get()->getProcessRate();
+$oModulator = new Operator\ModulatableOscillator(
 
-
-// Specify a simple sinewave based operator at 55Hz
-$oModulator1 = new Operator\ModulatedOscillator(
-    // Oscillator
-
+    // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
         220
     ),
-    // Amplitude
+
+    // Amplitude Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
-            0,                // Initial Level
+            0,                // Start at Zero amplitude
             [
-                [1, 4],
-                [0, 4],
-                [0.5, 6]
+                [1, 4],       // Max  amplitude after +4 seconds
+                [0, 4],       // Zero amplitude after +4 secpmds
+                [0.5, 6]      // Half amplitude after +6 seconds
             ]
         )
     ),
 
-    // Pitch
+    // Pitch Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
-            0,              // Initial Level
-            [                 // Level / Time Pairs
-                [-3, I_TIME]
+            0,                // Start input pitch
+            [
+                [-36, 4]       // 3 Octaves down after +4 seconds
             ]
         )
     )
 );
 
-// Specify a carrier operator using a morphing wave oscillator that changes from sine to square, at 220Hz.
-$oCarrier = new Operator\ModulatedOscillator(
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+$oCarrier = new Operator\ModulatableOscillator(
+
+    // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Square(),
         440
     ),
-    // Amplitude
+
+    // Amplitude Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
-            1,              // Initial Level
-            [                 // Level / Time Pairs
-                [0.5, 5]
+            1,                // Start at Max amplitude
+            [
+                [0.5, 5]      // Half amplitude after +5 seconds
             ]
         )
     ),
-    // Pitch
+
+    // Pitch Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
-            0,              // Initial Level
-            [                 // Level / Time Pairs
-                [-3, I_TIME]
+            0,                // Start at input pitch
+            [
+                [-36, 4]       // 3 Octaves down after +4 seconds
             ]
         )
     )
 );
 
-// Specify a carrier operator using a morphing wave oscillator that changes from sine to square, at 220Hz.
-$oCarrier2 = new Operator\ModulatedOscillator(
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+$oCarrier2 = new Operator\ModulatableOscillator(
+
+    // Wave function
     new Oscillator\Simple(
         new Signal\Generator\SawDown(),
         444
     ),
-    // Amplitude
+
+    // Amplitude Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
-            0.25,              // Initial Level
-            [                 // Level / Time Pairs
-                [0.75, I_TIME]
+            0.25,             // Start at Quarter amplitude
+            [
+                [0.75, 4]     // Three quarters amplitude after +4 seconds
             ]
         )
     ),
-    // Pitch
+
+    // Pitch Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
-            0,              // Initial Level
-            [                 // Level / Time Pairs
-                [-3, I_TIME]
+            0,                // Start at input pitch
+            [
+                [-36, 4]       // 3 octaves down after +4 seconds
             ]
         )
     )
 );
 
-$oFilter = new Operator\EnvelopedFilter(
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$oFilter = new Operator\ControlledFilter(
+
+    // Filter type
     new Signal\Filter\ResonantLowPass(),
-    // Cutoff
+
+    // Cutoff Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
-            0.1,// Initial Level
+            0.1,              // Start at 10% cutoff
             [
-                [1, 1],
-                [0.1, 4],
-                [0.01, 4]
+                [1, 1],       // Max cutoff after +1 second
+                [0.1, 4],     // 10% cutoff after +4 seconds
+                [0.01, 4]     //  1% cutoff after +4 seconds
             ]
         )
     ),
-    // Resonance
+
+    // Resonance Control
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
-            0,// Initial Level
+            0,                // Start at zero resonance
             [
-                [0.5, 1],
+                [0.5, 1],     // Half resonance after +1 seconds
             ]
         )
     )
 );
 
-// Define the Algorithm...
-$oCarrier->attachPhaseModulatorInput($oModulator1, 2);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Define the Signal Routing
+$oCarrier
+    ->attachPhaseModulatorInput($oModulator, 2);
 $oFilter
     ->attachSignalInput($oCarrier, 1)
-    ->attachSignalInput($oCarrier2, 1);
+    ->attachSignalInput($oCarrier2, 1)
+;
 
-// Define the final summing output
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Define the final summing output and render
 $oOutput = new Operator\PCMOutput(new Output\Wav);
 $oOutput
     ->attachSignalInput($oFilter, 1.0)
     ->open('output/test_complex.wav')
+    ->render(8.0)
+    ->close();
 ;
 
-$fStart = microtime(true);
-do {
-    $oOutput->emit();
-} while ($oFilter->getPosition() < $iMaxSamples);
-$fElapsed = microtime(true) - $fStart;
-
-$oOutput->close();
-
-echo "Generated ", I_TIME, " seconds in ", $fElapsed, " seconds\n";
