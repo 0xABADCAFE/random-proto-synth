@@ -10,9 +10,12 @@ require_once 'Utility.php';
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Type safe enumeration for Operator Input types.
+ * InputKund
+ *
+ * Type safe enumeration for Operator Input types. Intended for use in patch file import process.
  */
 final class InputKind {
+
     use TEnum;
 
     const
@@ -27,14 +30,18 @@ final class InputKind {
     protected function defineAllowedValues() : array {
         return [self::E_SIGNAL, self::E_AMPLITUDE, self::E_PHASE];
     }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Basic interface for Linkable Operators.
+ * IOperator
+ *
+ * Basic interface for linkable Operators. Operators combine Oscillators and control sources to sculpt sounds.
  */
 interface IOperator extends IStream {
+
     /**
      * Generic input attachment: Attaches another Operator as an input. Some Operators may support more than one
      * kind of input. This can be provied by the optional last parameter.
@@ -45,14 +52,18 @@ interface IOperator extends IStream {
      * @return self
      */
     public function attachInput(self $oOperator, float $fLevel, InputKind $oKind = null) : self;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * IProcessor
+ *
  * Tag interface for general signal processing operators, e.g. summing outputs or filters.
  */
 interface IProcessor {
+
     /**
      * Add a signal input. The output of the attached input is used as a signal source.
      * The level parameter ajusts the signal power, with 1.0 being no change.
@@ -62,14 +73,18 @@ interface IProcessor {
      * @return self
      */
     public function attachSignalInput(IOperator $oOperator, float $fLevel) : self;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * IAmplitudeModulated
+ *
  * Tag interface for operators that allow another operator's output to be used as an Amplitude Modulation source.
  */
 interface IAmplitudeModulated {
+
     /**
      * Add an Amplitude Modulator input. The level specifies the modulation index.
      *
@@ -78,14 +93,18 @@ interface IAmplitudeModulated {
      * @return self
      */
     public function attachAmplitudeModulatorInput(IOperator $oOperator, float $fLevel) : self;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * IPhaseModulated
+ *
  * Tag interface for operators that allow another operator's output to be used as a Phase Modulation source.
  */
 interface IPhaseModulated {
+
     /**
      * Add a Phase Modulator input. The level specifies the modulation index
      *
@@ -94,14 +113,33 @@ interface IPhaseModulated {
      * @return self
      */
     public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : self;
+
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * IOutput
+ *
+ * Tag interface for operators that render to output
+ */
+interface IOutput extends IProcessor {
+
+    /**
+     * Render audio. The time period requested will be converted into the nearest number of Packet lengths.
+     *
+     * @param  float $fSeconds
+     * @return self  fluent
+     */
+    public function render(float $fSeconds) : self;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 require_once 'operator/Base.php';
 require_once 'operator/Summing.php';
-require_once 'operator/ModulatedOscillator.php';
+require_once 'operator/FixedOscillator.php';
+require_once 'operator/ModulatableOscillator.php';
 require_once 'operator/Filter.php';
 require_once 'operator/Output.php';
 

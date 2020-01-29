@@ -12,7 +12,10 @@ use ABadCafe\Synth\Signal\Packet;
 /**
  * Base class for Oscillator implementations
  */
-abstract class Base implements IOscillator, IStream {
+abstract class Base implements IOscillator {
+
+    const F_INV_TWELVE = 1.0/12.0;
+
     protected
         /** @var IGenerator $oGenerator */
         $oGenerator,
@@ -121,10 +124,10 @@ abstract class Base implements IOscillator, IStream {
      */
     public function setPitchModulation(Packet $oPitch = null) : IOscillator {
         if ($oPitch) {
-            // Convert the linear octave based shifts into absolute multiples of the base frequency
+            // Convert the linear semitone based shifts into absolute multiples of the base frequency
             $this->oPitchShift = clone $oPitch->getValues();
             foreach ($this->oPitchShift as $i => $fValue) {
-                $this->oPitchShift[$i] = $this->fFrequency * (2 ** $fValue);
+                $this->oPitchShift[$i] = $this->fFrequency * (2 ** ($fValue * self::F_INV_TWELVE));
             }
         } else {
             $this->oPitchShift = null;

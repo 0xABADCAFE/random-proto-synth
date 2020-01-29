@@ -6,26 +6,25 @@ use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Oscillator\IOscillator;
-use ABadCafe\Synth\Envelope\IGenerator as IEnvelopeGenerator;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * ModulatedOscillator
+ * Modulatable
  *
  * Simple modulatable Operator implementation. Supports E_AMPLITUDE and E_PHASE modulation inputs.
  */
-class ModulatedOscillator extends Base implements IAmplitudeModulated, IPhaseModulated {
+class ModulatableOscillator extends Base implements IAmplitudeModulated, IPhaseModulated {
 
     protected
         /** @var IOscillator $oOscillator */
         $oOscillator,
 
-        /** @var IEnvelopeGenerator $oAmplitudeEnvelope */
-        $oAmplitudeEnvelope,
+        /** @var IStream $oAmplitudeControl */
+        $oAmplitudeControl,
 
-        /** @var IEnvelopeGenerator $oPitchEnvelope */
-        $oPitchEnvelope,
+        /** @var IStream $oPitchControl */
+        $oPitchControl,
 
         /** @var IOperator[] $aModulators - keyed by instance ID */
         $aModulators               = [],
@@ -35,24 +34,23 @@ class ModulatedOscillator extends Base implements IAmplitudeModulated, IPhaseMod
 
         /** @var float[] $aAmplidudeModulationIndex - keyed by instance ID */
         $aAmplitudeModulationIndex = []
-
     ;
 
     /**
      * Constructor
      *
-     * @param IOscillator             $oOscillator        : Waveform generator to use    (required)
-     * @param IEnvelopeGenerator      $oAmplitudeEnvelope : Amplitude Envelope Generator (required)
-     * @param IEnvelopeGenerator|null $oPitchEnvelope     : Pitch Envelope Generator     (optional)
+     * @param IOscillator  $oOscillator       : Waveform generator to use   (required)
+     * @param IStream|null $oAmplitudeControl : Amplitude Envelope Generator (optional)
+     * @param IStream|null $oPitchControl     : Pitch Envelope Generator     (optional)
      */
     public function __construct(
-        IOscillator        $oOscillator,
-        IEnvelopeGenerator $oAmplitudeEnvelope,
-        IEnvelopeGenerator $oPitchEnvelope = null
+        IOscillator $oOscillator,
+        IStream     $oAmplitudeControl  = null,
+        IStream     $oPitchControl      = null
     ) {
-        $this->oOscillator        = $oOscillator;
-        $this->oAmplitudeEnvelope = $oAmplitudeEnvelope;
-        $this->oPitchEnvelope     = $oPitchEnvelope;
+        $this->oOscillator       = $oOscillator;
+        $this->oAmplitudeControl = $oAmplitudeControl;
+        $this->oPitchControl     = $oPitchControl;
         $this->assignInstanceID();
     }
 
@@ -68,7 +66,12 @@ class ModulatedOscillator extends Base implements IAmplitudeModulated, IPhaseMod
      */
     public function reset() : IStream {
         $this->oOscillator->reset();
-        $this->oAmplitudeEnvelope->reset();
+        if ($this->oAmplitudeControl) {
+            $this->oAmplitudeControl->reset();
+        }
+        if ($this->oPitchControl) {
+            $this->oPitchControl->reset();
+        }
         $this->iPacketIndex = 0;
         return $this;
     }
@@ -139,20 +142,30 @@ class ModulatedOscillator extends Base implements IAmplitudeModulated, IPhaseMod
             }
         }
 
+        // Apply any phase modulation
         if ($oPhaseAccumulator) {
             $this->oOscillator->setPhaseModulation($oPhaseAccumulator);
         }
 
-        if ($this->oPitchEnvelope) {
-            $this->oOscillator->setPitchModulation($this->oPitchEnvelope->emit());
+        // Apply any pitch control
+        if ($this->oPitchControl) {
+            $this->oOscillator->setPitchModulation($this->oPitchControl->emit());
         }
 
-        $oOscillatorPacket        = $this->oOscillator->emit();
-        $oAmplitudeEnvelopePacket = $oAmplitudeAccumulator ?
-            $this->oAmplitudeEnvelope->emit()->modulateWith($oAmplitudeAccumulator) :
-            $this->oAmplitudeEnvelope->emit()
-        ;
-        $this->oLastPacket        = $oOscillatorPacket->modulateWith($this->oAmplitudeEnvelope->emit());
+        // Get the raw oscillator output
+        $oOscillatorPacket = $this->oOscillator->emit();
+
+        // Apply any amplitude control
+        if ($this->oAmplitudeControl) {
+            $oOscillatorPacket->modulateWith($this->oAmplitudeControl->emit());
+        }
+
+        // Apply any amplitude modulation
+        if ($oAmplitudeAccumulator) {
+            $oOscillatorPacket->modulateWith($oAmplitudeAccumulator);
+        }
+
+        $this->oLastPacket        = $oOscillatorPacket;
         $this->iPacketIndex       = $iPacketIndex;
         return $this->oLastPacket;
     }

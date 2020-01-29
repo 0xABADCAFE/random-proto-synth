@@ -15,7 +15,7 @@ use ABadCafe\Synth\Envelope\IGenerator;
  *
  * Calculates the continuous signal packet stream for an envelope defined by a given IShape
  */
-class LinearInterpolated implements IGenerator, IStream {
+class LinearInterpolated implements IGenerator {
 
     private
         /** @var IShape $oShape : input IShape */
@@ -60,6 +60,23 @@ class LinearInterpolated implements IGenerator, IStream {
         $this->oFinalPacket  = new Packet();
         $this->reset();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getShape() : IShape {
+        return $this->oShape;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setShape(IShape $oShape) : IGenerator {
+        $this->oShape = $oShape;
+        $this->reset();
+        return $this;
+    }
+
 
     /**
      * Get the oscillator sample position, which is the total number of samples generated since

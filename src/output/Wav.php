@@ -80,6 +80,15 @@ class Wav implements IPCMOutput {
         ) {
             throw new IOException();
         }
+        fprintf(
+            STDERR,
+            "%s opened %s for output, using %d channel(s) at %d Hz, %d bits\n",
+            self::class,
+            $sPath,
+            $this->iNumChannels,
+            $this->iSampleRate,
+            $this->iBitsPerSample
+        );
         $this->reserveHeader();
     }
 
@@ -99,7 +108,7 @@ class Wav implements IPCMOutput {
      */
     public function write(Packet $oPacket) {
         $aOutput = $oPacket
-             ->quantize($this->iQuantize, -$this->iQuantize, $this->iQuantize)
+            ->quantize($this->iQuantize, -$this->iQuantize, $this->iQuantize)
             ->toArray();
         fwrite($this->rOutput, pack('v*', ...$aOutput));
     }

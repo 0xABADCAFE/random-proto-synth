@@ -9,6 +9,7 @@ require_once '../Output.php';
 
 $iMaxSamples = 5 * Signal\Context::get()->getProcessRate();
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $oOscillator = new Oscillator\Morphing(
     new Signal\Generator\Square(),
@@ -19,6 +20,7 @@ $oOscillator = new Oscillator\Morphing(
     1
 );
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $oCutoffEnvelope = new Envelope\Generator\LinearInterpolated(
     new Envelope\Shape(
@@ -32,6 +34,8 @@ $oCutoffEnvelope = new Envelope\Generator\LinearInterpolated(
     )
 );
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 $oResonanceEnvelope = new Envelope\Generator\LinearInterpolated(
     new Envelope\Shape(
         0.5, [
@@ -40,9 +44,9 @@ $oResonanceEnvelope = new Envelope\Generator\LinearInterpolated(
     )
 );
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $oOutput = new Output\Wav;
-
 $oOutput->open('output/test_filter.wav');
 
 $oFilter = new Signal\Filter\ResonantLowPass;
