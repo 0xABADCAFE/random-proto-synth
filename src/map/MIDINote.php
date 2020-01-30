@@ -2,30 +2,125 @@
 
 namespace ABadCafe\Synth\Map\Note;
 
-use ABadCafe\Synth\Map\MIDIByteMap;
+use ABadCafe\Synth\Map\MIDIByte;
 use \OutOfBoundsException;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * INumber
+ * IMIDINumber
  *
- * Enumerates significant notes
+ * Enumerates MIDI note numbers
  */
-interface INumber {
+interface IMIDINumber {
     const
-        A4 = 69; // LMAO
+        CENTRE_REFERENCE = 69; // LMAO: A4
+
+    /**
+     * Invokes mapByte() for a named note
+     *
+     * @param  string $sNote
+     * @return float
+     * @throws OutOfBoundsException
+     */
+    public function mapNote(string $sNode) : float;
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * TwelveToneMap
+ * IMIDINumberAware
+ *
+ * Interface for component systems that use Map\Note\IMIDINumber entities
+ */
+interface IMIDINumberAware {
+
+    /**
+     * Set a new Note Map
+     *
+     * @param  IMIDINumber
+     * @return self
+     */
+    public function setNoteNumberMap(IMIDINumber $oNoteMap) : self;
+
+    /**
+     * Get the current Note Map
+     *
+     * @return IMIDINumber
+     */
+    public function getNoteNumberMap() : IMIDINumber;
+
+    /**
+     * Set the note number to use. The expectation is that the consuming class will use the Note Map to derive some
+     * control paramter base on the note.
+     *
+     * @param  int $iNote
+     * @return self
+     * @throws OutOfRangeException
+     */
+    public function setNoteNumber(int $iNote) : self;
+
+    /**
+     * Set the note to use, by name. The expectation is that the consuming class will use the Note Map to derive some
+     * control paramter base on the note.
+     *
+     * @param  string $sNote
+     * @return self
+     * @throws OutOfBoundsException
+     */
+    public function setNoteName(string $sNote) : self;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Invariant
+ *
+ * Used to allow IMIDINumberAware implementors to have a default "do nothing" map. All note values map to 1.0
+ */
+class Invariant extends MIDIByte implements IMIDINumber {
+
+    private static $oInstance = null;
+
+    /**
+     * Singleton
+     *
+     * @retuurn self
+     */
+    public static function get() : self {
+        if (!self::$oInstance) {
+            self::$oInstance = new self;
+        }
+        return self::$oInstance;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function mapNote(string $sNode) : float {
+        return 1.0;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function populateMap() {
+        for ($i = self::I_MIN_SINGLE_BYTE_VALUE; $i <= self::I_MAX_SINGLE_BYTE_VALUE; ++$i) {
+            $this->oMap[$i] = 1.0;
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * TwelveTone
  *
  * Base class for all Twelve Tone Map classes. This defines all the allowed note names, mapping them back to a
  * compatible MIDI note number and provies a method for getting a mapped value by note name.
  */
-abstract class TwelveToneMap extends MIDIByteMap implements INumber {
+abstract class TwelveTone extends MIDIByte implements IMIDINumber {
 
     /** @const int I_SEMIS_PER_OCTAVE */
     const I_SEMIS_PER_OCTAVE = 12;
@@ -45,7 +140,7 @@ abstract class TwelveToneMap extends MIDIByteMap implements INumber {
         'A#1'  =>   34, 'Bb1'  =>  34, 'B1'   =>  35,
 
         'C2'   =>   36, 'C#2'  =>  37, 'Db2'  =>  37, 'D2'   =>  38, 'D#2'  =>  39, 'Eb2'  =>  39, 'E2'   =>  40,
-        'F2'   =>   41, 'F#2'  =>  42, 'Gb2'  =>   42, 'G2'  =>  43, 'G#2'  =>  44, 'Ab2'  =>  44, 'A2'   =>  45,
+        'F2'   =>   41, 'F#2'  =>  42, 'Gb2'  =>  42, 'G2'   =>  43, 'G#2'  =>  44, 'Ab2'  =>  44, 'A2'   =>  45,
         'A#2'  =>   46, 'Bb2'  =>  46, 'B2'   =>  47,
 
         'C3'   =>   48, 'C#3'  =>  49, 'Db3'  =>  49, 'D3'   =>  50, 'D#3'  =>  51, 'Eb3'  =>  51, 'E3'   =>  52,
@@ -97,11 +192,11 @@ abstract class TwelveToneMap extends MIDIByteMap implements INumber {
      * Invokes mapByte() for a named note
      *
      * @param  string $sNote
-     * @return mixed
+     * @return float
      * @throws OutOfBoundsException
      */
-    public function mapNote(string $sNode) {
-        return $this->mapByte(self::getNoteNumber($sNode));
+    public function mapNote(string $sNote) : float {
+        return $this->mapByte(self::getNoteNumber($sNote));
     }
 }
 
@@ -110,16 +205,58 @@ abstract class TwelveToneMap extends MIDIByteMap implements INumber {
 /**
  * TwelveToneEqualTemperament
  *
- * Maps note number to a multiplier (centred on A4)
+ * Maps note number to a multiplier (centred on A4) where the the multiplier has a set value at the CENTRE_REFERNCE
+ * note and scales up and down per octave based on a scaling rate.
  */
-class TwelveToneEqualTemperament extends TwelveToneMap {
+class TwelveToneEqualTemperament extends TwelveTone {
+
+    private
+        $fCentreValue,
+        $fScalePerOctave
+    ;
+
+    /**
+     * Constructor
+     *
+     * @param float $fCentreValue    - Defines the value at the CENTRE_REFERENCE note
+     * @param float $fScalePerOctave - Defines the scaling per octave; 1.0 gives a standard doubling per octave.
+     *
+     */
+    public function __construct(
+        float $fCentreValue    = 1.0,
+        float $fScalePerOctave = 1.0
+    ) {
+        $this->fCentreValue    = $fCentreValue;
+        $this->fScalePerOctave = $fScalePerOctave;
+        parent::__construct();
+    }
+
+    /**
+     * Get the centre value, i.e. the value for the CENTRE_REFERENCE note number.
+     *
+     * @return float
+     */
+    public function getCentreValue() : float {
+        return $this->fCentreValue;
+    }
+
+    /**
+     * Get the scale per octave value.
+     *
+     * @return float
+     */
+    public function getScalePerOctave() : float {
+        return $this->fScalePerOctave;
+    }
 
     /**
      * @inheritdoc
      */
     protected function populateMap() {
         for ($i = self::I_MIN_SINGLE_BYTE_VALUE; $i <= self::I_MAX_SINGLE_BYTE_VALUE; ++$i) {
-            $this->oMap[$i] = (2**(($i - self::A4) / self::I_SEMIS_PER_OCTAVE));
+            $this->oMap[$i] = $this->fCentreValue * (2**(
+                $this->fScalePerOctave * ($i - self::CENTRE_REFERENCE) / self::I_SEMIS_PER_OCTAVE)
+            );
         }
     }
 }

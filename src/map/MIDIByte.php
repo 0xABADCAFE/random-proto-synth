@@ -5,22 +5,26 @@ namespace ABadCafe\Synth\Map;
 use \SPLFixedArray;
 use \OutOfRangeException;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Limits for MIDI Maps
  */
-interface IMIDIByteMapLimits {
+interface IMIDIByteLimits {
     const
         I_MIN_SINGLE_BYTE_VALUE = 0,
         I_MAX_SINGLE_BYTE_VALUE = 127
     ;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * MIDIByteMap
  *
- * Base class for MIDI based byte maps
+ * Base class for MIDI based byte maps, in which a byte number maps to some controlling value.
  */
-abstract class MIDIByteMap implements IMIDIByteMapLimits {
+abstract class MIDIByte implements IMIDIByteLimits {
 
     /** @var SPLFixedArray $oMap */
     protected $oMap;
@@ -36,13 +40,14 @@ abstract class MIDIByteMap implements IMIDIByteMapLimits {
     }
 
     /**
-     * Map an input byte to a value. There is no return type enforced as the value will be entirely dependent on what the map contains.
+     * Map an input byte to a value. The value must be expressable as a floating point number but the meaning of
+     * the value depends on what the Map contains.
      *
      * @param  int $iByte
-     * @return mixed
+     * @return float
      * @throws OutOfRangeException
      */
-    public function mapByte(int $iByte) {
+    public function mapByte(int $iByte) : float {
         $this->assertByteRange($iByte);
         return $this->oMap[$iByte];
     }

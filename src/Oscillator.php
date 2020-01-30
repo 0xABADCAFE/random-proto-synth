@@ -21,8 +21,8 @@ interface ILimits {
          * Frequency Range
          */
         F_MIN_FREQ = 1.0/60.0,
-        F_MAX_FREQ = 3520.0,
-        F_DEF_FREQ = 440.0
+        F_DEF_FREQ = 440.0,      // A4 : Standard Concert Pitch
+        F_MAX_FREQ = 14080.0     // A9
     ;
 }
 

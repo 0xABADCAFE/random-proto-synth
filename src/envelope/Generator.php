@@ -8,6 +8,10 @@ use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Envelope\IShape;
 use ABadCafe\Synth\Envelope\IGenerator;
 
+use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
+use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
+use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -15,11 +19,17 @@ use ABadCafe\Synth\Envelope\IGenerator;
  *
  * Calculates the continuous signal packet stream for an envelope defined by a given IShape
  */
-class LinearInterpolated implements IGenerator {
+class LinearInterpolated implements IGenerator, IMIDINoteMapAware {
 
     private
         /** @var IShape $oShape : input IShape */
         $oShape          = null,
+
+        /** @var IMIDINoteMap $oKeyScaleMap */
+        $oKeyScaleMap   = null,
+
+        /** @var int $iNoteNumber */
+        $iNoteNumber    = IMIDINoteMap::CENTRE_REFERENCE,
 
         /** @var Packet $oOutputPacket : Buffer for signal */
         $oOutputPacket   = null,
@@ -54,10 +64,14 @@ class LinearInterpolated implements IGenerator {
      *
      * @param IShape $oShape
      */
-    public function __construct(IShape $oShape) {
+    public function __construct(
+        IShape       $oShape,
+        IMIDINoteMap $oKeyScaleMap = null
+    ) {
         $this->oShape        = $oShape;
         $this->oOutputPacket = new Packet();
         $this->oFinalPacket  = new Packet();
+        $this->oKeyScaleMap  = $oKeyScaleMap ?: InvariantNoteMap::get();
         $this->reset();
     }
 
@@ -95,30 +109,7 @@ class LinearInterpolated implements IGenerator {
      */
     public function reset() : IStream {
         $this->iSamplePosition = 0;
-        $this->aProcessPoints  = [];
-        $iProcessRate = Context::get()->getProcessRate();
-        $fTimeTotal   = 0.0;
-        $i = 0;
-        foreach ($this->oShape->getAll() as $aPoint) {
-            $fTimeTotal += $aPoint[1];
-            $iPosition = (int)($fTimeTotal * $iProcessRate);
-            $this->aProcessIndexes[$iPosition] = $i;
-            $this->aProcessPoints[$i++] = (object)[
-                'iStart' => $iPosition,
-                'fLevel' => $aPoint[0]
-            ];
-        }
-        $oLastPoint = end($this->aProcessPoints);
-
-        // Pad on the last point again with a slight time offset. This ensures the interpolant code is always acting between a pair
-        // of points and avoids wandering off the end of the array.
-        $this->aProcessPoints[$i] = (object)[
-            'iStart' => $oLastPoint->iStart + 16,
-            'fLevel' => $oLastPoint->fLevel
-        ];
-
-        $this->iLastPosition = $oLastPoint->iStart;
-        $this->oFinalPacket->fillWith($oLastPoint->fLevel);
+        $this->recalculate();
         return $this;
     }
 
@@ -147,6 +138,70 @@ class LinearInterpolated implements IGenerator {
             $oValues[$i] = $this->fYOffset + (++$this->iSamplePosition - $this->iXOffset)*$this->fGradient;
         }
         return $this->oOutputPacket;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNoteNumberMap(IMIDINoteMap $oKeyScaleMap) : IMIDINoteMapAware {
+        $this->oKeyScaleMap = $oKeyScaleMap;
+        $this->recalculate();
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getNoteNumberMap() : IMIDINoteMap {
+        return $this->oKeyScaleMap;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
+        $this->recalculate();
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNoteName(string $sNote) : IMIDINoteMapAware {
+        $this->recalculate();
+        return $this;
+    }
+
+    /**
+     * Recalculate the internal process points
+     *
+     * @todo - Use the note map to scale the timing
+     */
+    private function recalculate() {
+        $this->aProcessPoints  = [];
+        $iProcessRate = Context::get()->getProcessRate();
+        $fTimeTotal   = 0.0;
+        $i = 0;
+        foreach ($this->oShape->getAll() as $aPoint) {
+            $fTimeTotal += $aPoint[1];
+            $iPosition = (int)($fTimeTotal * $iProcessRate);
+            $this->aProcessIndexes[$iPosition] = $i;
+            $this->aProcessPoints[$i++] = (object)[
+                'iStart' => $iPosition,
+                'fLevel' => $aPoint[0]
+            ];
+        }
+        $oLastPoint = end($this->aProcessPoints);
+
+        // Pad on the last point again with a slight time offset. This ensures the interpolant code is always acting between a pair
+        // of points and avoids wandering off the end of the array.
+        $this->aProcessPoints[$i] = (object)[
+            'iStart' => $oLastPoint->iStart + 16,
+            'fLevel' => $oLastPoint->fLevel
+        ];
+
+        $this->iLastPosition = $oLastPoint->iStart;
+        $this->oFinalPacket->fillWith($oLastPoint->fLevel);
     }
 
     /**
