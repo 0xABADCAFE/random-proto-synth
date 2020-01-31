@@ -8,6 +8,10 @@ use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Envelope\IShape;
 use ABadCafe\Synth\Envelope\IGenerator;
 
+use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
+use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
+use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -17,9 +21,26 @@ use ABadCafe\Synth\Envelope\IGenerator;
  */
 class LinearInterpolated implements IGenerator {
 
+    const A_MAPS = [
+        self::S_NOTE_MAP_SPEED => true,
+        self::S_NOTE_MAP_LEVEL => true
+    ];
+
     private
         /** @var IShape $oShape : input IShape */
         $oShape          = null,
+
+        /** @var IMIDINoteMap[] $aNoteMaps - keyed by use case */
+        $aNoteMaps       = [],
+
+        /** @var int $iNoteNumber */
+        $iNoteNumber     = IMIDINoteMap::CENTRE_REFERENCE,
+
+        /** @var float $fTimeScale */
+        $fTimeScale      = 1.0,
+
+        /** @var float $fAmplitude Scale */
+        $fLevelScale = 1.0,
 
         /** @var Packet $oOutputPacket : Buffer for signal */
         $oOutputPacket   = null,
@@ -52,12 +73,27 @@ class LinearInterpolated implements IGenerator {
     /**
      * Constructor
      *
-     * @param IShape $oShape
+     * Accepts the basic envelope shape and a pair of optional note maps that are used to scale the speed and level of the envelope points
+     * depending on the note number.
+     *
+     * @param IShape            $oShape
+     * @param IMIDINoteMap|null $oNoteMapSpeed (optional)
+     * @param IMIDINoteMap|null $oNoteMapLevel (optional)
      */
-    public function __construct(IShape $oShape) {
+    public function __construct(
+        IShape       $oShape,
+        IMIDINoteMap $oNoteMapSpeed = null,
+        IMIDINoteMap $oNoteMapLevel = null
+    ) {
         $this->oShape        = $oShape;
         $this->oOutputPacket = new Packet();
         $this->oFinalPacket  = new Packet();
+        if ($oNoteMapSpeed) {
+            $this->aNoteMaps[self::S_NOTE_MAP_SPEED] = $oNoteMapSpeed;
+        }
+        if ($oNoteMapLevel) {
+            $this->aNoteMaps[self::S_NOTE_MAP_LEVEL] = $oNoteMapLevel;
+        }
         $this->reset();
     }
 
@@ -77,7 +113,6 @@ class LinearInterpolated implements IGenerator {
         return $this;
     }
 
-
     /**
      * Get the oscillator sample position, which is the total number of samples generated since
      * instantiation or the last call to reset().
@@ -95,30 +130,7 @@ class LinearInterpolated implements IGenerator {
      */
     public function reset() : IStream {
         $this->iSamplePosition = 0;
-        $this->aProcessPoints  = [];
-        $iProcessRate = Context::get()->getProcessRate();
-        $fTimeTotal   = 0.0;
-        $i = 0;
-        foreach ($this->oShape->getAll() as $aPoint) {
-            $fTimeTotal += $aPoint[1];
-            $iPosition = (int)($fTimeTotal * $iProcessRate);
-            $this->aProcessIndexes[$iPosition] = $i;
-            $this->aProcessPoints[$i++] = (object)[
-                'iStart' => $iPosition,
-                'fLevel' => $aPoint[0]
-            ];
-        }
-        $oLastPoint = end($this->aProcessPoints);
-
-        // Pad on the last point again with a slight time offset. This ensures the interpolant code is always acting between a pair
-        // of points and avoids wandering off the end of the array.
-        $this->aProcessPoints[$i] = (object)[
-            'iStart' => $oLastPoint->iStart + 16,
-            'fLevel' => $oLastPoint->fLevel
-        ];
-
-        $this->iLastPosition = $oLastPoint->iStart;
-        $this->oFinalPacket->fillWith($oLastPoint->fLevel);
+        $this->recalculate();
         return $this;
     }
 
@@ -128,7 +140,6 @@ class LinearInterpolated implements IGenerator {
      * @return Packet
      */
     public function emit() : Packet {
-
         $iLength = Context::get()->getPacketLength();
 
         // If we are at the end of the envelope, just return the final packet
@@ -147,6 +158,99 @@ class LinearInterpolated implements IGenerator {
             $oValues[$i] = $this->fYOffset + (++$this->iSamplePosition - $this->iXOffset)*$this->fGradient;
         }
         return $this->oOutputPacket;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase = null) : IMIDINoteMapAware {
+        if (isset(self::A_MAPS[$sUseCase])) {
+            $this->aNoteMaps[$sUseCase] = $oNoteMap;
+            $this->recalculate();
+        }
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getNoteNumberMap(string $sUseCase = null) : IMIDINoteMap {
+        if (null !== $sUseCase && isset($this->aNoteMaps[$sUseCase])) {
+            return $this->aNoteMaps[$sUseCase];
+        }
+        // Fulfil the interface requirements by returning the invariant note map
+        return InvariantNoteMap::get();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
+        // If the note number has changed, use the key scale map to obtain the time scaling to use for that note
+        if ($iNote != $this->iNoteNumber) {
+            $this->fTimeScale = isset($this->aNoteMaps[self::S_NOTE_MAP_SPEED]) ?
+                $this->aNoteMaps[self::S_NOTE_MAP_SPEED]->mapByte($iNote) :
+                1.0;
+
+            $this->fLevelScale = isset($this->aNoteMaps[self::S_NOTE_MAP_LEVEL]) ?
+                $this->aNoteMaps[self::S_NOTE_MAP_LEVEL]->mapByte($iNote) :
+                1.0;
+
+            $this->iNoteNumber = $iNote;
+
+            fprintf(
+                STDERR,
+                "%s() Set Note #%d : TScale %.3f, LScale %.3f\n",
+                __METHOD__,
+                $iNote,
+                $this->fTimeScale,
+                $this->fLevelScale
+            );
+
+            $this->recalculate();
+        }
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNoteName(string $sNote) : IMIDINoteMapAware {
+        // Just use the first Note Map, if any, to convert the note name.
+        foreach ($this->aNoteMaps as $oNoteMap) {
+            return $this->setNoteNumber($oNoteMap->getNoteNumber($sNote));
+        }
+        return $this;
+    }
+
+    /**
+     * Recalculate the internal process points
+     */
+    private function recalculate() {
+        $this->aProcessPoints  = [];
+        $iProcessRate = Context::get()->getProcessRate();
+        $fTimeTotal   = 0.0;
+        $i = 0;
+        foreach ($this->oShape->getAll() as $aPoint) {
+            $fTimeTotal += $aPoint[1] * $this->fTimeScale;
+            $iPosition = (int)($fTimeTotal * $iProcessRate);
+            $this->aProcessIndexes[$iPosition] = $i;
+            $this->aProcessPoints[$i++] = (object)[
+                'iStart' => $iPosition,
+                'fLevel' => $aPoint[0] * $this->fLevelScale
+            ];
+        }
+        $oLastPoint = end($this->aProcessPoints);
+
+        // Pad on the last point again with a slight time offset. This ensures the interpolant code is always acting between a pair
+        // of points and avoids wandering off the end of the array.
+        $this->aProcessPoints[$i] = (object)[
+            'iStart' => $oLastPoint->iStart + 16,
+            'fLevel' => $oLastPoint->fLevel
+        ];
+
+        $this->iLastPosition = $oLastPoint->iStart;
+        $this->oFinalPacket->fillWith($oLastPoint->fLevel);
     }
 
     /**

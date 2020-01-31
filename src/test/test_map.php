@@ -2,10 +2,10 @@
 
 namespace ABadCafe\Synth;
 
-require_once '../Utility.php';
+require_once '../Map.php';
 
-//print_r(Map\Note\TwelveToneMap::A_NOTE_NAMES);
-
-$oMap = new Map\Note\TwelveToneEqualTemperament;
+$oMap = new Map\Note\TwelveToneEqualTemperament(440, 1);
 
 echo $oMap->mapNote('A4'), "\n";
+
+print_r($oMap);

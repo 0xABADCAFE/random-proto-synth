@@ -10,7 +10,7 @@ require_once 'Utility.php';
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * InputKund
+ * InputKind
  *
  * Type safe enumeration for Operator Input types. Intended for use in patch file import process.
  */

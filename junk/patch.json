@@ -1,0 +1,52 @@
+{
+    "name":"example",
+    "version":"0.0.01",
+    "description":"This is how it might look.",
+
+    "envelopes":{
+        "epic_drop":{
+            "type":"LinearEnvelope",
+            "shape":{
+                "initial":0.0,
+                "points":[
+                    [-36.0, 4.0]
+                ]
+            }
+        }
+    },
+
+    "operators":{
+        "my_modulator":{
+            "type":"FixedOscillator",
+            "function":"Sine",
+            "ratio":1.0,
+            "amplitudeControl":{
+                "type":"LinearEnvelope",
+                "shape":{
+                    "initial":0.0,
+                    "points":[
+                        [1.0, 4.0],
+                        [0.0, 4.0],
+                        [0.5, 6.0]
+                    ]
+                }
+            },
+            "pitchControl":"epic_drop"
+        },
+        "carrier_1":{
+            "type":"FixedOscillator",
+            "function":"Square",
+            "ratio":2.0,
+            "amplitudeControl":{
+                "type":"LinearEnvelope",
+                "shape":{
+                    "initial":1.0,
+                    "points":[
+                        [0.5, 5.0]
+                    ]
+                }
+            },
+            "pitchControl":"epic_drop"
+        }
+    }
+}
