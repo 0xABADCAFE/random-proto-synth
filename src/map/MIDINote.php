@@ -17,13 +17,22 @@ interface IMIDINumber {
         CENTRE_REFERENCE = 69; // LMAO: A4
 
     /**
+     * Maps a note name to a number
+     *
+     * @param  string $sNote
+     * @return int
+     * @throws OutOfBoundsException
+     */
+    public function getNoteNumber(string $sNote) : int;
+
+    /**
      * Invokes mapByte() for a named note
      *
      * @param  string $sNote
      * @return float
      * @throws OutOfBoundsException
      */
-    public function mapNote(string $sNode) : float;
+    public function mapNote(string $sNote) : float;
 
 };
 
@@ -37,19 +46,27 @@ interface IMIDINumber {
 interface IMIDINumberAware {
 
     /**
-     * Set a new Note Map
+     * Set a new Note Map. An implementor may use multiple Note Maps for multiple things, for exanple, the effect of
+     * note number on envelope speeds, amplitudes, filter cutoff etc. The use cases are specific to the implementor.
      *
-     * @param  IMIDINumber
+     * While the use case parameter is optional in this interface, it may be mandatory for some implementations.
+     *
+     * @param  IMIDINumber $oNoteMap
+     * @param  string      $sUseCase
      * @return self
      */
-    public function setNoteNumberMap(IMIDINumber $oNoteMap) : self;
+    public function setNoteNumberMap(IMIDINumber $oNoteMap, string $sUseCase = null) : self;
 
     /**
-     * Get the current Note Map
+     * Get the current Note Map.
+     *
+     * While the use case parameter is optional in this interface, it may be mandatory for some implementations.
+     *
+     * @param string $sUseCase
      *
      * @return IMIDINumber
      */
-    public function getNoteNumberMap() : IMIDINumber;
+    public function getNoteNumberMap(string $sUseCase = null) : IMIDINumber;
 
     /**
      * Set the note number to use. The expectation is that the consuming class will use the Note Map to derive some
@@ -98,8 +115,15 @@ class Invariant extends MIDIByte implements IMIDINumber {
     /**
      * @inheritdoc
      */
-    public function mapNote(string $sNode) : float {
+    public function mapNote(string $sNote) : float {
         return 1.0;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getNoteNumber(string $sNote) : int {
+        return self::CENTRE_REFERENCE;
     }
 
     /**
@@ -175,13 +199,9 @@ abstract class TwelveTone extends MIDIByte implements IMIDINumber {
     ];
 
     /**
-     * Get the number for a note name
-     *
-     * @param  string $sNote
-     * @return int
-     * @throws OutOfBoundsException
+     * @inheritdoc
      */
-    public static function getNoteNumber(string $sNote) : int {
+    public function getNoteNumber(string $sNote) : int {
         if (isset(self::A_NOTE_NAMES[$sNote])) {
             return self::A_NOTE_NAMES[$sNote];
         }
@@ -189,14 +209,23 @@ abstract class TwelveTone extends MIDIByte implements IMIDINumber {
     }
 
     /**
-     * Invokes mapByte() for a named note
-     *
-     * @param  string $sNote
-     * @return float
-     * @throws OutOfBoundsException
+     * @inheritdoc
      */
     public function mapNote(string $sNote) : float {
-        return $this->mapByte(self::getNoteNumber($sNote));
+        return $this->mapByte($this->getNoteNumber($sNote));
+    }
+
+    public function debug() {
+        $aStrings = [];
+        foreach (self::A_NOTE_NAMES as $sNote => $iNote) {
+            $aStrings[] = "\t" . $sNote . ' (' . $iNote . ') : ' . $this->oMap[$iNote];
+        }
+        fprintf(
+            STDERR,
+            "%s()\n%s\n",
+            __METHOD__,
+            implode("\n", $aStrings)
+        );
     }
 }
 
@@ -211,8 +240,20 @@ abstract class TwelveTone extends MIDIByte implements IMIDINumber {
 class TwelveToneEqualTemperament extends TwelveTone {
 
     private
+        /**
+         * @var float $fCentreValue - value at CENTRE_REFERENCE
+         */
         $fCentreValue,
-        $fScalePerOctave
+
+        /**
+         * @var float $fScalePerOctave
+         */
+        $fScalePerOctave,
+
+        /**
+         * @var bool $bInversed
+         */
+        $bInversed
     ;
 
     /**
@@ -224,10 +265,12 @@ class TwelveToneEqualTemperament extends TwelveTone {
      */
     public function __construct(
         float $fCentreValue    = 1.0,
-        float $fScalePerOctave = 1.0
+        float $fScalePerOctave = 1.0,
+        bool  $bInversed       = false
     ) {
         $this->fCentreValue    = $fCentreValue;
         $this->fScalePerOctave = $fScalePerOctave;
+        $this->bInversed       = $bInversed;
         parent::__construct();
     }
 
@@ -254,9 +297,12 @@ class TwelveToneEqualTemperament extends TwelveTone {
      */
     protected function populateMap() {
         for ($i = self::I_MIN_SINGLE_BYTE_VALUE; $i <= self::I_MAX_SINGLE_BYTE_VALUE; ++$i) {
-            $this->oMap[$i] = $this->fCentreValue * (2**(
+
+            $fValue = (2**(
                 $this->fScalePerOctave * ($i - self::CENTRE_REFERENCE) / self::I_SEMIS_PER_OCTAVE)
             );
+
+            $this->oMap[$i] = $this->fCentreValue * ($this->bInversed ? 1.0 / $fValue : $fValue);
         }
     }
 }

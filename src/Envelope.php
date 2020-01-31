@@ -7,7 +7,8 @@ require_once 'Map.php';
 use \Countable;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Signal\IStream;
-
+use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
+use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -66,7 +67,13 @@ interface IShape extends Countable {
  *
  * Basic tag interface for Envelope Generators
  */
-interface IGenerator extends IStream {
+interface IGenerator extends IStream, IMIDINoteMapAware {
+
+    const
+        // Use cases for IMIDINoteMapAware
+        S_NOTE_MAP_SPEED = 'speed',
+        S_NOTE_MAP_LEVEL = 'level'
+    ;
 
     /**
      * Set the envelope shape. Will trigger a reset.
