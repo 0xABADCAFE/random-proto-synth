@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Oscillator
+ */
 namespace ABadCafe\Synth\Oscillator;
 
 use ABadCafe\Synth\Signal\Context;

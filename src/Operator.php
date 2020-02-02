@@ -1,11 +1,14 @@
 <?php
 
+/**
+ * Operator
+ */
 namespace ABadCafe\Synth\Operator;
 
 use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Utility\TEnum;
-
-require_once 'Utility.php';
+use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
+use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

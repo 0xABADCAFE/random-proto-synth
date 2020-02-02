@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Output
+ */
 namespace ABadCafe\Synth\Output;
 
 use \Exception;
