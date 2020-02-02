@@ -2,10 +2,7 @@
 
 namespace ABadCafe\Synth;
 
-require_once '../Signal.php';
-require_once '../Oscillator.php';
-require_once '../Envelope.php';
-require_once '../Output.php';
+require_once '../Synth.php';
 
 const I_TIME = 8;
 

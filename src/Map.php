@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Map
+ */
 namespace ABadCafe\Synth\Map;
 
 require_once 'map/MIDIByte.php';

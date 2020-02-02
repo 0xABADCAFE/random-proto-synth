@@ -1,8 +1,9 @@
 <?php
 
+/**
+ * Envelope
+ */
 namespace ABadCafe\Synth\Envelope;
-
-require_once 'Map.php';
 
 use \Countable;
 use ABadCafe\Synth\Signal\Packet;

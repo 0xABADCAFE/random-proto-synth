@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Utility
+ */
 namespace ABadCafe\Synth\Utility;
 
 require_once 'utility/Enum.php';
