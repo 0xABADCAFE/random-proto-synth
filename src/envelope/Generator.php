@@ -162,6 +162,17 @@ class LinearInterpolated implements IGenerator {
 
     /**
      * @inheritdoc
+     *
+     * @see IMIDINumberAware
+     */
+    public function getNoteNumberMapUseCases() : array {
+        return array_keys(self::A_MAPS);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @see IMIDINumberAware
      */
     public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase = null) : IMIDINoteMapAware {
         if (isset(self::A_MAPS[$sUseCase])) {
@@ -173,6 +184,8 @@ class LinearInterpolated implements IGenerator {
 
     /**
      * @inheritdoc
+     *
+     * @see IMIDINumberAware
      */
     public function getNoteNumberMap(string $sUseCase = null) : IMIDINoteMap {
         if (null !== $sUseCase && isset($this->aNoteMaps[$sUseCase])) {
@@ -184,6 +197,8 @@ class LinearInterpolated implements IGenerator {
 
     /**
      * @inheritdoc
+     *
+     * @see IMIDINumberAware
      */
     public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
         // If the note number has changed, use the key scale map to obtain the time scaling to use for that note
@@ -214,6 +229,8 @@ class LinearInterpolated implements IGenerator {
 
     /**
      * @inheritdoc
+     *
+     * @see IMIDINumberAware
      */
     public function setNoteName(string $sNote) : IMIDINoteMapAware {
         // Just use the first Note Map, if any, to convert the note name.

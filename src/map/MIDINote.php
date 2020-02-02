@@ -46,6 +46,13 @@ interface IMIDINumber {
 interface IMIDINumberAware {
 
     /**
+     * Obtain a list of use cases that IMIDINumber maps can be set for.
+     *
+     * @return string[]
+     */
+    public function getNoteNumberMapUseCases() : array;
+
+    /**
      * Set a new Note Map. An implementor may use multiple Note Maps for multiple things, for exanple, the effect of
      * note number on envelope speeds, amplitudes, filter cutoff etc. The use cases are specific to the implementor.
      *
