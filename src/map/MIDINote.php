@@ -56,24 +56,20 @@ interface IMIDINumberAware {
      * Set a new Note Map. An implementor may use multiple Note Maps for multiple things, for exanple, the effect of
      * note number on envelope speeds, amplitudes, filter cutoff etc. The use cases are specific to the implementor.
      *
-     * While the use case parameter is optional in this interface, it may be mandatory for some implementations.
-     *
      * @param  IMIDINumber $oNoteMap
      * @param  string      $sUseCase
      * @return self
      */
-    public function setNoteNumberMap(IMIDINumber $oNoteMap, string $sUseCase = null) : self;
+    public function setNoteNumberMap(IMIDINumber $oNoteMap, string $sUseCase) : self;
 
     /**
      * Get the current Note Map.
-     *
-     * While the use case parameter is optional in this interface, it may be mandatory for some implementations.
      *
      * @param string $sUseCase
      *
      * @return IMIDINumber
      */
-    public function getNoteNumberMap(string $sUseCase = null) : IMIDINumber;
+    public function getNoteNumberMap(string $sUseCase) : IMIDINumber;
 
     /**
      * Set the note number to use. The expectation is that the consuming class will use the Note Map to derive some
