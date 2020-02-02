@@ -43,7 +43,7 @@ final class InputKind {
  *
  * Basic interface for linkable Operators. Operators combine Oscillators and control sources to sculpt sounds.
  */
-interface IOperator extends IStream {
+interface IOperator extends IStream, IMIDINoteMapAware {
 
     /**
      * Generic input attachment: Attaches another Operator as an input. Some Operators may support more than one

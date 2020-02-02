@@ -5,6 +5,9 @@ namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Utility\IEnumeratedInstance;
 use ABadCafe\Synth\Utility\TEnumeratedInstance;
+use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
+use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
+use AbadCafe\Synth\Map\Note\Invariant        as IMIDIInvariantNoteMap;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +34,61 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      */
     public function emit() : Packet {
         return $this->emitPacketForIndex($this->iPacketIndex + 1);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * This is a stub and should be overridden by any implementation supporting a number map control
+     *
+     * @see IMIDINumberAware
+     */
+    public function getNoteNumberMapUseCases() : array {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * This is a stub and should be overridden by any implementation supporting a number map control
+     *
+     * @see IMIDINumberAware
+     */
+    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase = null) : IMIDINoteMapAware {
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * This is a stub and should be overridden by any implementation supporting a number map control
+     *
+     * @see IMIDINumberAware
+     */
+    public function getNoteNumberMap(string $sUseCase = null) : IMIDINoteMap {
+        return IMIDIInvariantNoteMap::get();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * This is a stub and should be overridden by any implementation supporting a number map control
+     *
+     * @see IMIDINumberAware
+     */
+    public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * This is a stub and should be overridden by any implementation supporting a number map control
+     *
+     * @see IMIDINumberAware
+     */
+    public function setNoteName(string $sNote) : IMIDINoteMapAware {
+        return $this;
     }
 
     /**
