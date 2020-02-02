@@ -174,7 +174,7 @@ class LinearInterpolated implements IGenerator {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase = null) : IMIDINoteMapAware {
+    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase) : IMIDINoteMapAware {
         if (isset(self::A_MAPS[$sUseCase])) {
             $this->aNoteMaps[$sUseCase] = $oNoteMap;
             $this->recalculate();
@@ -187,7 +187,7 @@ class LinearInterpolated implements IGenerator {
      *
      * @see IMIDINumberAware
      */
-    public function getNoteNumberMap(string $sUseCase = null) : IMIDINoteMap {
+    public function getNoteNumberMap(string $sUseCase) : IMIDINoteMap {
         if (null !== $sUseCase && isset($this->aNoteMaps[$sUseCase])) {
             return $this->aNoteMaps[$sUseCase];
         }

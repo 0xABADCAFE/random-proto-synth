@@ -54,7 +54,7 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase = null) : IMIDINoteMapAware {
+    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase) : IMIDINoteMapAware {
         return $this;
     }
 
@@ -65,7 +65,7 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      *
      * @see IMIDINumberAware
      */
-    public function getNoteNumberMap(string $sUseCase = null) : IMIDINoteMap {
+    public function getNoteNumberMap(string $sUseCase) : IMIDINoteMap {
         return IMIDIInvariantNoteMap::get();
     }
 
