@@ -36,7 +36,7 @@ $oModulator1 = new Operator\ModulatableOscillator(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oModulator2 = new Operator\FixedOscillator(
+$oModulator2 = new Operator\UnmodulatedOscillator(
     // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Sine(),

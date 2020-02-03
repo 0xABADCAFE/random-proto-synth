@@ -141,7 +141,7 @@ interface IOutput extends IProcessor {
 
 require_once 'operator/Base.php';
 require_once 'operator/Summing.php';
-require_once 'operator/FixedOscillator.php';
+require_once 'operator/UnmodulatedOscillator.php';
 require_once 'operator/ModulatableOscillator.php';
 require_once 'operator/Filter.php';
 require_once 'operator/Output.php';

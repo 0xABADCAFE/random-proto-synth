@@ -17,25 +17,9 @@ use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
  *
  * Simple modulatable Operator implementation. Supports E_AMPLITUDE and E_PHASE modulation inputs.
  */
-class ModulatableOscillator extends Base implements IAmplitudeModulated, IPhaseModulated {
-
-    const
-        S_NOTE_PITCH       = 'note_pitch',
-        S_AMPLITUDE_PREFIX = 'amplitude_',
-        S_PITCH_PREFIX     = 'pitch_'
-    ;
-
+class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeModulated, IPhaseModulated {
 
     protected
-        /** @var IOscillator $oOscillator */
-        $oOscillator,
-
-        /** @var IStream $oAmplitudeControl */
-        $oAmplitudeControl,
-
-        /** @var IStream $oPitchControl */
-        $oPitchControl,
-
         /** @var IOperator[] $aModulators - keyed by instance ID */
         $aModulators               = [],
 
@@ -43,31 +27,8 @@ class ModulatableOscillator extends Base implements IAmplitudeModulated, IPhaseM
         $aPhaseModulationIndex     = [],
 
         /** @var float[] $aAmplidudeModulationIndex - keyed by instance ID */
-        $aAmplitudeModulationIndex = [],
-
-        $aNoteMapForwards = []
+        $aAmplitudeModulationIndex = []
     ;
-
-    /**
-     * Constructor
-     *
-     * @param IOscillator       $oOscillator       : Waveform generator to use   (required)
-     * @param IStream|null      $oAmplitudeControl : Amplitude Envelope Generator (optional)
-     * @param IStream|null      $oPitchControl     : Pitch Envelope Generator     (optional)
-     * @param IMIDINoteMap|null $oNoteMap          :
-     */
-    public function __construct(
-        IOscillator  $oOscillator,
-        IStream      $oAmplitudeControl  = null,
-        IStream      $oPitchControl      = null,
-        IMIDINoteMap $oNoteMap           = null
-    ) {
-        $this->oOscillator       = $oOscillator;
-        $this->oAmplitudeControl = $oAmplitudeControl;
-        $this->oPitchControl     = $oPitchControl;
-        $this->assignInstanceID();
-        $this->configureNoteMapBehaviours();
-    }
 
     /**
      * @inheritdoc
@@ -140,7 +101,6 @@ class ModulatableOscillator extends Base implements IAmplitudeModulated, IPhaseM
      * @return Packet
      */
     protected function emitPacketForIndex(int $iPacketIndex) : Packet {
-
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
         }
@@ -184,29 +144,5 @@ class ModulatableOscillator extends Base implements IAmplitudeModulated, IPhaseM
         $this->iPacketIndex       = $iPacketIndex;
         return $this->oLastPacket;
     }
-    /**
-     * Builds the list of note map use cases. We take the filter cutoff and resonance control inputs and if they
-     * support note maps, we extract them and aggregate them here. This means the filter operator supports the
-     * complete set of note maps that each of it's input controls supports. We prefix the use case to ensure that
-     * there is no overlap between them.
-     */
-    private function configureNoteMapBehaviours() {
-        $this->aNoteMapForwards = [];
-        if ($this->oAmplitudeControl instanceof IMIDINoteMapAware) {
-            foreach ($this->oAmplitudeControl->getNoteNumberMapUseCases() as $sAmplitudeUseCase) {
-                $this->aNoteMapForwards[self::S_AMPLITUDE_PREFIX . $sAmplitudeUseCase] = (object)[
-                    'oControl' => $this->oAmplitudeControl,
-                    'sUseCase' => $sAmplitudeUseCase
-                ];
-            }
-        }
-        if ($this->oPitchControl instanceof IMIDINoteMapAware) {
-            foreach ($this->oPitchControl->getNoteNumberMapUseCases() as $sPitchUseCase) {
-                $this->aNoteMapForwards[self::S_PITCH_PREFIX . $sPitchUseCase] = (object)[
-                    'oControl' => $this->oResonanceControl,
-                    'sUseCase' => $sPitchUseCase
-                ];
-            }
-        }
-    }
+
 }
