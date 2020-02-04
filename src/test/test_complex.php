@@ -15,7 +15,7 @@ $oModulator = new Operator\ModulatableOscillator(
 
     // Frequency Ratio
     0.5,
-    
+
     // Detune
     0.0,
 
@@ -53,7 +53,7 @@ $oCarrier = new Operator\ModulatableOscillator(
 
     // Frequency ratio
     1.0,
-    
+
     // Detune
     0.0,
 
@@ -89,7 +89,7 @@ $oCarrier2 = new Operator\ModulatableOscillator(
 
     // Frequency ratio
     444.0/440.0,
-    
+
     // Detune
     0.0,
 
