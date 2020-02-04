@@ -34,7 +34,7 @@ class UnmodulatedOscillator extends Base implements ISource {
 
         /** @var float $fFrequencyRatio */
         $fFrequencyRatio,
-        
+
         /** @var float $fDetune */
         $fDetune,
 
@@ -66,7 +66,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      */
     public function __construct(
         IOscillator  $oOscillator,
-        float        $fFrequecyRatio    = 1.0,
+        float        $fFrequencyRatio   = 1.0,
         float        $fDetune           = 0.0,
         IStream      $oAmplitudeControl = null,
         IStream      $oPitchControl     = null,
@@ -200,16 +200,16 @@ class UnmodulatedOscillator extends Base implements ISource {
      * Get the frequency ratio for the operator. This is a multiple of the frequency of the root
      * note.
      *
-     * @return float 
+     * @return float
      */
     public function getFrequencyRatio() : float {
         return $this->fFrequencyRatio;
     }
-    
+
     /**
      * Get the detune amount for the operator. This is a fixed offset in Hz.
      *
-     * @return float 
+     * @return float
      */
     public function getDetune() : float {
         return $this->fDetune;
