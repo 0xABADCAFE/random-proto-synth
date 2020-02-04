@@ -10,12 +10,12 @@ $oModulator1 = new Operator\ModulatableOscillator(
 
     // Wave function
     new Oscillator\Simple(
-        new Signal\Generator\Sine(),
+        new Signal\Generator\Sine()
     ),
 
     // Frequency ratio
     1987.0/440.0,
-    
+
     // Detune
     0.0,
 
@@ -55,7 +55,7 @@ $oCarrier1 = new Operator\ModulatableOscillator(
 
     // Frequency Ratio
     1.0,
-    
+
     // Detune
     0.0,
 
@@ -92,13 +92,13 @@ $oCarrier2 = new Operator\ModulatableOscillator(
     new Oscillator\Simple(
         new Signal\Generator\Sine()
     ),
-    
+
     // Frequency Ratio
     0.25,
-    
+
     // Detune
     1.0,
-    
+
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             1,              // Initial Level

@@ -10,12 +10,12 @@ $oModulator1 = new Operator\UnmodulatedOscillator(
 
     // Wave function
     new Oscillator\Simple(
-        new Signal\Generator\Sine(),
+        new Signal\Generator\Sine()
     ),
 
     // Frequency ratio
     1987.0/440.0,
-    
+
     // Detune
     0.0,
 
@@ -52,12 +52,12 @@ $oCarrier = new Operator\ModulatableOscillator(
 
     // Wave function
     new Oscillator\Simple(
-        new Signal\Generator\Sine(),
+        new Signal\Generator\Sine()
     ),
 
     // Frequency ratio
     1.0,
-    
+
     // Detune
     0.0,
 
@@ -84,8 +84,8 @@ $oCarrier
     ->attachPhaseModulatorInput($oModulator2, 0.2)
 ;
 
-$oModulator1->setNoteName('C3');
-$oCarrier->setNoteName('C3');
+$oModulator1->setNoteName('C4');
+$oCarrier->setNoteName('C4');
 
 // Define the final summing output and render
 $oOutput = new Operator\PCMOutput(new Output\Wav);
