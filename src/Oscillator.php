@@ -83,5 +83,6 @@ interface IOscillator extends IStream {
 
 require_once 'oscillator/Base.php';
 require_once 'oscillator/Simple.php';
+require_once 'oscillator/Super.php';
 require_once 'oscillator/Morphing.php';
 
