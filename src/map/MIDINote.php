@@ -278,6 +278,19 @@ class TwelveToneEqualTemperament extends TwelveTone {
     }
 
     /**
+     * @todo - make this defer to a global tuning value
+     *
+     * @return self
+     */
+    public static function getStandardNoteMap() : self {
+        static $oMap = null;
+        if (null === $oMap) {
+            $oMap = new self(440);
+        }
+        return $oMap;
+    }
+
+    /**
      * Get the centre value, i.e. the value for the CENTRE_REFERENCE note number.
      *
      * @return float

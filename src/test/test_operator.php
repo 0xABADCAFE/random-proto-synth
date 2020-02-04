@@ -6,13 +6,18 @@ require_once '../Synth.php';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oModulator1 = new Operator\ModulatableOscillator(
+$oModulator1 = new Operator\UnmodulatedOscillator(
 
     // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
-        1987
     ),
+
+    // Frequency ratio
+    1987.0/440.0,
+    
+    // Detune
+    0.0,
 
     // Amplitude Control
     new Envelope\Generator\LinearInterpolated(
@@ -31,7 +36,7 @@ $oModulator1 = new Operator\ModulatableOscillator(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oModulator2 = new Operator\FixedOscillator(
+$oModulator2 = new Operator\UnmodulatedOscillator(
 
     // Wave function
     new Oscillator\Simple(
@@ -48,8 +53,13 @@ $oCarrier = new Operator\ModulatableOscillator(
     // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
-        440
     ),
+
+    // Frequency ratio
+    1.0,
+    
+    // Detune
+    0.0,
 
     // Amplitude Control
     new Envelope\Generator\LinearInterpolated(
@@ -73,6 +83,9 @@ $oCarrier
     ->attachPhaseModulatorInput($oModulator1, 0.5)
     ->attachPhaseModulatorInput($oModulator2, 0.2)
 ;
+
+$oModulator1->setNoteName('C3');
+$oCarrier->setNoteName('C3');
 
 // Define the final summing output and render
 $oOutput = new Operator\PCMOutput(new Output\Wav);

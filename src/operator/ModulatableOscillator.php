@@ -7,6 +7,9 @@ use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Oscillator\IOscillator;
 
+use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
+use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
+use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -14,18 +17,9 @@ use ABadCafe\Synth\Oscillator\IOscillator;
  *
  * Simple modulatable Operator implementation. Supports E_AMPLITUDE and E_PHASE modulation inputs.
  */
-class ModulatableOscillator extends Base implements IAmplitudeModulated, IPhaseModulated {
+class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeModulated, IPhaseModulated {
 
     protected
-        /** @var IOscillator $oOscillator */
-        $oOscillator,
-
-        /** @var IStream $oAmplitudeControl */
-        $oAmplitudeControl,
-
-        /** @var IStream $oPitchControl */
-        $oPitchControl,
-
         /** @var IOperator[] $aModulators - keyed by instance ID */
         $aModulators               = [],
 
@@ -35,24 +29,6 @@ class ModulatableOscillator extends Base implements IAmplitudeModulated, IPhaseM
         /** @var float[] $aAmplidudeModulationIndex - keyed by instance ID */
         $aAmplitudeModulationIndex = []
     ;
-
-    /**
-     * Constructor
-     *
-     * @param IOscillator  $oOscillator       : Waveform generator to use   (required)
-     * @param IStream|null $oAmplitudeControl : Amplitude Envelope Generator (optional)
-     * @param IStream|null $oPitchControl     : Pitch Envelope Generator     (optional)
-     */
-    public function __construct(
-        IOscillator $oOscillator,
-        IStream     $oAmplitudeControl  = null,
-        IStream     $oPitchControl      = null
-    ) {
-        $this->oOscillator       = $oOscillator;
-        $this->oAmplitudeControl = $oAmplitudeControl;
-        $this->oPitchControl     = $oPitchControl;
-        $this->assignInstanceID();
-    }
 
     /**
      * @inheritdoc
@@ -125,7 +101,6 @@ class ModulatableOscillator extends Base implements IAmplitudeModulated, IPhaseM
      * @return Packet
      */
     protected function emitPacketForIndex(int $iPacketIndex) : Packet {
-
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
         }
@@ -169,4 +144,5 @@ class ModulatableOscillator extends Base implements IAmplitudeModulated, IPhaseM
         $this->iPacketIndex       = $iPacketIndex;
         return $this->oLastPacket;
     }
+
 }

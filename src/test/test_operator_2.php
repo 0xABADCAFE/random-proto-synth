@@ -4,10 +4,6 @@ namespace ABadCafe\Synth;
 
 require_once '../Synth.php';
 
-const I_TIME = 4;
-
-$iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $oModulator1 = new Operator\ModulatableOscillator(
@@ -15,8 +11,13 @@ $oModulator1 = new Operator\ModulatableOscillator(
     // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
-        1987
     ),
+
+    // Frequency ratio
+    1987.0/440.0,
+    
+    // Detune
+    0.0,
 
     // Amplitude Control
     new Envelope\Generator\LinearInterpolated(
@@ -36,7 +37,7 @@ $oModulator1 = new Operator\ModulatableOscillator(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oModulator2 = new Operator\FixedOscillator(
+$oModulator2 = new Operator\UnmodulatedOscillator(
     // Wave function
     new Oscillator\Simple(
         new Signal\Generator\Sine(),
@@ -49,9 +50,14 @@ $oModulator2 = new Operator\FixedOscillator(
 $oCarrier1 = new Operator\ModulatableOscillator(
     // Wave function
     new Oscillator\Simple(
-        new Signal\Generator\Sine(),
-        440
+        new Signal\Generator\Sine()
     ),
+
+    // Frequency Ratio
+    1.0,
+    
+    // Detune
+    0.0,
 
     // Amplitude Control
     new Envelope\Generator\LinearInterpolated(
@@ -84,9 +90,15 @@ $oCarrier1 = new Operator\ModulatableOscillator(
 $oCarrier2 = new Operator\ModulatableOscillator(
 
     new Oscillator\Simple(
-        new Signal\Generator\Sine(),
-        110
+        new Signal\Generator\Sine()
     ),
+    
+    // Frequency Ratio
+    0.25,
+    
+    // Detune
+    1.0,
+    
     new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             1,              // Initial Level
@@ -117,6 +129,10 @@ $oCarrier2
     ->attachPhaseModulatorInput($oModulator1, 0.2)
     ->attachPhaseModulatorInput($oModulator2, 0.5)
 ;
+
+$oModulator1->setNoteName('C4');
+$oCarrier1->setNoteName('C4');
+$oCarrier2->setNoteName('C4');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
