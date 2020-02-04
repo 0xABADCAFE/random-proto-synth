@@ -6,6 +6,7 @@
 namespace ABadCafe\Synth\Operator;
 
 use ABadCafe\Synth\Signal\IStream;
+use ABadCafe\Synth\Oscillator\IOscillator;
 use ABadCafe\Synth\Utility\TEnum;
 use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
 use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
@@ -116,6 +117,39 @@ interface IPhaseModulated {
      * @return self
      */
     public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : self;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * ISource
+ *
+ * Tag interface for operators that generate a signal, e.g. via an oscillator
+ */
+interface ISource {
+
+    /**
+     * Get the principle oscillator of the source signal
+     *
+     * @return IOscillator
+     */
+    public function getOscillator() : IOscillator;
+
+    /**
+     * Get the frequency ratio for the operator. This is a multiple of the frequency of the root
+     * note.
+     *
+     * @return float 
+     */
+    public function getFrequencyRatio() : float;
+    
+    /**
+     * Get the detune amount for the operator. This is a fixed offset in Hz.
+     *
+     * @return float 
+     */
+    public function getDetune() : float;
 
 }
 

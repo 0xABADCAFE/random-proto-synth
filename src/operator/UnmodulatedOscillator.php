@@ -17,9 +17,10 @@ use ABadCafe\Synth\Map\Note\TwelveToneEqualTemperament;
 /**
  * UnmodulatedOscillator
  *
- * Basic output only oscillator. Ignores all input. Intended for use as LFO, etc.
+ * Basic output only oscillator. Accepts pitch and amplitude control streams but not signal
+ * modulation.
  */
-class UnmodulatedOscillator extends Base {
+class UnmodulatedOscillator extends Base implements ISource {
 
     const
         S_ROOT_NOTE        = 'root_note',
@@ -30,6 +31,12 @@ class UnmodulatedOscillator extends Base {
     protected
         /** @var IOscillator $oOscillator */
         $oOscillator,
+
+        /** @var float $fFrequencyRatio */
+        $fFrequencyRatio,
+        
+        /** @var float $fDetune */
+        $fDetune,
 
         /** @var IStream $oAmplitudeControl */
         $oAmplitudeControl,
@@ -48,20 +55,26 @@ class UnmodulatedOscillator extends Base {
     ;
 
     /**
-     * Constructor
+     * Constructo
      *
      * @param IOscillator       $oOscillator       : Waveform generator to use    (required)
+     * @param float             $fFrequencyRatio   : Multiple of root note
+     * @param float             $fDetune           : Frequency adjustment
      * @param IStream|null      $oAmplitudeControl : Amplitude Envelope Generator (optional)
      * @param IStream|null      $oPitchControl     : Pitch Envelope Generator     (optional)
      * @param IMIDINoteMap|null $oRootNoteMap      : Basic notemap for pitch
      */
     public function __construct(
         IOscillator  $oOscillator,
+        float        $fFrequecyRatio    = 1.0,
+        float        $fDetune           = 0.0,
         IStream      $oAmplitudeControl = null,
         IStream      $oPitchControl     = null,
         IMIDINoteMap $oRootNoteMap      = null
     ) {
         $this->oOscillator       = $oOscillator;
+        $this->fFrequencyRatio   = $fFrequencyRatio;
+        $this->fDetune           = $fDetune;
         $this->oAmplitudeControl = $oAmplitudeControl;
         $this->oPitchControl     = $oPitchControl;
         $this->oRootNoteMap      = $oRootNoteMap ?: TwelveToneEqualTemperament::getStandardNoteMap();
@@ -130,7 +143,6 @@ class UnmodulatedOscillator extends Base {
         } else if ($sUseCase === self::S_ROOT_NOTE) {
             $this->oRootNoteMap = $oNoteMap;
         }
-
         return $this;
     }
 
@@ -153,13 +165,11 @@ class UnmodulatedOscillator extends Base {
 
     /**
      * @inheritdoc
-     *
-     * This is a stub and should be overridden by any implementation supporting a number map control
-     *
      * @see IMIDINumberAware
      */
     public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
-        $this->oOscillator->setFrequency($this->oRootNoteMap->mapByte($iNote));
+        $fFrequency = $this->fDetune + $this->fFrequencyRatio * $this->oRootNoteMap->mapByte($iNote);
+        $this->oOscillator->setFrequency($fFrequency);
         if ($this->oAmplitudeControl instanceof IMIDINoteMapAware) {
             $this->oAmplitudeControl->setNoteNumber($iNote);
         }
@@ -171,13 +181,38 @@ class UnmodulatedOscillator extends Base {
 
     /**
      * @inheritdoc
-     *
-     * This is a stub and should be overridden by any implementation supporting a number map control
-     *
      * @see IMIDINumberAware
      */
     public function setNoteName(string $sNote) : IMIDINoteMapAware {
         return $this->setNoteNumber($this->oRootNoteMap->getNoteNumber($sNote));
+    }
+
+    /**
+     * Get the principle oscillator of the source signal
+     *
+     * @return IOscillator
+     */
+    public function getOscillator() : IOscillator {
+        return $this->oOscillator;
+    }
+
+    /**
+     * Get the frequency ratio for the operator. This is a multiple of the frequency of the root
+     * note.
+     *
+     * @return float 
+     */
+    public function getFrequencyRatio() : float {
+        return $this->fFrequencyRatio;
+    }
+    
+    /**
+     * Get the detune amount for the operator. This is a fixed offset in Hz.
+     *
+     * @return float 
+     */
+    public function getDetune() : float {
+        return $this->fDetune;
     }
 
     /**
