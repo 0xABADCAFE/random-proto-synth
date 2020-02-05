@@ -7,6 +7,7 @@ use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Generator\IGenerator;
 use ABadCafe\Synth\Signal\Packet;
 use \InvalidArgumentException;
+use \RangeException;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -22,20 +23,27 @@ class Super extends Simple {
         /** @var float[] $aIntensities*/
         $aIntensities = [],
 
+        /** @var float[] $aInitPhases */
+        $aInitPhases = [],
+
         /** @var float[] $aPhaseCorrections */
         $aPhaseCorrections = []
     ;
 
     /**
-     * Requires a generator and a Harmonic Stack which is an array of [float Harmonic, float Intensity] pairs. The Harmonic is the
-     * specific multiple of the base frequency, e.g. 2 = Octave above and the intensity is the mixing intensity. It
-     * is presumed, but not required that the first entry in the array will be for the first harmonic.
+     * Requires a generator and a Harmonic Stack which is an array of [float Harmonic, float Intensity, float Phase]
+     * triplets.
+     *   - Harmonic is the specific multiple of the base frequency, e.g. 2.0 is one octave above
+     *   - Intensity is the ampliude level for harmonic, 1.0 is full volume
+     *   - Phase is the initial phase offset, 1.0 is one full duty cycle behind
+     *
+     * It is presumed, but not required that the first entry in the array will be for the first harmonic.
      *
      * For this Oscillator to be useful, at least two harmonics need to be present. For this reason an exception is
      * thrown if the harmonic array has fewer than two entries.
      *
      * @param IGenerator $oGenerator
-     * @param float[2][] $aHarmonicStack
+     * @param float[3][] $aHarmonicStack
      * @param float      $fFrequency
      *
      * @throws InvalidArgumentException
@@ -45,15 +53,10 @@ class Super extends Simple {
         array      $aHarmonicStack,
         float      $fFrequency  = ILimits::F_DEF_FREQ
     ) {
-        if (count($aHarmonicStack) < 2) {
-            throw new InvaliArgumentException();
-        }
-        $this->oGenerator        = $oGenerator;
-        $this->oGeneratorInput   = new Packet();
-        $this->aHarmonics        = array_column($aHarmonicStack, 0);
-        $this->aIntensities      = array_column($aHarmonicStack, 1);
-        $this->aPhaseCorrections = array_fill(0, count($this->aHarmonics), 0.0);
+        $this->oGenerator      = $oGenerator;
+        $this->oGeneratorInput = new Packet();
         $this->setFrequency($fFrequency);
+        $this->initHarmonicStack($aHarmonicStack);
     }
 
     /**
@@ -100,7 +103,7 @@ class Super extends Simple {
                 $iSamplePosition = $this->iSamplePosition;
                 $fScaleVal       = $this->fScaleVal * $fHarmonic;
                 foreach ($oValues as $i => $fValue) {
-                    $oValues[$i] = $fScaleVal * $iSamplePosition++;
+                    $oValues[$i] = ($fScaleVal * $iSamplePosition++) + $this->aPhaseCorrections[$iHarmonicID];
                 }
 
                 // Apply any phase shift
@@ -119,4 +122,39 @@ class Super extends Simple {
         return $oOutput;
     }
 
+    /**
+     * @overriden
+     */
+    public function reset() : IStream {
+        parent::reset();
+        $this->aPhaseCorrections = $this->aInitPhases;
+        return $this;
+    }
+
+    /**
+     * Initialise the harmonic stack.
+     */
+    private function initHarmonicStack(array $aHarmonicStack) {
+        if (count($aHarmonicStack) < 2) {
+            throw new InvaliArgumentException();
+        }
+
+        foreach ($aHarmonicStack as $iHarmonicID => $aHarmonic) {
+            if (!is_array($aHarmonic) || count($aHarmonic) != 3) {
+                throw new InvalidArgumentException('Invalid parameter count for Harmonic #' . $iHarmonicID);
+            }
+            if ($aHarmonic[0] <= 0) {
+                throw new RangeException('Invalid multiplier for Harmonic ' . $iHarmonicID);
+            }
+        }
+
+        $this->aHarmonics        = array_column($aHarmonicStack, 0);
+        $this->aIntensities      = array_column($aHarmonicStack, 1);
+        $this->aInitPhases       = array_column($aHarmonicStack, 2);
+        $fPeriod = $this->oGenerator->getPeriod();
+        foreach ($this->aInitPhases as $i => $fPhaseNormalised) {
+            $this->aInitPhases[$i] = $fPeriod * $fPhaseNormalised;
+        }
+        $this->aPhaseCorrections   = $this->aInitPhases;
+    }
 }
