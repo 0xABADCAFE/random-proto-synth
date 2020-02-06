@@ -4,7 +4,7 @@ namespace ABadCafe\Synth\Oscillator;
 
 use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Generator\IGenerator;
+use ABadCafe\Synth\Signal\IGenerator;
 use ABadCafe\Synth\Signal\Packet;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

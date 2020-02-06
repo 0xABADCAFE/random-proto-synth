@@ -69,6 +69,81 @@ interface IStream {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * IGenerator
+ *
+ * Main signal generator interface. Function generators generate a basic waveform, with a time-independent duty
+ * cycle of 0.0 - 1.0. Values outside this range will have their integer part ignored.
+ */
+interface IGenerator {
+
+    /**
+     * Returns the period of this function, i.e. the numeric interval after which it's output cycles.
+     *
+     * @return float
+     */
+    public function getPeriod() : float;
+
+    /**
+     * Calculate a Packets worth of output values for a Packets worth of input values
+     *
+     * @param Packet $oInput
+     * @return Packet
+     *
+     */
+    public function map(Packet $oInput) : Packet;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * IFilter
+ *
+ * Main signal filter interface. The filter cutoff is normalised such that the range 0.0 - 1.0 covers the full frequency
+ * range.
+ */
+interface IFilter {
+    const
+        F_MIN_CUTOFF = 0.001,
+        F_DEF_CUTOFF = 0.5,
+        F_MAX_CUTOFF = 1.0
+    ;
+
+    /**
+     * Reset the filter, re-initialising all internal state.
+     *
+     * @return self.
+     */
+    public function reset() : self;
+
+    /**
+     * Set the cutoff. Uses a normalied scale in which 1.0 is the highest stable setting
+     * supported by the filter.
+     *
+     * @param  float $fCutoff - 0 < $fCutoff <= 1.0
+     * @return self
+     */
+    public function setCutoff(float $fCutoff) : self;
+
+    /**
+     * Get the cutoff. This may return a value ifferent than what was set if the specific
+     * filter implementation clamped the range.
+     *
+     * @return float
+     */
+    public function getCutoff() : float;
+
+    /**
+     * Filter a Packet
+     *
+     * @param  Packet $oInput
+     * @return Packet
+     */
+    public function filter(Packet $oInput) : Packet;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 require_once 'signal/Context.php';
 require_once 'signal/Packet.php';
 require_once 'signal/Generator.php';

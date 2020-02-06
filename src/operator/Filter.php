@@ -5,8 +5,9 @@ namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\Filter\IFilter;
-use ABadCafe\Synth\Signal\Filter\IResonant;
+use ABadCafe\Synth\Signal\IFilter;
+use ABadCafe\Synth\Signal\Filter\ICutoffControlled;
+use ABadCafe\Synth\Signal\Filter\IResonanceControlled;
 
 use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
 use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
@@ -126,10 +127,10 @@ class ControlledFilter extends Base implements IProcessor {
             $this->oLastPacket->accumulate($oOperator->emitPacketForIndex($iPacketIndex), $this->aLevels[$iInstanceID]);
         }
 
-        if ($this->oCutoffControl) {
+        if ($this->oCutoffControl && $this->oFilter instanceof ICutoffControlled) {
             $this->oFilter->setCutoffControl($this->oCutoffControl->emit());
         }
-        if ($this->oResonanceControl && $this->oFilter instanceof IResonant) {
+        if ($this->oResonanceControl && $this->oFilter instanceof IResonanceControlled) {
             $this->oFilter->setResonanceControl($this->oResonanceControl->emit());
         }
 

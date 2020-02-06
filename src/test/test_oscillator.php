@@ -6,13 +6,23 @@ require_once '../Synth.php';
 
 // Test some generators
 $aGenerators = [
-    'flat'     => new Signal\Generator\Flat(0.5),
-    'sine'     => new Signal\Generator\Sine(),
-    'square'   => new Signal\Generator\Square(),
-    'saw_up'   => new Signal\Generator\SawUp(),
-    'saw_down' => new Signal\Generator\SawDown(),
-    'triangle' => new Signal\Generator\Triangle(),
-    'noise'    => new Signal\Generator\Noise()
+    'flat'          => new Signal\Generator\Flat(0.5),
+    'sine_full'     => new Signal\Generator\Sine(),
+    'sine_pos'      => new Signal\Generator\Sine(0.01, 1.0),
+    'sine_neg'      => new Signal\Generator\Sine(-1.0, -0.01),
+    'square_full'   => new Signal\Generator\Square(),
+    'square_pos'    => new Signal\Generator\Square(0.01, 1.0),
+    'square_neg'    => new Signal\Generator\Square(-1.0, -0.01),
+    'saw_up_full'   => new Signal\Generator\SawUp(),
+    'saw_up_pos'    => new Signal\Generator\SawUp(0.01, 1.0),
+    'saw_up_neg'    => new Signal\Generator\SawUp(-1.0, -0.01),
+    'saw_down_full' => new Signal\Generator\SawDown(),
+    'saw_down_pos'  => new Signal\Generator\SawDown(0.01, 1.0),
+    'saw_down_neg'  => new Signal\Generator\SawDown(-1.0, -0.01),
+    'triangle_full' => new Signal\Generator\Triangle(),
+    'triangle_pos'  => new Signal\Generator\Triangle(0.01, 1.0),
+    'triangle_neg'  => new Signal\Generator\Triangle(-1.0, -0.01),
+    'noise'         => new Signal\Generator\Noise()
 ];
 
 $iOneSecond = Signal\Context::get()->getProcessRate();
@@ -36,21 +46,21 @@ foreach ($aGenerators as $sName => $oGenerator) {
 }
 
 // Quick test of a morphing oscillator
-$oOscillator = new Oscillator\Morphing(
-    $aGenerators['sine'],
-    $aGenerators['sine'],
-    $aGenerators['sine'],
-    440,
-    1.5,
-    4
-);
-
-echo "Testing : ", $oOscillator, "\n";
-$oOutput->open('output/test_morph.wav');
-
-do {
-    $oOutput->write($oOscillator->emit());
-} while ($oOscillator->getPosition() < $iOneSecond);
-echo "End: ", $oOscillator, "\n\n";
-
-$oOutput->close();
+// $oOscillator = new Oscillator\Morphing(
+//     $aGenerators['sine'],
+//     $aGenerators['sine'],
+//     $aGenerators['sine'],
+//     440,
+//     1.5,
+//     4
+// );
+//
+// echo "Testing : ", $oOscillator, "\n";
+// $oOutput->open('output/test_morph.wav');
+//
+// do {
+//     $oOutput->write($oOscillator->emit());
+// } while ($oOscillator->getPosition() < $iOneSecond);
+// echo "End: ", $oOscillator, "\n\n";
+//
+// $oOutput->close();
