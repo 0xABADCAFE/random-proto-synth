@@ -5,46 +5,17 @@ namespace ABadCafe\Synth\Signal\Filter;
 use ABadCafe\Synth\Signal\ILimits;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal\IFilter;
 use \SPLFixedArray;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * IFilter
+ * ICutoffControlled
  *
  * Basic filter interface
  */
-interface IFilter {
-
-    const
-        F_MIN_CUTOFF = 0.001,
-        F_DEF_CUTOFF = 0.5,
-        F_MAX_CUTOFF = 1.0
-    ;
-
-    /**
-     * Reset the filter, re-initialising all internal state.
-     *
-     * @return self.
-     */
-    public function reset() : self;
-
-    /**
-     * Set the cutoff. Uses a normalied scale in which 1.0 is the highest stable setting
-     * supported by the filter.
-     *
-     * @param  float $fCutoff - 0 < $fCutoff <= 1.0
-     * @return self
-     */
-    public function setCutoff(float $fCutoff) : self;
-
-    /**
-     * Get the cutoff. This may return a value ifferent than what was set if the specific
-     * filter implementation clamped the range.
-     *
-     * @return float
-     */
-    public function getCutoff() : float;
+interface ICutoffControlled extends IFilter {
 
     /**
      * Set a control packet for the cutoff. This allows the control of the filter from other signal sources.
@@ -68,11 +39,11 @@ interface IFilter {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * IResonant
+ * IResonanceControlled
  *
- * Builds upon the IFilter interface, adding support for
+ * Builds upon the ICutoffControlled interface, adding support for
  */
-interface IResonant extends IFilter {
+interface IResonanceControlled extends ICutoffControlled {
 
     const
         F_MIN_RESONANCE = 0.0,
@@ -114,7 +85,7 @@ interface IResonant extends IFilter {
 /**
  * Common base class for filter implementations
  */
-abstract class Base implements IFilter {
+abstract class Base implements ICutoffControlled {
     protected
         /** @var SPLFixedArray $oCutoff */
         $oCutoff,
@@ -150,7 +121,7 @@ abstract class Base implements IFilter {
     /**
      * @inheritdoc
      */
-    public function setCutoffControl(Packet $oCutoff = null) : IFilter {
+    public function setCutoffControl(Packet $oCutoff = null) : ICutoffControlled {
         if ($oCutoff) {
             $this->oCutoff = clone $oCutoff->getValues();
         } else {
@@ -165,7 +136,7 @@ abstract class Base implements IFilter {
 /**
  * Common base class for resonant filter implementations
  */
-abstract class Resonant extends Base implements IResonant {
+abstract class Resonant extends Base implements IResonanceControlled {
     protected
         /** @var SPLFixedArray $oResonance */
         $oResonance,
@@ -187,7 +158,7 @@ abstract class Resonant extends Base implements IResonant {
     /**
      * @inheritdoc
      */
-    public function setResonance(float $fResonance) : IResonant {
+    public function setResonance(float $fResonance) : IResonanceControlled {
         $this->fResonance = max(
             $fResonance,
             self::F_MIN_RESONANCE
@@ -205,7 +176,7 @@ abstract class Resonant extends Base implements IResonant {
     /**
      * @inheritdoc
      */
-    public function setResonanceControl(Packet $oResonance = null) : IResonant {
+    public function setResonanceControl(Packet $oResonance = null) : IResonanceControlled {
         if ($oResonance) {
             $this->oResonance = clone $oResonance->getValues();
         } else {

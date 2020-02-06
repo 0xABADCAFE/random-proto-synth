@@ -5,32 +5,8 @@ namespace ABadCafe\Synth\Signal\Generator;
 use ABadCafe\Synth\Signal\ILimits;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal\IGenerator;
 use \SPLFixedArray;
-
-/**
- * IGenerator
- *
- * Main function generator interface. Function generators generate a basic waveform, with a time-independent duty
- * cycle of 0.0 - 1.0. Values outside this range will have their integer part ignored.
- */
-interface IGenerator {
-
-    /**
-     * Returns the period of this function, i.e. the numeric interval after which it's output cycles.
-     *
-     * @return float
-     */
-    public function getPeriod() : float;
-
-    /**
-     * Calculate a Packets worth of output values for a Packets worth of input values
-     *
-     * @param Packet $oInput
-     * @return Packet
-     *
-     */
-    public function map(Packet $oInput) : Packet;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -246,7 +222,7 @@ class SawDown extends SawUp {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = -($this->fScaleLevel * ($fValue - floor($fValue)) + $this->fMinLevel);
+            $oValues[$i] = $this->fScaleLevel * (ceil($fValue) - $fValue) + $this->fMinLevel;
         }
         return $oOutput;
     }
@@ -263,7 +239,7 @@ class Triangle implements IGenerator {
     const F_PERIOD = 2.0;
 
     protected
-        $fMinLevel,
+        $fBiasLevel,
         $fScaleLevel
     ;
 
@@ -275,8 +251,8 @@ class Triangle implements IGenerator {
         float $fMinLevel = ILimits::F_MIN_LEVEL_NO_CLIP,
         float $fMaxLevel = ILimits::F_MAX_LEVEL_NO_CLIP
     ) {
-        $this->fMinLevel   = $fMinLevel;
-        $this->fScaleLevel = $fMaxLevel - $fMinLevel;
+        $this->fBiasLevel  = 0.5*($fMaxLevel + $fMinLevel);
+        $this->fScaleLevel = abs($fMaxLevel - $fMinLevel);
     }
 
 
@@ -296,8 +272,8 @@ class Triangle implements IGenerator {
         foreach ($oValues as $i => $fValue) {
             $fValue -= 0.5;
             $fFloor = floor($fValue);
-            $fSign  = (int)$fFloor & 1 ? 1 : -1;
-            $oValues[$i] = $fSign*($this->fScaleLevel * ($fValue - $fFloor) + $this->fMinLevel);
+            $fScale  = (int)$fFloor & 1 ? $this->fScaleLevel : -$this->fScaleLevel;
+            $oValues[$i] = $this->fBiasLevel + $fScale*($fValue - $fFloor - 0.5);
         }
         return $oOutput;
     }
