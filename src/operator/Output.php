@@ -5,7 +5,9 @@ namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
-use AbadCafe\Synth\Output\IPCMOutput;
+use ABadCafe\Synth\Output\IPCMOutput;
+
+use function ABadCafe\Synth\Utility\dprintf;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -43,8 +45,7 @@ class PCMOutput extends Summing implements IOutput {
             $this->emit();
         } while ($this->getPosition() < $iMaxSamples);
         $fElapsed = microtime(true) - $fStart;
-        fprintf(
-            STDERR,
+        dprintf(
             "Generated %.3f seconds in %.3f seconds [%.3fx realtime]\n",
             $fSeconds,
             $fElapsed,

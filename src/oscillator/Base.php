@@ -7,6 +7,8 @@ use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\IGenerator;
 use ABadCafe\Synth\Signal\Packet;
 
+use function ABadCafe\Synth\Utility\clamp;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -46,18 +48,21 @@ abstract class Base implements IOscillator {
     ;
 
     /**
-     * Constructor. Set default sample rate and frequency here. Sample rate is immutable once set.
+     * Constructor.
      *
      * @param IGenerator $oGenerator
      * @param float      $fFrequency
+     * @param float      $fPhase;
      */
     public function __construct(
         IGenerator $oGenerator,
-        float      $fFrequency  = ILimits::F_DEF_FREQ
+        float      $fFrequency  = ILimits::F_DEF_FREQ,
+        float      $fPhase      = 0.0
     ) {
         $this->oGenerator      = $oGenerator;
         $this->oGeneratorInput = new Packet();
         $this->setFrequency($fFrequency);
+        $this->fPhaseShift     = $oGenerator->getPeriod() * $fPhase;
     }
 
     /**
@@ -114,7 +119,7 @@ abstract class Base implements IOscillator {
      * @return self
      */
     public function setFrequency(float $fFrequency) : IOscillator {
-        $this->fFrequency = $this->clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
+        $this->fFrequency = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
         $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency * Context::get()->getSamplePeriod();
         return $this;
     }
@@ -152,15 +157,4 @@ abstract class Base implements IOscillator {
         return $this;
     }
 
-    /**
-     * Clamp some numeric vale between a minimum and maximum
-     *
-     * @param  float|int $mValue
-     * @param  float|int $mMin
-     * @param  float|int $mMax
-     * @return float|int
-     */
-    protected function clamp($mValue, $mMin, $mMax) {
-        return max(min($mValue, $mMax), $mMin);
-    }
 }
