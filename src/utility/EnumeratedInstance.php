@@ -37,8 +37,7 @@ trait TEnumeratedInstance {
      */
     protected function assignInstanceID() {
         $this->iInstanceID = ++self::$iNextInstanceID;
-        fprintf(
-            STDERR,
+        dprintf(
             "%s assigned instance %d\n",
             get_class($this),
             $this->iInstanceID

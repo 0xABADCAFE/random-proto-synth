@@ -5,6 +5,8 @@ namespace ABadCafe\Synth\Map\Note;
 use ABadCafe\Synth\Map\MIDIByte;
 use \OutOfBoundsException;
 
+use function ABadCafe\Synth\Utility\dprintf;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -223,8 +225,7 @@ abstract class TwelveTone extends MIDIByte implements IMIDINumber {
         foreach (self::A_NOTE_NAMES as $sNote => $iNote) {
             $aStrings[] = "\t" . $sNote . ' (' . $iNote . ') : ' . $this->oMap[$iNote];
         }
-        fprintf(
-            STDERR,
+        dprintf(
             "%s()\n%s\n",
             __METHOD__,
             implode("\n", $aStrings)

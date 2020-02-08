@@ -12,6 +12,8 @@ use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
 use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
 use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
 
+use function ABadCafe\Synth\Utility\dprintf;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -213,8 +215,7 @@ class LinearInterpolated implements IGenerator {
 
             $this->iNoteNumber = $iNote;
 
-            fprintf(
-                STDERR,
+            dprintf(
                 "%s() Set Note #%d : TScale %.3f, LScale %.3f\n",
                 __METHOD__,
                 $iNote,

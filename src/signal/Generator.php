@@ -11,7 +11,7 @@ use \SPLFixedArray;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * DC - simplest spectral complexity (zero frequencies)
+ * Flat - simplest spectral complexity (zero frequencies)
  *
  * Maps to a fixed value, irrespective of input
  */
@@ -38,7 +38,7 @@ class Flat implements IGenerator {
      * Set the level
      *
      * @param  float $fLevel
-     * @return DC fluent
+     * @return self  fluent
      */
     public function setLevel(float $fLevel) : self {
         $this->oPacket->fillWith($fLevel);
@@ -65,17 +65,13 @@ class Flat implements IGenerator {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Sine - single frequency
- *
- * Maps input values to a sine wave output.
+ * Base class for non-flat generator functions
  */
-class Sine implements IGenerator {
+abstract class NonFlat implements IGenerator {
 
-    const F_PERIOD = 2.0 * M_PI;
-
-    private
+    protected
         $fMinLevel,
-        $fScaleLevel
+        $fMaxLevel
     ;
 
     /**
@@ -86,9 +82,34 @@ class Sine implements IGenerator {
         float $fMinLevel = ILimits::F_MIN_LEVEL_NO_CLIP,
         float $fMaxLevel = ILimits::F_MAX_LEVEL_NO_CLIP
     ) {
-        $this->fMinLevel   = ($fMaxLevel + $fMinLevel)/2;
-        $this->fScaleLevel = ($fMaxLevel - $fMinLevel)/2;
+        $this->fMinLevel = min($fMinLevel, $fMaxLevel);
+        $this->fMaxLevel = max($fMinLevel, $fMaxLevel);
+        $this->init();
     }
+
+    /**
+     * Perform any initialisation after setting the levels
+     */
+    protected function init() {
+
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Sine - single frequency
+ *
+ * Maps input values to a sine wave output.
+ */
+class Sine extends NonFlat {
+
+    const F_PERIOD = 2.0 * M_PI;
+
+    private
+        $fBiasLevel,
+        $fScaleLevel
+    ;
 
     /**
      * @inheritdoc
@@ -104,9 +125,17 @@ class Sine implements IGenerator {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = ($this->fScaleLevel * sin($fValue)) + $this->fMinLevel;
+            $oValues[$i] = ($this->fScaleLevel * sin($fValue)) + $this->fBiasLevel;
         }
         return $oOutput;
+    }
+
+    /**
+     * @overridden
+     */
+    protected function init() {
+        $this->fBiasLevel  = 0.5*($this->fMaxLevel + $this->fMinLevel);
+        $this->fScaleLevel = 0.5*($this->fMaxLevel - $this->fMinLevel);
     }
 }
 
@@ -117,26 +146,9 @@ class Sine implements IGenerator {
  *
  * Maps input values to a square output.
  */
-class Square implements IGenerator {
+class Square extends NonFlat {
 
     const F_PERIOD = 2.0;
-
-    private
-        $fMinLevel,
-        $fMaxLevel
-    ;
-
-    /**
-     * @param float $fMinLevel
-     * @param float $fMaxLevel
-     */
-    public function __construct(
-        float $fMinLevel = ILimits::F_MIN_LEVEL_NO_CLIP,
-        float $fMaxLevel = ILimits::F_MAX_LEVEL_NO_CLIP
-    ) {
-        $this->fMinLevel = $fMinLevel;
-        $this->fMaxLevel = $fMaxLevel;
-    }
 
     /**
      * @inheritdoc
@@ -165,25 +177,12 @@ class Square implements IGenerator {
  *
  * Maps input values to a upwards sawtooth output.
  */
-class SawUp implements IGenerator {
+class SawUp extends NonFlat {
     const F_PERIOD  = 1.0;
 
     protected
-        $fMinLevel,
         $fScaleLevel
     ;
-
-    /**
-     * @param float $fMinLevel
-     * @param float $fMaxLevel
-     */
-    public function __construct(
-        float $fMinLevel = ILimits::F_MIN_LEVEL_NO_CLIP,
-        float $fMaxLevel = ILimits::F_MAX_LEVEL_NO_CLIP
-    ) {
-        $this->fMinLevel   = $fMinLevel;
-        $this->fScaleLevel = $fMaxLevel - $fMinLevel;
-    }
 
     /**
      * @inheritdoc
@@ -204,6 +203,12 @@ class SawUp implements IGenerator {
         return $oOutput;
     }
 
+    /**
+     * @overriden
+     */
+    protected function init() {
+        $this->fScaleLevel = $this->fMaxLevel - $this->fMinLevel;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +239,7 @@ class SawDown extends SawUp {
 /**
  * Basic triangle generator
  */
-class Triangle implements IGenerator {
+class Triangle extends NonFlat {
 
     const F_PERIOD = 2.0;
 
@@ -242,19 +247,6 @@ class Triangle implements IGenerator {
         $fBiasLevel,
         $fScaleLevel
     ;
-
-    /**
-     * @param float $fMinLevel
-     * @param float $fMaxLevel
-     */
-    public function __construct(
-        float $fMinLevel = ILimits::F_MIN_LEVEL_NO_CLIP,
-        float $fMaxLevel = ILimits::F_MAX_LEVEL_NO_CLIP
-    ) {
-        $this->fBiasLevel  = 0.5*($fMaxLevel + $fMinLevel);
-        $this->fScaleLevel = abs($fMaxLevel - $fMinLevel);
-    }
-
 
     /**
      * @inheritdoc
@@ -277,6 +269,14 @@ class Triangle implements IGenerator {
         }
         return $oOutput;
     }
+
+    /**
+     * @overriden
+     */
+    protected function init() {
+        $this->fBiasLevel  = 0.5*($this->fMaxLevel + $this->fMinLevel);
+        $this->fScaleLevel = $this->fMaxLevel - $this->fMinLevel;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,9 +286,13 @@ class Triangle implements IGenerator {
  *
  * Maps to a randomised value, irrespective of input
  */
-class Noise implements IGenerator {
+class Noise extends NonFlat {
 
     const F_PERIOD = 1.0;
+
+    protected
+        $fScaleLevel
+    ;
 
     /**
      * @inheritdoc
@@ -301,17 +305,19 @@ class Noise implements IGenerator {
      * @inheritdoc
      */
     public function map(Packet $oInput) : Packet {
-        static $fNormalize = null;
-        if (null === $fNormalize) {
-            $fNormalize = (ILimits::F_MAX_LEVEL_NO_CLIP - ILimits::F_MIN_LEVEL_NO_CLIP) / (float)mt_getrandmax();
-        }
-
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach($oValues as $i => $fValue) {
-            $oValues[$i] = ILimits::F_MIN_LEVEL_NO_CLIP + mt_rand() * $fNormalize;
+            $oValues[$i] = $this->fMinLevel + mt_rand() * $this->fScaleLevel;
         }
         return $oOutput;
+    }
+
+    /**
+     * @overriden
+     */
+    protected function init() {
+        $this->fScaleLevel = ($this->fMaxLevel - $this->fMinLevel) / mt_getrandmax();
     }
 }
 

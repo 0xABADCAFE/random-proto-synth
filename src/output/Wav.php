@@ -4,6 +4,7 @@ namespace ABadCafe\Synth\Output;
 
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
+use function ABadCafe\Synth\Utility\dprintf;
 
 /**
  * Wav
@@ -80,8 +81,7 @@ class Wav implements IPCMOutput {
         ) {
             throw new IOException();
         }
-        fprintf(
-            STDERR,
+        dprintf(
             "%s opened %s for output, using %d channel(s) at %d Hz, %d bits\n",
             self::class,
             $sPath,

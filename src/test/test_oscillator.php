@@ -22,7 +22,9 @@ $aGenerators = [
     'triangle_full' => new Signal\Generator\Triangle(),
     'triangle_pos'  => new Signal\Generator\Triangle(0.01, 1.0),
     'triangle_neg'  => new Signal\Generator\Triangle(-1.0, -0.01),
-    'noise'         => new Signal\Generator\Noise()
+    'noise_full'    => new Signal\Generator\Noise(),
+    'noise_pos'     => new Signal\Generator\Noise(0.01, 1.0),
+    'noise_neg'     => new Signal\Generator\Noise(-1.0, -0.01)
 ];
 
 $iOneSecond = Signal\Context::get()->getProcessRate();
