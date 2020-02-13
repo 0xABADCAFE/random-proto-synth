@@ -8,6 +8,8 @@ use ABadCafe\Synth\Signal\IGenerator;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Signal\ILimits as SignalLimits;
 
+use function ABadCafe\Synth\Utility\clamp;
+
 /**
  * Morphing Oscillator. Two Generators, second at a fixed frequency ratio to the first, mixed using a third Generator as an LFO.
  */
@@ -37,8 +39,8 @@ use ABadCafe\Synth\Signal\ILimits as SignalLimits;
         float      $fSecondaryRatio,
         float      $fMixingFrequency
     ) {
-        $this->fMixingFrequency    = $this->clamp($fMixingFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
-        $this->fSecondaryRatio     = $this->clamp($fSecondaryRatio, self::F_MIN_RATIO, self::F_MAX_RATIO);
+        $this->fMixingFrequency    = clamp($fMixingFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
+        $this->fSecondaryRatio     = clamp($fSecondaryRatio, self::F_MIN_RATIO, self::F_MAX_RATIO);
         $this->oSecondaryGenerator = $oSecondaryGenerator;
         $this->oMixingGenerator    = $oMixingGenerator;
         $this->oSecondaryInput     = new Packet();
