@@ -24,8 +24,15 @@ $aGenerators = [
     'triangle_neg'  => new Signal\Generator\Triangle(-1.0, -0.01),
     'noise_full'    => new Signal\Generator\Noise(),
     'noise_pos'     => new Signal\Generator\Noise(0.01, 1.0),
-    'noise_neg'     => new Signal\Generator\Noise(-1.0, -0.01)
+    'noise_neg'     => new Signal\Generator\Noise(-1.0, -0.01),
+    'wavetable'     => new Signal\Generator\Wavetable(8)
 ];
+
+$oTable = $aGenerators['wavetable']->getTable();
+$fScale = 1.0 / count($oTable);
+foreach($oTable as $i => $fValue) {
+    $oTable[$i] = (2 ** ($i * $fScale)) - 1.5;
+}
 
 $iOneSecond = Signal\Context::get()->getProcessRate();
 $oOutput    = new Output\Wav;
