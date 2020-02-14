@@ -26,12 +26,17 @@ class ResonantLowPass extends Resonant {
     ;
 
     private
-
+        $fInitCutoff,
+        $fInitResonance,
         $fIn1,  $fIn2,  $fIn3,  $fIn4,
         $fOut1, $fOut2, $fOut3, $fOut4
     ;
 
-    public function __construct() {
+    public function __construct(float $fCutoff = self::F_DEF_CUTOFF, float $fResonance = self::F_DEF_RESONANCE) {
+        $this->setCutoff($fCutoff);
+        $this->setResonance($fResonance);
+        $this->fInitCutoff    = $this->fCutoff;
+        $this->fInitResonance = $this->fResonance;
         $this->reset();
     }
 
@@ -48,6 +53,8 @@ class ResonantLowPass extends Resonant {
         $this->fOut2 = 0;
         $this->fOut3 = 0;
         $this->fOut4 = 0;
+        $this->fCutoff     = $this->fInitCutoff;
+        $this->fResonance  = $this->fInitResonance;
         return $this;
     }
 

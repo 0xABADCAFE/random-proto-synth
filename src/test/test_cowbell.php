@@ -45,25 +45,7 @@ $oFilter = new Operator\ControlledFilter(
 
     // TODO - bandbass here
     // Filter type
-    new Signal\Filter\ResonantLowPass(),
-
-    // Cutoff Control
-    new Envelope\Generator\LinearInterpolated(
-        new Envelope\Shape(
-            0.5,              // Start at 10% cutoff
-            [
-            ]
-        )
-    ),
-
-    // Resonance Control
-    new Envelope\Generator\LinearInterpolated(
-        new Envelope\Shape(
-            0.6,              // Start at 10% cutoff
-            [
-            ]
-        )
-    )
+    new Signal\Filter\ResonantLowPass(0.23, 0.6)
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

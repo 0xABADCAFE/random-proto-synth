@@ -99,7 +99,6 @@ abstract class Base implements ICutoffControlled {
      */
     public function reset() : IFilter {
         $this->oCutoff = null;
-        $this->fCutoff = self::F_DEF_CUTOFF;
         return $this;
     }
 
@@ -151,7 +150,6 @@ abstract class Resonant extends Base implements IResonanceControlled {
     public function reset() : IFilter {
         parent::reset();
         $this->oResonance = null;
-        $this->fResonance = self::F_DEF_RESONANCE;
         return $this;
     }
 
