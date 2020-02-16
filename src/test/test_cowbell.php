@@ -35,7 +35,7 @@ $oCarrier = new Operator\UnmodulatedOscillator(
                 [ 1/32, 0.125],
                 [ 1/64, 0.125],
                 [ 1/128, 0.125],
-                [ 1/256, 1]
+                [ 0, 1]
             ]
         )
     )
@@ -45,7 +45,7 @@ $oFilter = new Operator\ControlledFilter(
 
     // TODO - bandbass here
     // Filter type
-    new Signal\Filter\ResonantLowPass(0.23, 0.6)
+    new Signal\Filter\KarlsenBandPass(0.12, 0.35)
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
