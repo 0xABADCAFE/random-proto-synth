@@ -23,7 +23,7 @@ $oOscillator = new Oscillator\Super(
 // Render straight to wav output
 
 echo "Testing : ", $oOscillator, "\n";
-$oOutput = new Output\Wav;
+$oOutput = new Output\Play;
 $oOutput->open('output/test_super.wav');
 
 do {
