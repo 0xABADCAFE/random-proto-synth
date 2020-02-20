@@ -39,7 +39,7 @@ class Play implements IPCMOutput {
      */
     public function open(string $sPath) {
         $sCommand = sprintf(
-            'play -t raw -b 16 -c 1 -e signed --endian=little -r %d -',
+            'play -t raw -b 16 -c 1 -e signed --endian=little -r %d --buffer 128 -',
             Context::get()->getProcessRate()
         );
 
