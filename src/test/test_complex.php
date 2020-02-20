@@ -154,14 +154,16 @@ $oFilter
     ->attachSignalInput($oCarrier2, 1)
 ;
 
-$oModulator->setNoteName('A4');
-$oCarrier->setNoteName('A4');
-$oCarrier2->setNoteName('A4');
+$sNote = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : 'A4';
+
+$oModulator->setNoteName($sNote);
+$oCarrier->setNoteName($sNote);
+$oCarrier2->setNoteName($sNote);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Define the final summing output and render
-$oOutput = new Operator\PCMOutput(new Output\Wav);
+$oOutput = new Operator\PCMOutput(new Output\Play);
 $oOutput
     ->attachSignalInput($oFilter, 1.0)
     ->open('output/test_complex.wav')
