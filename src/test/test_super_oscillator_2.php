@@ -4,10 +4,10 @@ namespace ABadCafe\Synth;
 
 require_once '../Synth.php';
 
-$iSamples = 5 * Signal\Context::get()->getProcessRate();
+$iSamples = 4 * Signal\Context::get()->getProcessRate();
 
 $oOscillator = new Oscillator\Super(
-    new Signal\Generator\SawUp(),
+    new Signal\Generator\SawDown(),
     [
         [1.001,     0.25, 0.0],
         [1/1.001,   0.25, 0.25],
@@ -24,36 +24,84 @@ $oOscillator = new Oscillator\Super(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $oCutoffEnvelope = new Oscillator\Simple(
-    new Signal\Generator\Sine(0.25, 1.0),
-    5
+    new Signal\Generator\SawDown(0.05, 1.0),
+    8
 );
+
+$oVolumeEnvelope = new Oscillator\Simple(
+    new Signal\Generator\SawDown(0.5, 0.75),
+    8
+);
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $oResonanceEnvelope = new Envelope\Generator\LinearInterpolated(
     new Envelope\Shape(
         0.0, [
-            [0.9, 2.5],
-            [0.0, 2.5]
+            [0.5, 2],
+            [0.0, 2]
+        ]
+    )
+);
+
+// Very poor man's arp
+$oPitchEnvelope = new Envelope\Generator\LinearInterpolated(
+    new Envelope\Shape(
+        0.0, [
+            [0.0, 0.249],
+            [12.0, 0.001],
+            [12.0, 0.249],
+            [0.0, 0.001],
+            [0.0, 0.249],
+            [12.0, 0.001],
+            [12.0, 0.249],
+            [-9.0, 0.001],
+            [-9.0, 0.249],
+            [3.0, 0.001],
+            [3.0, 0.249],
+            [-9.0, 0.001],
+            [-9.0, 0.249],
+            [3.0, 0.001],
+            [3.0, 0.249],
+            [-7.0, 0.001],
+            [-7.0, 0.249],
+            [5.0, 0.001],
+            [5.0, 0.249],
+            [-7.0, 0.001],
+            [-7.0, 0.249],
+            [5.0, 0.001],
+            [5.0, 0.249],
+            [-12.0, 0.001],
+            [-12.0, 0.249],
+            [0.0, 0.001],
+            [0.0, 0.249],
+            [-12.0, 0.001],
+            [-12.0, 0.249],
+            [0.0, 0.001],
+            [0.0, 0.249],
+            [0.0, 0.001],
         ]
     )
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oOutput = new Output\Wav;
+$oOutput = new Output\Play;
 $oOutput->open('output/test_super2.wav');
 
 $oFilter = new Signal\Filter\ResonantLowPass;
 
 do {
+    $oOscillator
+        ->setPitchModulation($oPitchEnvelope->emit());
     $oFilter
         ->setCutoffControl($oCutoffEnvelope->emit())
         ->setResonanceControl($oResonanceEnvelope->emit());
     $oOutput->write(
         $oFilter->filter(
             $oOscillator->emit()
-        )
+        )->modulateWith($oVolumeEnvelope->emit())
     );
 } while ($oOscillator->getPosition() < $iSamples);
 

@@ -14,7 +14,8 @@ class Play implements IPCMOutput {
 
     const
         I_MIN_LEVEL = -32767,
-        I_MAX_LEVEL = 32767
+        I_MAX_LEVEL = 32767,
+        I_BUFFER    = 256
     ;
 
     /**
@@ -39,8 +40,9 @@ class Play implements IPCMOutput {
      */
     public function open(string $sPath) {
         $sCommand = sprintf(
-            'play -t raw -b 16 -c 1 -e signed --endian=little -r %d --buffer 128 -',
-            Context::get()->getProcessRate()
+            'play -t raw -b 16 -c 1 -e signed --endian=little -r %d --buffer %d -',
+            Context::get()->getProcessRate(),
+            self::I_BUFFER
         );
 
         if (

@@ -26,7 +26,7 @@ $oCutoffEnvelope = new Envelope\Generator\LinearInterpolated(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oOutput = new Output\Wav;
+$oOutput = new Output\Play;
 $oOutput->open('output/test_filter_2.wav');
 
 $oFilter = new Signal\Filter\ResonantLowPass;

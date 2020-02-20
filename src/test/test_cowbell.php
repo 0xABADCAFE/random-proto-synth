@@ -50,13 +50,15 @@ $oFilter = new Operator\ControlledFilter(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+$sNote = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : 'D5';
+
 $oFilter->attachSignalInput($oCarrier, 1.0);
-$oCarrier->setNoteName('D5');
+$oCarrier->setNoteName($sNote);
 
 
 
 // Define the final summing output and render
-$oOutput = new Operator\PCMOutput(new Output\Wav);
+$oOutput = new Operator\PCMOutput(new Output\Play);
 $oOutput
     ->attachSignalInput($oFilter, 1.0)
     ->open('output/cowbell.wav')
