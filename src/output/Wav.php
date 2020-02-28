@@ -60,7 +60,7 @@ class Wav implements IPCMOutput, IChannelMode {
     public function __construct(
         int $iSampleRate    = self::I_DEF_RATE_SIGNAL_DEFAULT,
         int $iBitsPerSample = self::I_DEF_RESOLUTION_BITS,
-        int $iChannelMiode  = self::I_CHAN_MONO
+        int $iChannelMode   = self::I_CHAN_MONO
     ) {
         $this->iSampleRate    = $iSampleRate != self::I_DEF_RATE_SIGNAL_DEFAULT ?: Context::get()->getProcessRate();
         $this->iBitsPerSample = $iBitsPerSample;
