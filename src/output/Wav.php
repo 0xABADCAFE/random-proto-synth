@@ -4,19 +4,23 @@ namespace ABadCafe\Synth\Output;
 
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal\IChannelMode;
+
+use function ABadCafe\Synth\Utility\clamp;
 use function ABadCafe\Synth\Utility\dprintf;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Wav
  *
  * Minimal implementation of the RIFF Wave standard for linear PCM
  */
-class Wav implements IPCMOutput {
+class Wav implements IPCMOutput, IChannelMode {
 
     const
         I_DEF_RATE_SIGNAL_DEFAULT = 0,
         I_DEF_RESOLUTION_BITS     = 16,
-        I_DEF_CHANNELS            = 1,
         I_HEADER_SIZE             = 44
     ;
 
@@ -51,16 +55,16 @@ class Wav implements IPCMOutput {
      *
      * @param int $iSampleRate    (defaults to the Signal Process Rate
      * @param int $iBitsPerSample (defaults to 16)
-     * @param int $iNumChannels   (defaults to mono)
+     * @param int $iChannelMiode  (defaults to mono)
      */
     public function __construct(
         int $iSampleRate    = self::I_DEF_RATE_SIGNAL_DEFAULT,
         int $iBitsPerSample = self::I_DEF_RESOLUTION_BITS,
-        int $iNumChannels   = self::I_DEF_CHANNELS
+        int $iChannelMiode  = self::I_CHAN_MONO
     ) {
         $this->iSampleRate    = $iSampleRate != self::I_DEF_RATE_SIGNAL_DEFAULT ?: Context::get()->getProcessRate();
         $this->iBitsPerSample = $iBitsPerSample;
-        $this->iNumChannels   = $iNumChannels;
+        $this->iNumChannels   = clamp($iChannelMode, self::I_CHAN_MONO, self::I_CHAN_STEREO);
         $this->iQuantize      = (1 << ($this->iBitsPerSample - 1)) - 1;
     }
 
@@ -144,4 +148,3 @@ class Wav implements IPCMOutput {
         );
     }
 }
-

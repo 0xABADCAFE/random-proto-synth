@@ -1,7 +1,9 @@
 <?php
 
 namespace ABadCafe\Synth\Signal;
+
 use \SPLFixedArray;
+
 use function ABadCafe\Synth\Utility\clamp;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,17 +13,7 @@ use function ABadCafe\Synth\Utility\clamp;
  *
  * Represents a packet of a signal. All Packet instances have the same length, configured in Signal\Context
  */
-class Packet {
-
-    const
-        // Limits
-        MIN_CHANNELS = 1,
-        MAX_CHANNELS = 2,
-
-        // Mode alieases
-        CH_MONO   = 1,
-        CH_STEREO = 2
-    ;
+class Packet implements IChannelMode {
 
     /** @var SPLFixedArray[] $aEmpty */
     private static $aEmpty = [];
@@ -29,18 +21,18 @@ class Packet {
     /** @var SPLFixedArray $oValues */
     private $oValues = null;
 
-    /** @var int $iChannels */
-    private $iChannels = self::MIN_CHANNELS;
+    /** @var int $iChannelMode */
+    private $iChannelMode = self::I_CHAN_MONO;
 
 
     /**
      * Constructor. Accepts the number of channels in this Packet instance. Default is MIN_CHANNELS.
      *
-     * @param int $iChannels
+     * @param int $iChannelMode
      */
-    public function __construct(int $iChannels = self::CH_MONO) {
-        $this->iChannels = clamp($iChannels, self::MIN_CHANNELS, self::MAX_CHANNELS);
-        $this->oValues   = self::initEmpty($this->iChannels);
+    public function __construct(int $iChannelMode = self::I_CHAN_MONO) {
+        $this->iChannelMode = clamp($iChannelMode, self::I_CHAN_MONO, self::I_CHAN_STEREO);
+        $this->oValues   = self::initEmpty($this->iChannelMode);
     }
 
     /**
@@ -96,10 +88,9 @@ class Packet {
      * @return Packet fluent
      */
     public function modulateWith(Packet $oPacket) : self {
-        if ($oPacket->iChannels == $this->iChannels) {
-            foreach ($this->oValues as $i => $fValue) {
-                $this->oValues[$i] = $fValue * $oPacket->oValues[$i];
-            }
+        $oValues = $this->extractValues($oPacket);
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue * $oValues[$i];
         }
         return $this;
     }
@@ -111,10 +102,9 @@ class Packet {
      * @return Packet fluent
      */
     public function sumWith(Packet $oPacket) : self {
-        if ($oPacket->iChannels == $this->iChannels) {
-            foreach ($this->oValues as $i => $fValue) {
-                $this->oValues[$i] = $fValue + $oPacket->oValues[$i];
-            }
+        $oValues = $this->extractValues($oPacket);
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue + $oValues[$i];
         }
         return $this;
     }
@@ -127,25 +117,9 @@ class Packet {
      * @return Packet fluent
      */
     public function accumulate(Packet $oPacket, float $fScale) : self {
-        if ($oPacket->iChannels == $this->iChannels) {
-            foreach ($this->oValues as $i => $fValue) {
-                $this->oValues[$i] = $fValue + $oPacket->oValues[$i] * $fScale;
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * Subtract the values in the provided packed with those in this packet
-     *
-     * @param  Packet $oPacket
-     * @return Packet fluent
-     */
-    public function diffWith(Packet $oPacket) : self {
-        if ($oPacket->iChannels == $this->iChannels) {
-            foreach ($this->oValues as $i => $fValue) {
-                $this->oValues[$i] = $fValue - $oPacket->oValues[$i];
-            }
+        $oValues = $this->extractValues($oPacket);
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue + $oValues[$i] * $fScale;
         }
         return $this;
     }
@@ -160,8 +134,32 @@ class Packet {
     /**
      * @return int
      */
-    public function getChannels() : int {
-        return $this-iChannels;
+    public function getChannelMode() : int {
+        return $this-iChannelMode;
+    }
+
+    /**
+     * Get the values for a Packet, ensuring that they are in the same channel mode as this one.
+     */
+    private function extractValues(Packet $oPacket) : SPLFixedArray {
+        if ($this->iChannelMode == $oPacket->iChannelMode) {
+            return $oPacket->oValues;
+        }
+        $oValues = clone $this->oValues;
+        $i = 0;
+        if ($this->iChannelMode > $oPacket->iChannelMode) {
+            // Split into stereo
+            foreach ($oPacket->oValues as $fValue) {
+                $oValues[$i++] = $fValue;
+                $oValues[$i++] = $fValue;
+            }
+        } else {
+            // Merge into mono
+            foreach ($oValues as $j => $fValue) {
+                $oValues[$j] = 0.5 * ($oPacket->oValues[$i++] + $oPacket->oValues[$i++]);
+            }
+        }
+        return $oValues;
     }
 
     /**
@@ -183,10 +181,10 @@ class Packet {
      *
      * @return SPLFixedArray
      */
-    private static function initEmpty(int $iChannels) : SPLFixedArray {
-        if (!isset(self::$aEmpty[$iChannels])) {
-            self::$aEmpty[$iChannels] = SPLFixedArray::fromArray(array_fill(0, $iChannels * Context::get()->getPacketLength(), 0.0));
+    private static function initEmpty(int $iChannelMode) : SPLFixedArray {
+        if (!isset(self::$aEmpty[$iChannelMode])) {
+            self::$aEmpty[$iChannelMode] = SPLFixedArray::fromArray(array_fill(0, $iChannelMode * Context::get()->getPacketLength(), 0.0));
         }
-        return clone self::$aEmpty[$iChannels];
+        return clone self::$aEmpty[$iChannelMode];
     }
 }
