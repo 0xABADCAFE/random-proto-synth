@@ -83,6 +83,26 @@ interface IStream {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * IPanLaw
+ *
+ * Interface for panning law implementations that convert a stream of panning values into a stream of left/right
+ * amplitude.
+ */
+interface IPanLaw {
+
+    /**
+     * Convert a monophonic Packet of normalised panning values into a stereo Packet of amplitude values for the
+     * left and right channels.
+     *
+     * @param  Packet $oPanPacket - pan values from -1.0 (left) to 0.0 (centre) to 1.0 (right)
+     * @return Packet
+     */
+    public function map(Packet $oPanPacket) : Packet;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
  * IGenerator
  *
  * Main signal generator interface. Function generators generate a basic waveform, with a time-independent duty
@@ -159,5 +179,6 @@ interface IFilter {
 
 require_once 'signal/Context.php';
 require_once 'signal/Packet.php';
+require_once 'signal/PanLaw.php';
 require_once 'signal/Generator.php';
 require_once 'signal/Filter.php';
