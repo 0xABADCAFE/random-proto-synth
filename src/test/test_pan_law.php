@@ -8,14 +8,16 @@ const I_TIME = 1;
 
 $iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
 
-// Create a sine wave to use as the Pan value
-$oOscillator = new Oscillator\Simple(
-    new Signal\Generator\Sine(),
-    110
+$oPanEnvelope = new Envelope\Generator\LinearInterpolated(
+    new Envelope\Shape(
+        -1.0, [
+            [1.0, I_TIME]
+        ]
+    )
 );
 
 // Test the linear pan law
-$oPanLaw = new Signal\PanLaw\Linear;
+$oPanLaw = new Signal\PanLaw\CentreMax;
 
 // Render to a Wav so the data can be inspected
 $oOutput = $oOutput = new Output\Wav(
@@ -25,14 +27,10 @@ $oOutput = $oOutput = new Output\Wav(
 );
 $oOutput->open('output/test_pan_law.wav');
 
-// Render a second of stereo. We expect that:
-// 1. The output signal is always zero or positive for both the left and right channel (ie biased 50%)
-// 2. The output signal starts at 50% in each channel
-// 3. The left and right sine waves are completely out of phase.
 do {
     $oOutput->write(
-        $oPanLaw->map($oOscillator->emit())
+        $oPanLaw->map($oPanEnvelope->emit())
     );
-} while ($oOscillator->getPosition() < $iMaxSamples);
+} while ($oPanEnvelope ->getPosition() < $iMaxSamples);
 
 $oOutput->close();

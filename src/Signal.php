@@ -94,10 +94,10 @@ interface IPanLaw {
      * Convert a monophonic Packet of normalised panning values into a stereo Packet of amplitude values for the
      * left and right channels.
      *
-     * @param  Packet $oPanPacket - pan values from -1.0 (left) to 0.0 (centre) to 1.0 (right)
-     * @return Packet
+     * @param  MonoPacket $oPanPacket - pan values from -1.0 (left) to 0.0 (centre) to 1.0 (right)
+     * @return StereoPacket
      */
-    public function map(Packet $oPanPacket) : Packet;
+    public function map(MonoPacket $oPanPacket) : StereoPacket;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

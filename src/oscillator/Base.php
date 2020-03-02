@@ -6,6 +6,7 @@ use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\IGenerator;
 use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal\MonoPacket;
 
 use function ABadCafe\Synth\Utility\clamp;
 
@@ -59,10 +60,10 @@ abstract class Base implements IOscillator {
         float      $fFrequency  = ILimits::F_DEF_FREQ,
         float      $fPhase      = 0.0
     ) {
-        $this->oGenerator      = $oGenerator;
-        $this->oGeneratorInput = new Packet();
+        $this->oGenerator       = $oGenerator;
+        $this->oGeneratorInput  = new Packet();
         $this->setFrequency($fFrequency);
-        $this->fPhaseShift     = $oGenerator->getPeriod() * $fPhase;
+        $this->fPhaseCorrection = $oGenerator->getPeriod() * $fPhase;
     }
 
     /**
@@ -108,7 +109,7 @@ abstract class Base implements IOscillator {
         $this->oPhaseShift      = null;
         $this->oPitchShift      = null;
         $this->fCurrentFreqency = $this->fFrequency;
-        $this->fPhaseAdjustment = 0;
+        $this->fPhaseCorrection = 0;
         return $this;
     }
 
@@ -127,7 +128,7 @@ abstract class Base implements IOscillator {
     /**
      * @inheritdoc
      */
-    public function setPitchModulation(Packet $oPitch = null) : IOscillator {
+    public function setPitchModulation(MonoPacket $oPitch = null) : IOscillator {
         if ($oPitch) {
             // Convert the linear semitone based shifts into absolute multiples of the base frequency
             $this->oPitchShift = clone $oPitch->getValues();

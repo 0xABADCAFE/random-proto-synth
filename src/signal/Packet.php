@@ -135,7 +135,7 @@ class Packet implements IChannelMode {
      * @return int
      */
     public function getChannelMode() : int {
-        return $this-iChannelMode;
+        return $this->iChannelMode;
     }
 
     /**
@@ -186,5 +186,27 @@ class Packet implements IChannelMode {
             self::$aEmpty[$iChannelMode] = SPLFixedArray::fromArray(array_fill(0, $iChannelMode * Context::get()->getPacketLength(), 0.0));
         }
         return clone self::$aEmpty[$iChannelMode];
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Type hintable front for specifically mono packet users
+ */
+class MonoPacket extends Packet {
+    public function __construct() {
+        parent::__construct(self::I_CHAN_MONO);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Type hintable front for specifically stereo packet users
+ */
+class StereoPacket extends Packet {
+    public function __construct() {
+        parent::__construct(self::I_CHAN_STEREO);
     }
 }
