@@ -1,36 +1,20 @@
 <?php
 
-namespace ABadCafe\Synth;
+namespace ABadCafe\Synth\Signal;
 
-require 'profiling.php';
+require_once '../Synth.php';
 
-require_once '../Signal.php';
+$foo = new Audio\Packet;
+$bar = new Control\Packet;
 
-const I_ITERATIONS = 100000;
+$foo->fillWith(1.0)->sumWith($foo);
 
-$oPacket1 = new Signal\Packet();
-$oPacket2 = new Signal\Packet();
+$bar->fillWith(0.5);
 
-echo "Testing Packet::sumWith() over ", I_ITERATIONS, " iterations...";
-$fTime = microtime(true);
-for ($i = 0; $i < I_ITERATIONS; $i++) {
-    $oPacket1->sumWith($oPacket2);
+print_r($foo);
+
+try {
+    $bar->sumWith($foo);
+} catch (\Throwable $oError) {
+    echo "Caught ", $oError, "\n";
 }
-$fTime = microtime(true) - $fTime;
-echo " Took ", $fTime, " seconds\n";
-
-echo "Testing Packet::modulateWith() over ", I_ITERATIONS, " iterations...";
-$fTime = microtime(true);
-for ($i = 0; $i < I_ITERATIONS; $i++) {
-    $oPacket1->modulateWith($oPacket2);
-}
-$fTime = microtime(true) - $fTime;
-echo " Took ", $fTime, " seconds\n";
-
-echo "Testing Packet::accumulate() over ", I_ITERATIONS, " iterations...";
-$fTime = microtime(true);
-for ($i = 0; $i < I_ITERATIONS; $i++) {
-    $oPacket1->accumulate($oPacket2, 0.5);
-}
-$fTime = microtime(true) - $fTime;
-echo " Took ", $fTime, " seconds\n";

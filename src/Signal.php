@@ -182,3 +182,7 @@ require_once 'signal/Packet.php';
 require_once 'signal/PanLaw.php';
 require_once 'signal/Generator.php';
 require_once 'signal/Filter.php';
+
+require_once 'signal/packet/TPacket.php';
+require_once 'signal/packet/Audio.php';
+require_once 'signal/packet/Control.php';
