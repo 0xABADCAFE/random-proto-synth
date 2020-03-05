@@ -12,6 +12,8 @@ use function ABadCafe\Synth\Utility\clamp;
  * Packet
  *
  * Represents a packet of a signal. All Packet instances have the same length, configured in Signal\Context
+ *
+ * @deprecated
  */
 class Packet implements IChannelMode {
 
@@ -189,24 +191,3 @@ class Packet implements IChannelMode {
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Type hintable front for specifically mono packet users
- */
-class MonoPacket extends Packet {
-    public function __construct() {
-        parent::__construct(self::I_CHAN_MONO);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Type hintable front for specifically stereo packet users
- */
-class StereoPacket extends Packet {
-    public function __construct() {
-        parent::__construct(self::I_CHAN_STEREO);
-    }
-}

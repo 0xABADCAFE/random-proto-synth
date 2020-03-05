@@ -2,9 +2,9 @@
 
 namespace ABadCafe\Synth\Envelope\Generator;
 
-use ABadCafe\Synth\Signal\IStream;
+use ABadCafe\Synth\Signal\Control\IStream;
+use ABadCafe\Synth\Signal\Control\Packet;
 use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Signal\MonoPacket;
 use ABadCafe\Synth\Envelope\IShape;
 use ABadCafe\Synth\Envelope\IGenerator;
@@ -89,8 +89,8 @@ class LinearInterpolated implements IGenerator {
         IMIDINoteMap $oNoteMapLevel = null
     ) {
         $this->oShape        = $oShape;
-        $this->oOutputPacket = new MonoPacket();
-        $this->oFinalPacket  = new MonoPacket();
+        $this->oOutputPacket = new Packet();
+        $this->oFinalPacket  = new Packet();
         if ($oNoteMapSpeed) {
             $this->aNoteMaps[self::S_NOTE_MAP_SPEED] = $oNoteMapSpeed;
         }

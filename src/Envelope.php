@@ -6,6 +6,7 @@
 namespace ABadCafe\Synth\Envelope;
 
 use \Countable;
+use ABadCafe\Synth\Signal\Control\IStream as IControlStream;
 use ABadCafe\Synth\Signal\Packet;
 use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
@@ -68,7 +69,7 @@ interface IShape extends Countable {
  *
  * Basic tag interface for Envelope Generators
  */
-interface IGenerator extends IStream, IMIDINoteMapAware {
+interface IGenerator extends IControlStream, IMIDINoteMapAware {
 
     const
         // Use cases for IMIDINoteMapAware

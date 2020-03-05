@@ -4,7 +4,7 @@ namespace ABadCafe\Synth\Signal;
 
 require_once '../Synth.php';
 
-$foo = new Audio\Packet;
+$foo = new Audio\MonoPacket;
 $bar = new Control\Packet;
 
 $foo->fillWith(1.0)->sumWith($foo);

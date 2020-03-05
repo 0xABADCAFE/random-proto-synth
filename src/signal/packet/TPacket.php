@@ -1,7 +1,7 @@
 <?php
 
 namespace ABadCafe\Synth\Signal;
-
+use ABadCafe\Synth\Signal\Context;
 use \SPLFixedArray;
 
 use function ABadCafe\Synth\Utility\clamp;
@@ -11,9 +11,13 @@ use function ABadCafe\Synth\Utility\clamp;
 /**
  * TPacket
  *
- * Trait to allow generalisation of Packets
+ * Trait to allow generalisation of Packets as fixed length arrays of doubles with set behaviours, without imposing
+ * an overly abstract type interface.
  */
 trait TPacket {
+
+    /** @var SPLFixedArray $oEmptyValues */
+    private static $oEmptyValues = null;
 
     /** @var SPLFixedArray $oValues */
     private $oValues = null;
@@ -112,5 +116,15 @@ trait TPacket {
      */
     public function getValues() : SPLFixedArray {
         return $this->oValues;
+    }
+
+    /**
+     * @return SPLFixedArray
+     */
+    private static function initEmptyValues(int $iChannelMode) : SPLFixedArray {
+        if (null === self::$oEmptyValues) {
+            self::$oEmptyValues = SPLFixedArray::fromArray(array_fill(0, $iChannelMode * Context::get()->getPacketLength(), 0.0));
+        }
+        return clone self::$oEmptyValues;
     }
 }

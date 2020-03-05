@@ -94,10 +94,10 @@ interface IPanLaw {
      * Convert a monophonic Packet of normalised panning values into a stereo Packet of amplitude values for the
      * left and right channels.
      *
-     * @param  MonoPacket $oPanPacket - pan values from -1.0 (left) to 0.0 (centre) to 1.0 (right)
-     * @return StereoPacket
+     * @param  Control\Packet $oPanPacket - pan values from -1.0 (left) to 0.0 (centre) to 1.0 (right)
+     * @return Audio\StereoPacket
      */
-    public function map(MonoPacket $oPanPacket) : StereoPacket;
+    public function map(Control\Packet $oPanPacket) : Audio\StereoPacket;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,10 +179,13 @@ interface IFilter {
 
 require_once 'signal/Context.php';
 require_once 'signal/Packet.php';
-require_once 'signal/PanLaw.php';
-require_once 'signal/Generator.php';
-require_once 'signal/Filter.php';
 
 require_once 'signal/packet/TPacket.php';
 require_once 'signal/packet/Audio.php';
 require_once 'signal/packet/Control.php';
+
+require_once 'signal/PanLaw.php';
+require_once 'signal/Generator.php';
+require_once 'signal/Filter.php';
+
+

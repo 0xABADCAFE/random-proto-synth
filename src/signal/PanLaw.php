@@ -4,10 +4,10 @@ namespace ABadCafe\Synth\Signal\PanLaw;
 
 use ABadCafe\Synth\Signal\ILimits;
 use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\MonoPacket;
-use ABadCafe\Synth\Signal\StereoPacket;
 use ABadCafe\Synth\Signal\IChannelMode;
 use ABadCafe\Synth\Signal\IPanLaw;
+use ABadCafe\Synth\Signal\Control\Packet as ControlPacket;
+use ABadCafe\Synth\Signal\Audio\StereoPacket;
 use \SPLFixedArray;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ class Linear extends Base {
     /**
      * @inheritdoc
      */
-    public function map(MonoPacket $oPanPacket) : StereoPacket {
+    public function map(ControlPacket $oPanPacket) : StereoPacket {
         $oOutputPacket = clone self::$oOutputPrototype;
         $oOutput = $oOutputPacket->getValues();
         $i = 0;
@@ -74,7 +74,7 @@ class CentreMax extends Base {
     /**
      * @inheritdoc
      */
-    public function map(MonoPacket $oPanPacket) : StereoPacket {
+    public function map(ControlPacket $oPanPacket) : StereoPacket {
         $oOutputPacket = clone self::$oOutputPrototype;
         $oOutput = $oOutputPacket->getValues();
         $i = 0;
