@@ -3,7 +3,7 @@
 namespace ABadCafe\Synth\Output;
 
 use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal\Audio\IPacket;
 use ABadCafe\Synth\Signal\IChannelMode;
 
 use function ABadCafe\Synth\Utility\clamp;
@@ -110,7 +110,7 @@ class Wav implements IPCMOutput, IChannelMode {
     /**
      * @inheritdoc
      */
-    public function write(Packet $oPacket) {
+    public function write(IPacket $oPacket) {
         $aOutput = $oPacket
             ->quantize($this->iQuantize, -$this->iQuantize, $this->iQuantize)
             ->toArray();

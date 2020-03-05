@@ -2,7 +2,7 @@
 
 namespace ABadCafe\Synth\Output;
 
-use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal\Audio\IPacket;
 use ABadCafe\Synth\Signal\Context;
 use ABadCafe\Synth\Signal\IChannelMode;
 
@@ -87,7 +87,7 @@ class Play implements IPCMOutput, IChannelMode {
     /**
      * @inheritdoc
      */
-    public function write(Packet $oPacket) {
+    public function write(IPacket $oPacket) {
         $aOutput = $oPacket
             ->quantize(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)
             ->toArray();

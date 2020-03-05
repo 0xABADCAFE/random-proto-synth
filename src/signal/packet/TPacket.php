@@ -119,6 +119,20 @@ trait TPacket {
     }
 
     /**
+     * Obtain the values scaled and quantized to some fixed integer range (e.g. conversion to sint16 for final output)
+     *
+     * @return SPLFixedArray
+     */
+    public function quantize(int $iScaleValue, int $iMinValue, int $iMaxValue) : SPLFixedArray {
+        $oResult = clone $this->oValues;
+        foreach ($oResult as $i => $mValue) {
+            $mValue = (int)($mValue * $iScaleValue);
+            $oResult[$i] = $mValue < $iMinValue ? $iMinValue : ($mValue > $iMaxValue ? $iMaxValue : $mValue);
+        }
+        return $oResult;
+    }
+
+    /**
      * @return SPLFixedArray
      */
     private static function initEmptyValues(int $iChannelMode) : SPLFixedArray {

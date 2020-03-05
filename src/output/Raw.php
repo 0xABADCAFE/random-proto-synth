@@ -2,7 +2,7 @@
 
 namespace ABadCafe\Synth\Output;
 
-use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal\Audio\IPacket;
 
 /**
  * Raw
@@ -58,7 +58,7 @@ class Raw16BitLittle extends Raw {
     /**
      * @inheritdoc
      */
-    public function write(Packet $oPacket) {
+    public function write(IPacket $oPacket) {
         $aOutput = $oPacket
             ->quantize(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)
             ->toArray();

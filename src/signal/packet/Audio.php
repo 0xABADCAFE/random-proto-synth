@@ -7,9 +7,16 @@ use ABadCafe\Synth\Signal\TPacket;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Tag interface for Audio Packets
+ */
+interface IPacket {
+
+}
+
+/**
  * Audio Packet (Mono)
  */
-class MonoPacket {
+class MonoPacket implements IPacket {
     use TPacket;
 
     public function toStereo() : StereoPacket {
@@ -27,7 +34,7 @@ class MonoPacket {
 /**
  * Audio Packet (Stereo)
  */
-class StereoPacket {
+class StereoPacket implements IPacket {
     use TPacket;
 
     public function toMono() : MonoPacket {
