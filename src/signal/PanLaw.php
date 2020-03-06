@@ -1,13 +1,7 @@
 <?php
 
 namespace ABadCafe\Synth\Signal\PanLaw;
-
-use ABadCafe\Synth\Signal\ILimits;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\IChannelMode;
-use ABadCafe\Synth\Signal\IPanLaw;
-use ABadCafe\Synth\Signal\Control\Packet as ControlPacket;
-use ABadCafe\Synth\Signal\Audio\StereoPacket;
+use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,7 +9,7 @@ use \SPLFixedArray;
 /**
  * Base - common code for PanLaw implementations.
  */
-abstract class Base implements IPanLaw {
+abstract class Base implements Signal\IPanLaw {
 
     /**
      * @var Packet $oPrototyope
@@ -27,7 +21,7 @@ abstract class Base implements IPanLaw {
      */
     public function __construct() {
         if (null === self::$oOutputPrototype) {
-            self::$oOutputPrototype = new StereoPacket();
+            self::$oOutputPrototype = new Signal\Audio\StereoPacket();
         }
     }
 }
@@ -47,7 +41,7 @@ class Linear extends Base {
     /**
      * @inheritdoc
      */
-    public function map(ControlPacket $oPanPacket) : StereoPacket {
+    public function map(Signal\Control\Packet $oPanPacket) : Signal\Audio\StereoPacket {
         $oOutputPacket = clone self::$oOutputPrototype;
         $oOutput = $oOutputPacket->getValues();
         $i = 0;
@@ -74,7 +68,7 @@ class CentreMax extends Base {
     /**
      * @inheritdoc
      */
-    public function map(ControlPacket $oPanPacket) : StereoPacket {
+    public function map(Signal\Control\Packet $oPanPacket) : Signal\Audio\StereoPacket {
         $oOutputPacket = clone self::$oOutputPrototype;
         $oOutput = $oOutputPacket->getValues();
         $i = 0;
