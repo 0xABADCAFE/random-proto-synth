@@ -5,6 +5,8 @@
  */
 namespace ABadCafe\Synth\Signal;
 
+use \SPLFixedArray;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -51,7 +53,61 @@ interface IChannelMode {
     ;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * IPacket
+ *
+ * Top level abstraction for a Packet of values that is processed as a unit. These may be audio samples,
+ * control value samples, etc.
+ *
+ */
+interface IPacket {
+
+   /**
+    * Obtain the raw floating point values in the Packet
+    *
+    * @return SPLFixedArray
+    */
+   public function getValues() : SPLFixedArray;
+
+   /**
+    * Obtain an integer quantised set of values in the Packet
+    *
+    * @param  int $iScaleValue
+    * @param  int $iMinValue
+    * @param  int $iMaxValue
+    * @return SPLFixedArray
+    */
+   public function quantise(int $iScaleValue, int $iMinValue, int $iMaxValue) : SPLFixedArray;
+
+   /**
+    * Set all values in the Packet to a fixed value.
+    *
+    * @param  float $fValue
+    * @return self
+    */
+   public function fillWith(float $fValue) : self;
+
+   /**
+    * Add a fixed value to every value in the Packet
+    *
+    * @param  float $fValue
+    * @return self
+    */
+   public function biasBy(float $fValue) : self;
+
+   /**
+    * Add a fixed value to every value in the Packet
+    *
+    * @param  float $fValue
+    * @return self
+    */
+   public function scaleBy(float $fValue) : self;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * IStream
@@ -179,10 +235,6 @@ interface IFilter {
 
 require_once 'signal/Context.php';
 require_once 'signal/Packet.php';
-
-require_once 'signal/packet/TPacket.php';
-require_once 'signal/packet/Audio.php';
-require_once 'signal/packet/Control.php';
 
 require_once 'signal/PanLaw.php';
 require_once 'signal/Generator.php';

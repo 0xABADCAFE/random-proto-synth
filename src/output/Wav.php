@@ -2,9 +2,7 @@
 
 namespace ABadCafe\Synth\Output;
 
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Audio\IPacket;
-use ABadCafe\Synth\Signal\IChannelMode;
+use ABadCafe\Synth\Signal;
 
 use function ABadCafe\Synth\Utility\clamp;
 use function ABadCafe\Synth\Utility\dprintf;
@@ -16,7 +14,7 @@ use function ABadCafe\Synth\Utility\dprintf;
  *
  * Minimal implementation of the RIFF Wave standard for linear PCM
  */
-class Wav implements IPCMOutput, IChannelMode {
+class Wav implements IPCMOutput, Signal\IChannelMode {
 
     const
         I_DEF_RATE_SIGNAL_DEFAULT = 0,
@@ -62,7 +60,7 @@ class Wav implements IPCMOutput, IChannelMode {
         int $iBitsPerSample = self::I_DEF_RESOLUTION_BITS,
         int $iChannelMode   = self::I_CHAN_MONO
     ) {
-        $this->iSampleRate    = $iSampleRate != self::I_DEF_RATE_SIGNAL_DEFAULT ?: Context::get()->getProcessRate();
+        $this->iSampleRate    = $iSampleRate != self::I_DEF_RATE_SIGNAL_DEFAULT ?: Signal\Context::get()->getProcessRate();
         $this->iBitsPerSample = $iBitsPerSample;
         $this->iNumChannels   = clamp($iChannelMode, self::I_CHAN_MONO, self::I_CHAN_STEREO);
         $this->iQuantize      = (1 << ($this->iBitsPerSample - 1)) - 1;
@@ -110,9 +108,9 @@ class Wav implements IPCMOutput, IChannelMode {
     /**
      * @inheritdoc
      */
-    public function write(IPacket $oPacket) {
+    public function write(Signal\IPacket $oPacket) {
         $aOutput = $oPacket
-            ->quantize($this->iQuantize, -$this->iQuantize, $this->iQuantize)
+            ->quantise($this->iQuantize, -$this->iQuantize, $this->iQuantize)
             ->toArray();
         fwrite($this->rOutput, pack('v*', ...$aOutput));
     }

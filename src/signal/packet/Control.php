@@ -1,15 +1,15 @@
 <?php
 
 namespace ABadCafe\Synth\Signal\Control;
-use ABadCafe\Synth\Signal\TPacket;
+use ABadCafe\Synth\Signal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Control Packet
  */
-class Packet {
-    use TPacket;
+class Packet extends Signal\BasePacket {
+    use Signal\TPacketOperations;
 
     /**
      * Constructor
@@ -19,6 +19,8 @@ class Packet {
         $this->oValues = self::initEmptyValues(1);
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Control IStream

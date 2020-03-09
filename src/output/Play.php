@@ -2,9 +2,7 @@
 
 namespace ABadCafe\Synth\Output;
 
-use ABadCafe\Synth\Signal\Audio\IPacket;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\IChannelMode;
+use ABadCafe\Synth\Signal;
 
 use function ABadCafe\Synth\Utility\clamp;
 use function ABadCafe\Synth\Utility\dprintf;
@@ -16,7 +14,7 @@ use function ABadCafe\Synth\Utility\dprintf;
  *
  * Base class for raw output
  */
-class Play implements IPCMOutput, IChannelMode {
+class Play implements IPCMOutput, Signal\IChannelMode {
 
     const
         I_MIN_LEVEL = -32767,
@@ -54,7 +52,7 @@ class Play implements IPCMOutput, IChannelMode {
         $sCommand = sprintf(
             'play -t raw -b 16 -c %d -e signed --endian=little -r %d --buffer %d -',
             $this->iChannelMode,
-            Context::get()->getProcessRate(),
+            Signal\Context::get()->getProcessRate(),
             self::I_BUFFER
         );
 
@@ -87,9 +85,9 @@ class Play implements IPCMOutput, IChannelMode {
     /**
      * @inheritdoc
      */
-    public function write(IPacket $oPacket) {
+    public function write(Signal\IPacket $oPacket) {
         $aOutput = $oPacket
-            ->quantize(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)
+            ->quantise(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)
             ->toArray();
         fwrite($this->aPipes[0], pack('v*', ...$aOutput));
     }

@@ -4,9 +4,8 @@
  * Output
  */
 namespace ABadCafe\Synth\Output;
-
+use ABadCafe\Synth\Signal;
 use \Exception;
-use ABadCafe\Synth\Signal\Audio\IPacket;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +41,7 @@ interface IPCMOutput {
      * @param  Packet $oPacket
      * @throws IOException
      */
-    public function write(IPacket $oPacket);
+    public function write(Signal\IPacket $oPacket);
 
     /**
      * Close the output stream

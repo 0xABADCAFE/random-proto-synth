@@ -1,23 +1,15 @@
 <?php
 
 namespace ABadCafe\Synth\Signal\Audio;
-use ABadCafe\Synth\Signal\IChannelMode;
-use ABadCafe\Synth\Signal\TPacket;
+use ABadCafe\Synth\Signal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Tag interface for Audio Packets
- */
-interface IPacket {
-
-}
-
-/**
  * Audio Packet (Mono)
  */
-class MonoPacket implements IPacket {
-    use TPacket;
+class MonoPacket extends Signal\BasePacket {
+    use Signal\TPacketOperations;
 
     public function toStereo() : StereoPacket {
 
@@ -27,15 +19,17 @@ class MonoPacket implements IPacket {
      * Constructor
      */
     public function __construct() {
-        $this->oValues = self::initEmptyValues(IChannelMode::I_CHAN_MONO);
+        $this->oValues = self::initEmptyValues(Signal\IChannelMode::I_CHAN_MONO);
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Audio Packet (Stereo)
  */
-class StereoPacket implements IPacket {
-    use TPacket;
+class StereoPacket extends Signal\BasePacket {
+    use Signal\TPacketOperations;
 
     public function toMono() : MonoPacket {
 
@@ -45,9 +39,11 @@ class StereoPacket implements IPacket {
      * Constructor
      */
     public function __construct() {
-        $this->oValues = self::initEmptyValues(IChannelMode::I_CHAN_STEREO);
+        $this->oValues = self::initEmptyValues(Signal\IChannelMode::I_CHAN_STEREO);
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Control IStream
@@ -73,6 +69,8 @@ interface IMonoStream {
      */
     public function emit() : MonoPacket;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Control IStream
