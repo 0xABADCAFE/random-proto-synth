@@ -2,13 +2,11 @@
 
 namespace ABadCafe\Synth\Signal\Generator;
 
-use ABadCafe\Synth\Signal\ILimits;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\IGenerator;
+use ABadCafe\Synth\Signal;
+use \SPLFixedArray;
 use function ABadCafe\Synth\Utility\clamp;
 
-use \SPLFixedArray;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * WaveTable
@@ -16,7 +14,7 @@ use \SPLFixedArray;
  * Use a short lookup table as a wave period. The table must be a power of two in length. To enforce this,
  * construction takes the exponent size, which must be an integer between 2 and 8.
  */
-class WaveTable implements IGenerator {
+class WaveTable implements Signal\IGenerator {
 
     const
         I_MIN_SIZE_EXP = 2,
@@ -25,13 +23,18 @@ class WaveTable implements IGenerator {
 
 
     private
+        /** @var SPLFixedArray $oTable */
         $oTable  = null,
+
+        /** @var float $fPeriod */
         $fPeriod = 0,
+
+        /** @var int $iMask */
         $iMask   = 0
     ;
 
     /**
-     *
+     * @param int $iSizeExp
      */
     public function __construct(int $iSizeExp) {
         $iSize         = 1 << (int)clamp($iSizeExp, self::I_MIN_SIZE_EXP, self::I_MAX_SIZE_EXP);
@@ -40,6 +43,9 @@ class WaveTable implements IGenerator {
         $this->fPeriod = (float)$iSize;
     }
 
+    /**
+     * @return SPLFixedArray
+     */
     public function getTable() : SPLFixedArray {
         return $this->oTable;
     }
@@ -54,7 +60,7 @@ class WaveTable implements IGenerator {
     /**
      * @inheritdoc
      */
-    public function map(Packet $oInput) : Packet {
+    public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {

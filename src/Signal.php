@@ -133,7 +133,7 @@ interface IStream {
     /**
      * Emit a Packet
      */
-    public function emit() : Packet;
+    public function emit() : IPacket;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +180,7 @@ interface IGenerator {
      * @return Packet
      *
      */
-    public function map(Packet $oInput) : Packet;
+    public function map(IPacket $oInput) : IPacket;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,7 +228,7 @@ interface IFilter {
      * @param  Packet $oInput
      * @return Packet
      */
-    public function filter(Packet $oInput) : Packet;
+    public function filter(IPacket $oInput) : IPacket;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,5 +239,3 @@ require_once 'signal/Packet.php';
 require_once 'signal/PanLaw.php';
 require_once 'signal/Generator.php';
 require_once 'signal/Filter.php';
-
-

@@ -2,9 +2,7 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Output\IPCMOutput;
 
 use function ABadCafe\Synth\Utility\dprintf;
@@ -80,7 +78,7 @@ class PCMOutput extends Summing implements IOutput {
      * @inheritdoc
      * @see IStream
      */
-    public function emit() : Packet {
+    public function emit() : Signal\IPacket {
         $oPacket = parent::emit();
         $this->oPCMOutput->write($oPacket);
         return $oPacket;

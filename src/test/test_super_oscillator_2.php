@@ -23,6 +23,10 @@ $oOscillator = new Oscillator\Super(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// TODO - this won't work any more until we have an oscillator that emits control packets, or we have an audio to
+// control packet
+// adapter
+
 $oCutoffEnvelope = new Oscillator\Simple(
     new Signal\Generator\SawDown(0.05, 1.0),
     8

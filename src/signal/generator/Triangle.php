@@ -2,10 +2,7 @@
 
 namespace ABadCafe\Synth\Signal\Generator;
 
-use ABadCafe\Synth\Signal\ILimits;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\IGenerator;
+use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +29,7 @@ class Triangle extends NonFlat {
     /**
      * @inheritdoc
      */
-    public function map(Packet $oInput) : Packet {
+    public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {

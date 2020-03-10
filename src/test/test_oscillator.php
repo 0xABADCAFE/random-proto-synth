@@ -6,7 +6,6 @@ require_once '../Synth.php';
 
 // Test some generators
 $aGenerators = [
-    'flat'          => new Signal\Generator\Flat(0.5),
     'sine_full'     => new Signal\Generator\Sine(),
     'sine_pos'      => new Signal\Generator\Sine(0.01, 1.0),
     'sine_neg'      => new Signal\Generator\Sine(-1.0, -0.01),

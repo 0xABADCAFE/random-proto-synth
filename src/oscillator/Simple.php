@@ -2,10 +2,7 @@
 
 namespace ABadCafe\Synth\Oscillator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Generator\IGenerator;
-use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -17,7 +14,7 @@ class Simple extends Base {
     /**
      * @inheritdoc
      */
-    public function emit() : Packet {
+    public function emit() : Signal\IPacket {
 
         $oValues = $this->oGeneratorInput->getValues();
 

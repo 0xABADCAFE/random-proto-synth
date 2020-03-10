@@ -2,10 +2,7 @@
 
 namespace ABadCafe\Synth\Signal\Filter;
 
-use ABadCafe\Synth\Signal\ILimits;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\IFilter;
+use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +36,7 @@ abstract class Karlsen extends Resonant {
     /**
      * @inheritdoc
      */
-    public function reset() : IFilter {
+    public function reset() : Signal\IFilter {
         parent::reset();
         $this->fPole1      = 0.0;
         $this->fPole2      = 0.0;
@@ -54,7 +51,7 @@ abstract class Karlsen extends Resonant {
     /**
      * @inheritdoc
      */
-    public function filter(Packet $oInput) : Packet {
+    public function filter(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput    = clone $oInput;
         $oSamples   = $oOutput->getValues();
         $iCase      = ($this->oCutoff ? 1 : 0) | ($this->oResonance ? 2 : 0);

@@ -2,10 +2,7 @@
 
 namespace ABadCafe\Synth\Signal\Filter;
 
-use ABadCafe\Synth\Signal\ILimits;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\IFilter;
+use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,7 +12,7 @@ use \SPLFixedArray;
  *
  * Basic filter interface
  */
-interface ICutoffControlled extends IFilter {
+interface ICutoffControlled extends Signal\IFilter {
 
     /**
      * Set a control packet for the cutoff. This allows the control of the filter from other signal sources.
@@ -25,7 +22,7 @@ interface ICutoffControlled extends IFilter {
      *
      * @param Packet|null $oCutoff
      */
-    public function setCutoffControl(Packet $oCutoff = null) : self;
+    public function setCutoffControl(Signal\Control\Packet $oCutoff = null) : self;
 
     /**
      * Filter a Packet
@@ -33,7 +30,7 @@ interface ICutoffControlled extends IFilter {
      * @param  Packet $oInput
      * @return Packet
      */
-    public function filter(Packet $oInput) : Packet;
+    public function filter(Signal\IPacket $oInput) : Signal\IPacket;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +74,7 @@ interface IResonanceControlled extends ICutoffControlled {
      *
      * @param Packet|null $oCutoff
      */
-    public function setResonanceControl(Packet $oResonance = null) : self;
+    public function setResonanceControl(Signal\Control\Packet $oResonance = null) : self;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +94,7 @@ abstract class Base implements ICutoffControlled {
     /**
      * @inheritdoc
      */
-    public function reset() : IFilter {
+    public function reset() : Signal\IFilter {
         $this->oCutoff = null;
         return $this;
     }
@@ -105,7 +102,7 @@ abstract class Base implements ICutoffControlled {
     /**
      * @inheritdoc
      */
-    public function setCutoff(float $fCutoff) : IFilter {
+    public function setCutoff(float $fCutoff) : Signal\IFilter {
         $this->fCutoff = max($fCutoff, self::F_MIN_CUTOFF);
         return $this;
     }
@@ -120,7 +117,7 @@ abstract class Base implements ICutoffControlled {
     /**
      * @inheritdoc
      */
-    public function setCutoffControl(Packet $oCutoff = null) : ICutoffControlled {
+    public function setCutoffControl(Signal\Control\Packet $oCutoff = null) : ICutoffControlled {
         if ($oCutoff) {
             $this->oCutoff = clone $oCutoff->getValues();
         } else {
@@ -147,7 +144,7 @@ abstract class Resonant extends Base implements IResonanceControlled {
     /**
      * @inheritdoc
      */
-    public function reset() : IFilter {
+    public function reset() : Signal\IFilter {
         parent::reset();
         $this->oResonance = null;
         return $this;
@@ -174,7 +171,7 @@ abstract class Resonant extends Base implements IResonanceControlled {
     /**
      * @inheritdoc
      */
-    public function setResonanceControl(Packet $oResonance = null) : IResonanceControlled {
+    public function setResonanceControl(Signal\Control\Packet $oResonance = null) : IResonanceControlled {
         if ($oResonance) {
             $this->oResonance = clone $oResonance->getValues();
         } else {

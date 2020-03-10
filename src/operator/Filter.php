@@ -2,12 +2,7 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\IFilter;
-use ABadCafe\Synth\Signal\Filter\ICutoffControlled;
-use ABadCafe\Synth\Signal\Filter\IResonanceControlled;
+use ABadCafe\Synth\Signal;
 
 use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
 use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
@@ -49,14 +44,14 @@ class ControlledFilter extends Base implements IProcessor {
     /**
      * Constructor
      *
-     * @param IFilter $oFilter
-     * @param IStream $oCutoffControl    (optional)
-     * @param IStream $oResonanceControl (optional)
+     * @param Signal\IFilter $oFilter
+     * @param Signal\IStream $oCutoffControl    (optional)
+     * @param Signal\IStream $oResonanceControl (optional)
      */
     public function __construct(
-        IFilter $oFilter,
-        IStream $oCutoffControl    = null,
-        IStream $oResonanceControl = null
+        Signal\IFilter $oFilter,
+        Signal\IStream $oCutoffControl    = null,
+        Signal\IStream $oResonanceControl = null
     ) {
         $this->oFilter           = $oFilter;
         $this->oLastPacket       = new Packet();
@@ -91,7 +86,7 @@ class ControlledFilter extends Base implements IProcessor {
      * @inheritdoc
      * @see IStream
      */
-    public function reset() : IStream {
+    public function reset() : Signal\IStream {
         $this->iPosition = 0;
         $this->oLastPacket->fillWith(0);
         $this->oFilter->reset();
@@ -116,7 +111,7 @@ class ControlledFilter extends Base implements IProcessor {
      * @inheritdoc
      * @see IStream
      */
-    public function emitPacketForIndex(int $iPacketIndex) : Packet {
+    public function emitPacketForIndex(int $iPacketIndex) : Signal\IPacket {
         $this->iPosition += Context::get()->getPacketLength();
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
@@ -127,10 +122,10 @@ class ControlledFilter extends Base implements IProcessor {
             $this->oLastPacket->accumulate($oOperator->emitPacketForIndex($iPacketIndex), $this->aLevels[$iInstanceID]);
         }
 
-        if ($this->oCutoffControl && $this->oFilter instanceof ICutoffControlled) {
+        if ($this->oCutoffControl && $this->oFilter instanceof Signal\Filter\ICutoffControlled) {
             $this->oFilter->setCutoffControl($this->oCutoffControl->emit());
         }
-        if ($this->oResonanceControl && $this->oFilter instanceof IResonanceControlled) {
+        if ($this->oResonanceControl && $this->oFilter instanceof Signal\Filter\IResonanceControlled) {
             $this->oFilter->setResonanceControl($this->oResonanceControl->emit());
         }
 

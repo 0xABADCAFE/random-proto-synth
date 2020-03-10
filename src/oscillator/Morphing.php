@@ -2,11 +2,7 @@
 
 namespace ABadCafe\Synth\Oscillator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\IGenerator;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\ILimits as SignalLimits;
+use ABadCafe\Synth\Signal;
 
 use function ABadCafe\Synth\Utility\clamp;
 
@@ -32,9 +28,9 @@ use function ABadCafe\Synth\Utility\clamp;
     ;
 
     public function __construct(
-        IGenerator $oPrimaryGenerator,
-        IGenerator $oSecondaryGenerator,
-        IGenerator $oMixingGenerator,
+        Signal\IGenerator $oPrimaryGenerator,
+        Signal\IGenerator $oSecondaryGenerator,
+        Signal\IGenerator $oMixingGenerator,
         float      $fPrimaryFrequency,
         float      $fSecondaryRatio,
         float      $fMixingFrequency
@@ -43,14 +39,14 @@ use function ABadCafe\Synth\Utility\clamp;
         $this->fSecondaryRatio     = clamp($fSecondaryRatio, self::F_MIN_RATIO, self::F_MAX_RATIO);
         $this->oSecondaryGenerator = $oSecondaryGenerator;
         $this->oMixingGenerator    = $oMixingGenerator;
-        $this->oSecondaryInput     = new Packet();
-        $this->oMixingInput        = new Packet();
+        $this->oSecondaryInput     = new Signal\Audio\MonoPacket();
+        $this->oMixingInput        = new Signal\Audio\MonoPacket();
         parent::__construct($oPrimaryGenerator, $fPrimaryFrequency);
     }
 
     public function setFrequency(float $fFrequency) : IOscillator {
         parent::setFrequency($fFrequency);
-        $fRate = 1.0 / (float)Context::get()->getProcessRate();
+        $fRate = 1.0 / (float)Signal\Context::get()->getProcessRate();
         $this->fSecondaryScaleVal = $this->oSecondaryGenerator->getPeriod() * $this->fFrequency * $this->fSecondaryRatio * $fRate;
         $this->fMixingScaleVal    = $this->oMixingGenerator->getPeriod()    * $this->fMixingFrequency * $fRate;
         return $this;
@@ -61,7 +57,7 @@ use function ABadCafe\Synth\Utility\clamp;
      *
      * @todo - Reimplement to apply pitch and phase modulation as in the Simple oscillator.
      */
-    public function emit() : Packet {
+    public function emit() : Signal\IPacket {
         $oValues          = $this->oGeneratorInput->getValues();
         $oSecondaryValues = $this->oSecondaryInput->getValues();
         $oMixingValues    = $this->oMixingInput->getValues();
@@ -75,7 +71,7 @@ use function ABadCafe\Synth\Utility\clamp;
         $oMixingValues    = $this->oMixingGenerator->map($this->oMixingInput)->getValues();
         $oOutputValues    = $oOutputPacket->getValues();
         foreach ($oOutputValues as $i => $fPrimary) {
-            $fMixValue = 0.5 * ($oMixingValues[$i] + SignalLimits::F_MAX_LEVEL_NO_CLIP);
+            $fMixValue = 0.5 * ($oMixingValues[$i] + Signal\ILimits::F_MAX_LEVEL_NO_CLIP);
             $oOutputValues[$i] = ($fPrimary * $fMixValue) + ((1.0 - $fMixValue)*$oSecondaryValues[$i]);
         }
         return $oOutputPacket;
@@ -86,26 +82,26 @@ use function ABadCafe\Synth\Utility\clamp;
      *
      * @todo - remove. See emit()
      */
-    public function emitPhaseModulated(Packet $oPhase) : Packet {
-        $oValues             = $this->oGeneratorInput->getValues();
-        $oSecondaryValues    = $this->oSecondaryInput->getValues();
-        $oMixingValues       = $this->oMixingInput->getValues();
-        $fPhaseSize          = $this->oGenerator->getPeriod();
-        $fSecondaryPhaseSize = $this->oSecondaryGenerator->getPeriod();
-        $oModulator          = $oPhase->getValues();
-        foreach ($oValues as $i => $fValue) {
-            $oValues[$i]          = ($this->fScaleVal          * $this->iSamplePosition) + ($fPhaseSize * $oModulator[$i]);
-            $oSecondaryValues[$i] = ($this->fSecondaryScaleVal * $this->iSamplePosition) + ($fSecondaryPhaseSize * $oModulator[$i]);
-            $oMixingValues[$i]    = $this->fMixingScaleVal     * $this->iSamplePosition++;
-        }
-        $oOutputPacket    = $this->oGenerator->map($this->oGeneratorInput);
-        $oSecondaryValues = $this->oSecondaryGenerator->map($this->oSecondaryInput)->getValues();
-        $oMixingValues    = $this->oMixingGenerator->map($this->oMixingInput)->getValues();
-        $oOutputValues    = $oOutputPacket->getValues();
-        foreach ($oOutputValues as $i => $fPrimary) {
-            $fMixValue = 0.5 * ($oMixingValues[$i] + SignalLimits::F_MAX_LEVEL_NO_CLIP);
-            $oOutputValues[$i] = ($fPrimary * $fMixValue) + ((1.0 - $fMixValue)*$oSecondaryValues[$i]);
-        }
-        return $oOutputPacket;
-    }
+//     public function emitPhaseModulated(Packet $oPhase) : Packet {
+//         $oValues             = $this->oGeneratorInput->getValues();
+//         $oSecondaryValues    = $this->oSecondaryInput->getValues();
+//         $oMixingValues       = $this->oMixingInput->getValues();
+//         $fPhaseSize          = $this->oGenerator->getPeriod();
+//         $fSecondaryPhaseSize = $this->oSecondaryGenerator->getPeriod();
+//         $oModulator          = $oPhase->getValues();
+//         foreach ($oValues as $i => $fValue) {
+//             $oValues[$i]          = ($this->fScaleVal          * $this->iSamplePosition) + ($fPhaseSize * $oModulator[$i]);
+//             $oSecondaryValues[$i] = ($this->fSecondaryScaleVal * $this->iSamplePosition) + ($fSecondaryPhaseSize * $oModulator[$i]);
+//             $oMixingValues[$i]    = $this->fMixingScaleVal     * $this->iSamplePosition++;
+//         }
+//         $oOutputPacket    = $this->oGenerator->map($this->oGeneratorInput);
+//         $oSecondaryValues = $this->oSecondaryGenerator->map($this->oSecondaryInput)->getValues();
+//         $oMixingValues    = $this->oMixingGenerator->map($this->oMixingInput)->getValues();
+//         $oOutputValues    = $oOutputPacket->getValues();
+//         foreach ($oOutputValues as $i => $fPrimary) {
+//             $fMixValue = 0.5 * ($oMixingValues[$i] + SignalLimits::F_MAX_LEVEL_NO_CLIP);
+//             $oOutputValues[$i] = ($fPrimary * $fMixValue) + ((1.0 - $fMixValue)*$oSecondaryValues[$i]);
+//         }
+//         return $oOutputPacket;
+//     }
  }

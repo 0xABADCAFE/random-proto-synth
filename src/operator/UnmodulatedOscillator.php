@@ -2,10 +2,8 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Oscillator\IOscillator;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Oscillator;
 
 use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
 use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
@@ -57,20 +55,20 @@ class UnmodulatedOscillator extends Base implements ISource {
     /**
      * Constructo
      *
-     * @param IOscillator       $oOscillator       : Waveform generator to use    (required)
-     * @param float             $fFrequencyRatio   : Multiple of root note
-     * @param float             $fDetune           : Frequency adjustment
-     * @param IStream|null      $oAmplitudeControl : Amplitude Envelope Generator (optional)
-     * @param IStream|null      $oPitchControl     : Pitch Envelope Generator     (optional)
-     * @param IMIDINoteMap|null $oRootNoteMap      : Basic notemap for pitch
+     * @param Oscillator\IOscillator $oOscillator       : Waveform generator to use    (required)
+     * @param float                  $fFrequencyRatio   : Multiple of root note
+     * @param float                  $fDetune           : Frequency adjustment
+     * @param Signal\IStream|null    $oAmplitudeControl : Amplitude Envelope Generator (optional)
+     * @param Signal\IStream|null    $oPitchControl     : Pitch Envelope Generator     (optional)
+     * @param IMIDINoteMap|null      $oRootNoteMap      : Basic notemap for pitch
      */
     public function __construct(
-        IOscillator  $oOscillator,
-        float        $fFrequencyRatio   = 1.0,
-        float        $fDetune           = 0.0,
-        IStream      $oAmplitudeControl = null,
-        IStream      $oPitchControl     = null,
-        IMIDINoteMap $oRootNoteMap      = null
+        Oscillator\IOscillator  $oOscillator,
+        float                   $fFrequencyRatio   = 1.0,
+        float                   $fDetune           = 0.0,
+        Signal\IStream          $oAmplitudeControl = null,
+        Signal\IStream          $oPitchControl     = null,
+        IMIDINoteMap            $oRootNoteMap      = null
     ) {
         $this->oOscillator       = $oOscillator;
         $this->fFrequencyRatio   = $fFrequencyRatio;
@@ -92,7 +90,7 @@ class UnmodulatedOscillator extends Base implements ISource {
     /**
      * @inheritdoc
      */
-    public function reset() : IStream {
+    public function reset() : Signal\IStream {
         $this->oOscillator->reset();
         if ($this->oAmplitudeControl) {
             $this->oAmplitudeControl->reset();
@@ -192,7 +190,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      *
      * @return IOscillator
      */
-    public function getOscillator() : IOscillator {
+    public function getOscillator() : Oscillator\IOscillator {
         return $this->oOscillator;
     }
 
@@ -222,7 +220,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @param  int
      * @return Packet
      */
-    protected function emitPacketForIndex(int $iPacketIndex) : Packet {
+    protected function emitPacketForIndex(int $iPacketIndex) : Signal\IPacket {
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
         }

@@ -2,9 +2,8 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Utility\IEnumeratedInstance;
-use ABadCafe\Synth\Utility\TEnumeratedInstance;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Utility;
 use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
 use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
 use AbadCafe\Synth\Map\Note\Invariant        as IMIDIInvariantNoteMap;
@@ -17,9 +16,9 @@ use AbadCafe\Synth\Map\Note\Invariant        as IMIDIInvariantNoteMap;
  *
  * This class provides a mecahism where each emitted Packet has an index
  */
-abstract class Base implements IOperator, IEnumeratedInstance {
+abstract class Base implements IOperator, Utility\IEnumeratedInstance {
 
-    use TEnumeratedInstance;
+    use Utility\TEnumeratedInstance;
 
     protected
         /** @var Packet $oLastPacket */
@@ -32,7 +31,7 @@ abstract class Base implements IOperator, IEnumeratedInstance {
     /**
      * @inheritdoc
      */
-    public function emit() : Packet {
+    public function emit() : Signal\IPacket {
         return $this->emitPacketForIndex($this->iPacketIndex + 1);
     }
 
@@ -96,8 +95,8 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      * must bumo the iPacketIndex for every new Packet that is calculated.
      *
      * @param  int $iPacketIndex
-     * @return Packet
+     * @return Signal\IPacket
      */
-    protected abstract function emitPacketForIndex(int $iPacketIndex) : Packet;
+    protected abstract function emitPacketForIndex(int $iPacketIndex) : Signal\IPacket;
 
 }
