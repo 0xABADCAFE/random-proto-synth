@@ -5,12 +5,9 @@
  */
 namespace ABadCafe\Synth\Envelope;
 
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Map;
 use \Countable;
-use ABadCafe\Synth\Signal\Control\IStream as IControlStream;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -69,10 +66,10 @@ interface IShape extends Countable {
  *
  * Basic tag interface for Envelope Generators
  */
-interface IGenerator extends IControlStream, IMIDINoteMapAware {
+interface IGenerator extends Signal\Control\IStream, Map\Note\IMIDINumberAware {
 
     const
-        // Use cases for IMIDINoteMapAware
+        // Use cases for Map\Note\IMIDINumberAware
         S_NOTE_MAP_SPEED = 'speed',
         S_NOTE_MAP_LEVEL = 'level'
     ;
