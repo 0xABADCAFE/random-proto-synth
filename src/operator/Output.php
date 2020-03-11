@@ -3,7 +3,7 @@
 namespace ABadCafe\Synth\Operator;
 
 use ABadCafe\Synth\Signal;
-use ABadCafe\Synth\Output\IPCMOutput;
+use ABadCafe\Synth\Output;
 
 use function ABadCafe\Synth\Utility\dprintf;
 
@@ -12,19 +12,19 @@ use function ABadCafe\Synth\Utility\dprintf;
 /**
  * PCMOutput
  *
- * Extension of the basic Summing operator that pushes to an IPCMOutput stream.
+ * Extension of the basic Summing operator that pushes to an Output\Output\IPCMOutput stream.
  */
 class PCMOutput extends Summing implements IOutput {
 
-    /** @var IPCMOutput $oOutput */
+    /** @var Output\Output\IPCMOutput $oOutput */
     private $oPCMOutput;
 
     /**
      * Constructor, inject the desired file output type
      *
-     * @param IPCMOutput $oPCMOutput
+     * @param Output\Output\IPCMOutput $oPCMOutput
      */
-    public function __construct(IPCMOutput $oPCMOutput) {
+    public function __construct(Output\Output\IPCMOutput $oPCMOutput) {
         parent::__construct();
         $this->oPCMOutput = $oPCMOutput;
     }

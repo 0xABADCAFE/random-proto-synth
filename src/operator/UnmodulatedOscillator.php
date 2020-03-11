@@ -4,11 +4,7 @@ namespace ABadCafe\Synth\Operator;
 
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Oscillator;
-
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
-use ABadCafe\Synth\Map\Note\TwelveToneEqualTemperament;
+use ABadCafe\Synth\Map;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +38,7 @@ class UnmodulatedOscillator extends Base implements ISource {
         /** @var IStream $oPitchControl */
         $oPitchControl,
 
-        /** @var IMIDINoteMap */
+        /** @var Map\Note\IMIDINumber */
         $oRootNoteMap,
 
         /** @var [] */
@@ -60,7 +56,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @param float                  $fDetune           : Frequency adjustment
      * @param Signal\IStream|null    $oAmplitudeControl : Amplitude Envelope Generator (optional)
      * @param Signal\IStream|null    $oPitchControl     : Pitch Envelope Generator     (optional)
-     * @param IMIDINoteMap|null      $oRootNoteMap      : Basic notemap for pitch
+     * @param Map\Note\IMIDINumber|null      $oRootNoteMap      : Basic notemap for pitch
      */
     public function __construct(
         Oscillator\IOscillator  $oOscillator,
@@ -68,14 +64,14 @@ class UnmodulatedOscillator extends Base implements ISource {
         float                   $fDetune           = 0.0,
         Signal\IStream          $oAmplitudeControl = null,
         Signal\IStream          $oPitchControl     = null,
-        IMIDINoteMap            $oRootNoteMap      = null
+        Map\Note\IMIDINumber            $oRootNoteMap      = null
     ) {
         $this->oOscillator       = $oOscillator;
         $this->fFrequencyRatio   = $fFrequencyRatio;
         $this->fDetune           = $fDetune;
         $this->oAmplitudeControl = $oAmplitudeControl;
         $this->oPitchControl     = $oPitchControl;
-        $this->oRootNoteMap      = $oRootNoteMap ?: TwelveToneEqualTemperament::getStandardNoteMap();
+        $this->oRootNoteMap      = $oRootNoteMap ?: Map\Note\TwelveToneEqualTemperament::getStandardNoteMap();
         $this->configureNoteMapBehaviours();
         $this->assignInstanceID();
     }
@@ -131,7 +127,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase) : IMIDINoteMapAware {
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : Map\Note\IMIDINumberAware {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
             $oEntity = $this->aNoteMapForwards[$sUseCase];
             $oEntity->oControl->setNoteNumberMap(
@@ -149,7 +145,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      *
      * @see IMIDINumberAware
      */
-    public function getNoteNumberMap(string $sUseCase) : IMIDINoteMap {
+    public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
             $oEntity = $this->aNoteMapForwards[$sUseCase];
             return $oEntity->oControl->getNoteNumberMap(
@@ -165,7 +161,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @inheritdoc
      * @see IMIDINumberAware
      */
-    public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
+    public function setNoteNumber(int $iNote) : Map\Note\IMIDINumberAware {
         $fFrequency = $this->fDetune + $this->fFrequencyRatio * $this->oRootNoteMap->mapByte($iNote);
         $this->oOscillator->setFrequency($fFrequency);
         if ($this->oAmplitudeControl instanceof IMIDINoteMapAware) {
@@ -181,7 +177,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @inheritdoc
      * @see IMIDINumberAware
      */
-    public function setNoteName(string $sNote) : IMIDINoteMapAware {
+    public function setNoteName(string $sNote) : Map\Note\IMIDINumberAware {
         return $this->setNoteNumber($this->oRootNoteMap->getNoteNumber($sNote));
     }
 

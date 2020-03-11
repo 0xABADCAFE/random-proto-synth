@@ -5,9 +5,6 @@ namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Oscillator;
 
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**

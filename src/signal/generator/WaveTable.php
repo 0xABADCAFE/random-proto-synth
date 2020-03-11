@@ -21,7 +21,6 @@ class WaveTable implements Signal\IGenerator {
         I_MAX_SIZE_EXP = 8
     ;
 
-
     private
         /** @var SPLFixedArray $oTable */
         $oTable  = null,

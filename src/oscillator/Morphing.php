@@ -6,6 +6,8 @@ use ABadCafe\Synth\Signal;
 
 use function ABadCafe\Synth\Utility\clamp;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Morphing Oscillator. Two Generators, second at a fixed frequency ratio to the first, mixed using a third Generator as an LFO.
  */
