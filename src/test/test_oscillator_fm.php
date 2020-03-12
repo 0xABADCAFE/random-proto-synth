@@ -31,7 +31,7 @@ $oModulatorShape
 $oModulatorEnvelope = new Envelope\Generator\LinearInterpolated($oModulatorShape);
 
 $oCarrier = new Oscillator\Simple(
-    new Signal\Generator\Square(),
+    new Signal\Generator\Sine(),
     220
 );
 
@@ -44,7 +44,7 @@ $oCarrierShape
 
 $oCarrierEnvelope = new Envelope\Generator\LinearInterpolated($oCarrierShape);
 
-$oOutput = new Output\Wav;
+$oOutput = new Output\Play;
 $oOutput->open('output/test_fm.wav');
 
 $fStart = microtime(true);
@@ -55,13 +55,13 @@ do {
     $oCarrier->setPhaseModulation(
         $oModulator
             ->emit()
-            ->modulateWith(
+            ->levelControl(
                 $oModulatorEnvelope->emit()
             )
     );
 
     $oOutput->write(
-        $oCarrier->emit()->modulateWith(
+        $oCarrier->emit()->levelControl(
             $oCarrierEnvelope->emit()
         )
     );

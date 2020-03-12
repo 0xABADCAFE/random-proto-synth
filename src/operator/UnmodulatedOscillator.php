@@ -51,12 +51,12 @@ class UnmodulatedOscillator extends Base implements ISource {
     /**
      * Constructo
      *
-     * @param Oscillator\IOscillator $oOscillator       : Waveform generator to use    (required)
-     * @param float                  $fFrequencyRatio   : Multiple of root note
-     * @param float                  $fDetune           : Frequency adjustment
-     * @param Signal\IStream|null    $oAmplitudeControl : Amplitude Envelope Generator (optional)
-     * @param Signal\IStream|null    $oPitchControl     : Pitch Envelope Generator     (optional)
-     * @param Map\Note\IMIDINumber|null      $oRootNoteMap      : Basic notemap for pitch
+     * @param Oscillator\IOscillator    $oOscillator       : Waveform generator to use    (required)
+     * @param float                     $fFrequencyRatio   : Multiple of root note
+     * @param float                     $fDetune           : Frequency adjustment
+     * @param Signal\IStream|null       $oAmplitudeControl : Amplitude Envelope Generator (optional)
+     * @param Signal\IStream|null       $oPitchControl     : Pitch Envelope Generator     (optional)
+     * @param Map\Note\IMIDINumber|null $oRootNoteMap      : Basic notemap for pitch
      */
     public function __construct(
         Oscillator\IOscillator  $oOscillator,
@@ -64,7 +64,7 @@ class UnmodulatedOscillator extends Base implements ISource {
         float                   $fDetune           = 0.0,
         Signal\IStream          $oAmplitudeControl = null,
         Signal\IStream          $oPitchControl     = null,
-        Map\Note\IMIDINumber            $oRootNoteMap      = null
+        Map\Note\IMIDINumber    $oRootNoteMap      = null
     ) {
         $this->oOscillator       = $oOscillator;
         $this->fFrequencyRatio   = $fFrequencyRatio;

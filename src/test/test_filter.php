@@ -43,7 +43,7 @@ $oResonanceEnvelope = new Envelope\Generator\LinearInterpolated(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oOutput = new Output\Wav;
+$oOutput = new Output\Play;
 $oOutput->open('output/test_filter.wav');
 
 $oFilter = new Signal\Filter\ResonantLowPass;

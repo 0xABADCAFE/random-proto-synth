@@ -140,6 +140,7 @@ trait TPacketOperations {
         }
         return clone self::$oEmptyValues;
     }
+
 }
 
 require_once 'packet/Audio.php';
