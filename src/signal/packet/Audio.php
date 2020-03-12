@@ -181,3 +181,87 @@ interface IStereoStream {
      */
     public function emit() : StereoPacket;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Adapter class to allow an IStereoStream implementation to be used where an IMonoStream is expected
+ */
+class StereoToMonoAdapter implements IMonoStream {
+
+    /**
+     * @var IStereoStream $oStream
+     */
+    private $oStream;
+
+    /**
+     * @param IStereoStream $oStream
+     */
+    public function __construct(IStereoStream $oStream) {
+        $this->oStream = $oStream;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function emit() : MonoPacket {
+        return $this->oStream->emit()->toMono();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPosition() : int {
+        return $this->oStream->getPosition();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function reset() : IMonoStream {
+        $this->oStream->reset();
+        return $this;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Adapter class to allow an IMonoStream implementation to be used where an IStereoStream is expected
+ */
+class MonoToStereo implements IStereoStream {
+
+    /**
+     * @var IMonoStream $oStream
+     */
+    private $oStream;
+
+    /**
+     * @param IStereoStream $oStream
+     */
+    public function __construct(IMonoStream $oStream) {
+        $this->oStream = $oStream;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function emit() : StereoPacket {
+        return $this->oStream->emit()->toStereo();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPosition() : int {
+        return $this->oStream->getPosition();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function reset() : IStereoStream {
+        $this->oStream->reset();
+        return $this;
+    }
+}
