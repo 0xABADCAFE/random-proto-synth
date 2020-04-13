@@ -16,7 +16,7 @@ class Shape implements IShape {
     /**
      * @var float[2][] $aPoints
      */
-    private $aPoints = [
+    private array $aPoints = [
         0 => [0, 0]
     ];
 
