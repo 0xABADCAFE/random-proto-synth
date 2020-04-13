@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Oscillator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Oscillator;
 use ABadCafe\Synth\Signal;
 use \InvalidArgumentException;
 use \RangeException;
@@ -13,17 +14,19 @@ use \RangeException;
  */
 class Super extends Simple {
 
-    /** @var float[] $aHarmonics */
-    protected array $aHarmonics        = [];
+    protected array
+        /** @var float[] $aHarmonics */
+        $aHarmonics        = [],
 
-    /** @var float[] $aIntensities*/
-    protected array $aIntensities      = [];
+        /** @var float[] $aIntensities*/
+        $aIntensities      = [],
 
-    /** @var float[] $aInitPhases */
-    protected array $aInitPhases       = [];
+        /** @var float[] $aInitPhases */
+        $aInitPhases       = [],
 
-    /** @var float[] $aPhaseCorrections */
-    protected array $aPhaseCorrections = [];
+        /** @var float[] $aPhaseCorrections */
+        $aPhaseCorrections = []
+    ;
 
     /**
      * Requires a generator and a Harmonic Stack which is an array of [float Harmonic, float Intensity, float Phase]

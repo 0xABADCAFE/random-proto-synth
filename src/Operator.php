@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * Operator
  */
 namespace ABadCafe\Synth\Operator;
-
 use ABadCafe\Synth\Signal\IStream;
 use ABadCafe\Synth\Oscillator\IOscillator;
 use ABadCafe\Synth\Utility\TEnum;
@@ -140,14 +141,14 @@ interface ISource {
      * Get the frequency ratio for the operator. This is a multiple of the frequency of the root
      * note.
      *
-     * @return float 
+     * @return float
      */
     public function getFrequencyRatio() : float;
-    
+
     /**
      * Get the detune amount for the operator. This is a fixed offset in Hz.
      *
-     * @return float 
+     * @return float
      */
     public function getDetune() : float;
 

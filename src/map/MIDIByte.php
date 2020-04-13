@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Map;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Map;
 use \SPLFixedArray;
 use \OutOfRangeException;
 

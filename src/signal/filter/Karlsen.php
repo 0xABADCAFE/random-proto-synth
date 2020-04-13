@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Signal\Filter;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Signal\Filter;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
@@ -18,7 +19,7 @@ abstract class Karlsen extends Resonant {
         F_SCALE_MAX_Q  = 4.0 // The original goes to 50, but it's way OTT.
     ;
 
-     protected
+     protected float
         $fInitCutoff,
         $fInitResonance,
         $fPole1, $fPole2, $fPole3, $fPole4,

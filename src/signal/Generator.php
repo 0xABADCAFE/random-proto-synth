@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Signal\Generator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Signal\Generator;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
@@ -12,7 +13,7 @@ use \SPLFixedArray;
  */
 abstract class NonFlat implements Signal\IGenerator {
 
-    protected
+    protected float
         $fMinLevel,
         $fMaxLevel
     ;

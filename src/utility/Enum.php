@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Utility;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Utility;
 use \OutOfBoundsException;
 
 /**

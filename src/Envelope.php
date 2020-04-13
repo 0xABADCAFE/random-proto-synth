@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * Envelope
  */
 namespace ABadCafe\Synth\Envelope;
-
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Map;
 use \Countable;

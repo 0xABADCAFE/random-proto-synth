@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace ABadCafe\Synth\Output;
-
 use ABadCafe\Synth\Signal;
-
 use function ABadCafe\Synth\Utility\clamp;
 use function ABadCafe\Synth\Utility\dprintf;
 
@@ -40,8 +40,8 @@ class Wav implements IPCMOutput, Signal\IChannelMode {
 
     const S_HEADER_PACK = 'a4Va4a4VvvVVvva4V';
 
-    protected
-        $rOutput = null,
+    private $rOutput = null;
+    private int
         $iSampleRate,
         $iBitsPerSample,
         $iNumChannels,

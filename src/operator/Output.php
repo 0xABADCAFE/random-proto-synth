@@ -1,10 +1,10 @@
 <?php
 
-namespace ABadCafe\Synth\Operator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Output;
-
 use function ABadCafe\Synth\Utility\dprintf;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

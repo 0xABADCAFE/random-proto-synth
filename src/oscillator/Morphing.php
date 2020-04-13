@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace ABadCafe\Synth\Oscillator;
-
 use ABadCafe\Synth\Signal;
-
 use function ABadCafe\Synth\Utility\clamp;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,11 +18,17 @@ use function ABadCafe\Synth\Utility\clamp;
         F_MAX_RATIO = 8.0
     ;
 
-    protected
+    protected Signal\IGenerator
         $oSecondaryGenerator,
+        $oMixingGenerator
+    ;
+
+    protected Signal\Packet
         $oSecondaryInput,
-        $oMixingGenerator,
-        $oMixingInput,
+        $oMixingInput
+    ;
+
+    protected float
         $fSecondaryRatio,
         $fMixingFrequency,
         $fSecondaryScaleVal,
@@ -33,9 +39,9 @@ use function ABadCafe\Synth\Utility\clamp;
         Signal\IGenerator $oPrimaryGenerator,
         Signal\IGenerator $oSecondaryGenerator,
         Signal\IGenerator $oMixingGenerator,
-        float      $fPrimaryFrequency,
-        float      $fSecondaryRatio,
-        float      $fMixingFrequency
+        float             $fPrimaryFrequency,
+        float             $fSecondaryRatio,
+        float             $fMixingFrequency
     ) {
         $this->fMixingFrequency    = clamp($fMixingFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
         $this->fSecondaryRatio     = clamp($fSecondaryRatio, self::F_MIN_RATIO, self::F_MAX_RATIO);

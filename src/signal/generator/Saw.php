@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Signal\Generator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Signal\Generator;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
@@ -15,7 +16,7 @@ use \SPLFixedArray;
 class SawUp extends NonFlat {
     const F_PERIOD  = 1.0;
 
-    protected
+    protected float
         $fScaleLevel
     ;
 

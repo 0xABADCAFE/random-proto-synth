@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Signal;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Signal;
 use \LogicException;
 use \RangeException;
 
@@ -17,11 +18,13 @@ class Context {
     /** @var Context $oInstance */
     private static ?self $oInstance = null;
 
-    /** @var int $iProcessRate */
-    private int $iProcessRate;
+    private int
+        /** @var int $iProcessRate */
+        $iProcessRate,
 
-    /** @var int $iPacketLength */
-    private int $iPacketLength;
+        /** @var int $iPacketLength */
+        $iPacketLength
+    ;
 
     /** @var float $fSamplePeriod */
     private float $fSamplePeriod;

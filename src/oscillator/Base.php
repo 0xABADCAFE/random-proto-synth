@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace ABadCafe\Synth\Oscillator;
-
 use ABadCafe\Synth\Signal;
-
 use function ABadCafe\Synth\Utility\clamp;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,23 +24,27 @@ abstract class Base implements IOscillator {
     /** @var int $iSamplePosition */
     protected int $iSamplePosition = 0;
 
-    /** @var float $fFrequency - The base frequency */
-    protected float $fFrequency = ILimits::F_DEF_FREQ;
+    protected float
+        /** @var float $fFrequency - The base frequency */
+        $fFrequency = ILimits::F_DEF_FREQ,
 
-    /** @var float $fCurrentFequency - The present instantaneous frequency considering any pitch control */
-    protected float $fCurrentFrequency = ILimits::F_DEF_FREQ;
+        /** @var float $fCurrentFequency - The present instantaneous frequency considering any pitch control */
+        $fCurrentFrequency = ILimits::F_DEF_FREQ,
 
-    /** @var float $fPhaseCorrection - The accumulated phase difference as a result of pitch control */
-    protected float $fPhaseCorrection = 0;
+        /** @var float $fPhaseCorrection - The accumulated phase difference as a result of pitch control */
+        $fPhaseCorrection = 0.0,
 
-    /** @var float $fScaleVal */
-    protected float $fScaleVal= 0;
+        /** @var float $fScaleVal */
+        $fScaleVal = 0.0
+    ;
 
-    /** @var \SPLFixedArray $oPhaseShift */
-    protected ?\SPLFixedArray $oPhaseShift = null;
+    protected ?\SPLFixedArray
+        /** @var \SPLFixedArray|null $oPhaseShift */
+        $oPhaseShift = null,
 
-    /** @var \SPLFixedArray $oPitchShift */
-    protected ?\SPLFixedArray $oPitchShift = null;
+        /** @var \SPLFixedArray|null $oPitchShift */
+        $oPitchShift = null
+    ;
 
 
     /**

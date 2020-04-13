@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Operator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,11 +14,13 @@ use ABadCafe\Synth\Signal;
  */
 class Summing extends Base implements IProcessor {
 
-    /** @var IOperator[] $aOperators */
-    private array $aOperators = [];
+    private array
+        /** @var IOperator[] $aOperators */
+        $aOperators = [],
 
-    /** @var float[] $aLevels */
-    private array $aLevels    = [];
+        /** @var float[] $aLevels */
+        $aLevels    = []
+    ;
 
     /** @var int $iPosotion */
     private int $iPosition  = 0;

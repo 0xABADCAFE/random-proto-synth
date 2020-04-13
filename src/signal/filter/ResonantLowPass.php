@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Signal\Filter;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Signal\Filter;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
@@ -22,7 +23,7 @@ class ResonantLowPass extends Resonant {
         F_COEFF_3      = 0.35013
     ;
 
-    private
+    private float
         $fInitCutoff,
         $fInitResonance,
         $fIn1,  $fIn2,  $fIn3,  $fIn4,
