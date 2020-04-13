@@ -1,10 +1,10 @@
 <?php
 
-namespace ABadCafe\Synth\Map\Note;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Map\Note;
 use ABadCafe\Synth\Map;
 use \OutOfBoundsException;
-
 use function ABadCafe\Synth\Utility\dprintf;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,12 +103,12 @@ interface IMIDINumberAware {
  */
 class Invariant extends Map\MIDIByte implements IMIDINumber {
 
-    private static $oInstance = null;
+    private static ?self $oInstance = null;
 
     /**
      * Singleton
      *
-     * @retuurn self
+     * @return self
      */
     public static function get() : self {
         if (!self::$oInstance) {
@@ -243,22 +243,18 @@ abstract class TwelveTone extends Map\MIDIByte implements IMIDINumber {
  */
 class TwelveToneEqualTemperament extends TwelveTone {
 
-    private
-        /**
-         * @var float $fCentreValue - value at CENTRE_REFERENCE
-         */
+    private float
+        /** @var float $fCentreValue - value at CENTRE_REFERENCE */
         $fCentreValue,
 
-        /**
-         * @var float $fScalePerOctave
-         */
-        $fScalePerOctave,
-
-        /**
-         * @var bool $bInversed
-         */
-        $bInversed
+        /** @var float $fScalePerOctave */
+        $fScalePerOctave
     ;
+
+    /**
+     * @var bool $bInversed
+     */
+    private bool $bInversed;
 
     /**
      * Constructor
@@ -314,11 +310,9 @@ class TwelveToneEqualTemperament extends TwelveTone {
      */
     protected function populateMap() {
         for ($i = self::I_MIN_SINGLE_BYTE_VALUE; $i <= self::I_MAX_SINGLE_BYTE_VALUE; ++$i) {
-
             $fValue = (2**(
                 $this->fScalePerOctave * ($i - self::CENTRE_REFERENCE) / self::I_SEMIS_PER_OCTAVE)
             );
-
             $this->oMap[$i] = $this->fCentreValue * ($this->bInversed ? 1.0 / $fValue : $fValue);
         }
     }

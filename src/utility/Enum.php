@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Utility;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Utility;
 use \OutOfBoundsException;
 
 /**
@@ -11,7 +12,7 @@ trait TEnum {
    /**
     * @var self[] $aDefinedValues, keyed by the scalar
     */
-    private static $aDefinedValues = [];
+    private static array $aDefinedValues = [];
 
     /**
      * @var mixed $mValue

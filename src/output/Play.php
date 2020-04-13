@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace ABadCafe\Synth\Output;
-
 use ABadCafe\Synth\Signal;
-
 use function ABadCafe\Synth\Utility\clamp;
 use function ABadCafe\Synth\Utility\dprintf;
 
@@ -27,15 +27,16 @@ class Play implements IPCMOutput, Signal\IChannelMode {
      */
     private $rOutput = null;
 
-    private $aPipeDescriptors  = [
-        0 => ['pipe', 'r'],
-        1 => ['file', '/dev/null', 'a'],
-        2 => ['file', '/dev/null', 'a']
-    ];
+    private array
+        $aPipeDescriptors  = [
+            0 => ['pipe', 'r'],
+            1 => ['file', '/dev/null', 'a'],
+            2 => ['file', '/dev/null', 'a']
+        ],
+        $aPipes = []
+    ;
 
-    private $aPipes;
-
-    private $iChannelMode;
+    private int   $iChannelMode;
 
     public function __construct(int $iChannelMode = self::I_CHAN_MONO) {
         $this->iChannelMode = clamp($iChannelMode, self::I_CHAN_MONO, self::I_CHAN_STEREO);
@@ -78,7 +79,7 @@ class Play implements IPCMOutput, Signal\IChannelMode {
                 }
             }
             $this->rOutput = null;
-            $this->aPipes  = null;
+            $this->aPipes  = [];
         }
     }
 

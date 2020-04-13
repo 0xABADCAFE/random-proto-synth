@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Operator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Oscillator;
 use ABadCafe\Synth\Map;
@@ -22,26 +23,30 @@ class UnmodulatedOscillator extends Base implements ISource {
         S_PITCH_PREFIX     = 'pitch_'
     ;
 
-    protected
-        /** @var IOscillator $oOscillator */
-        $oOscillator,
+    /** @var IOscillator $oOscillator */
+    protected Oscillator\IOscillator $oOscillator;
 
+    protected float
         /** @var float $fFrequencyRatio */
         $fFrequencyRatio,
 
         /** @var float $fDetune */
-        $fDetune,
+        $fDetune
+    ;
 
-        /** @var IStream $oAmplitudeControl */
+    protected ?Signal\IStream
+        /** @var IStream|null $oAmplitudeControl */
         $oAmplitudeControl,
 
-        /** @var IStream $oPitchControl */
-        $oPitchControl,
+        /** @var IStream|null $oPitchControl */
+        $oPitchControl
+    ;
 
-        /** @var Map\Note\IMIDINumber */
-        $oRootNoteMap,
+    /** @var Map\Note\IMIDINumber */
+    protected Map\Note\IMIDINumber $oRootNoteMap;
 
-        /** @var [] */
+    protected array
+        /** @var [] $aNoteMapForwards */
         $aNoteMapForwards = [],
 
         /** @var string[] $aNoteMapUseCases */

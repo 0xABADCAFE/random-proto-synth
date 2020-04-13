@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Map;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Map;
 use \SPLFixedArray;
 use \OutOfRangeException;
 
@@ -27,7 +28,7 @@ interface IMIDIByteLimits {
 abstract class MIDIByte implements IMIDIByteLimits {
 
     /** @var SPLFixedArray $oMap */
-    protected $oMap;
+    protected SPLFixedArray $oMap;
 
     /**
      * Constructor

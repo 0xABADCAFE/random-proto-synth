@@ -1,11 +1,11 @@
 <?php
 
-namespace ABadCafe\Synth\Envelope\Generator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Envelope\Generator;
 use ABadCafe\Synth\Envelope;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Map;
-
 use function ABadCafe\Synth\Utility\dprintf;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,49 +22,57 @@ class LinearInterpolated implements Envelope\IGenerator {
         self::S_NOTE_MAP_LEVEL => true
     ];
 
-    private
-        /** @var Envelope\IShape $oShape : input envelope shape */
-        $oShape          = null,
+    /** @var Envelope\IShape $oShape : input envelope shape */
+    private Envelope\IShape $oShape;
 
-        /** @var Map\Note\IMIDINumber[] $aNoteMaps - keyed by use case */
-        $aNoteMaps       = [],
+    private Signal\Packet
+        /** @var Signal\Packet $oOutputPacket : Buffer for signal */
+        $oOutputPacket,
 
-        /** @var int $iNoteNumber */
-        $iNoteNumber     = Map\Note\IMIDINumber::CENTRE_REFERENCE,
+        /** @var Signal\Packet $oFinalPacket : Fixed packet filled with the final envelope value */
+        $oFinalPacket
+    ;
 
+    /** @var Map\Note\IMIDINumber[] $aNoteMaps - keyed by use case */
+    private array $aNoteMaps = [];
+
+    /** @var int $iNoteNumber */
+    private int   $iNoteNumber = Map\Note\IMIDINumber::CENTRE_REFERENCE;
+
+    private float
         /** @var float $fTimeScale */
-        $fTimeScale      = 1.0,
+        $fTimeScale = 1.0,
 
         /** @var float $fAmplitude Scale */
-        $fLevelScale     = 1.0,
+        $fLevelScale = 1.0
+    ;
 
-        /** @var Signal\Control\Packet $oOutputPacket : Buffer for signal */
-        $oOutputPacket   = null,
-
-        /** @var Signal\Control\Packet $oFinalPacket : Fixed packet filled with the final envelope value */
-        $oFinalPacket    = null,
-
+    private array
         /** @var {int, float}[] $aProcessPoints : Envelope points, converted into Sample Position => Level pairs */
         $aProcessPoints  = [],
 
         /** @var int[] $aProcessPoints : Indexes to the Process Points array, keyed by the Sample Position they start at  */
-        $aProcessIndexes = [],
+        $aProcessIndexes = []
+    ;
 
+    private int
         /** @var int $iSamplePosition : Current Sample Position */
         $iSamplePosition = 0,
 
         /** @var int $iLastPosition : Used to early out and return the fixed packet */
-        $iLastPosition   = 0,
+        $iLastPosition = 0
+    ;
 
+    private float
         /** @var float $fGradient : Current Interpolant Gradient */
-        $fGradient       = 0,
+        $fGradient = 0,
 
         /** @var float $fYOffset : Current Interpolant Y Offset */
-        $fYOffset        = 0,
-
-        /** @var int $iXOffset : Current Interpolant X Offset */
-        $iXOffset        = 0
+        $fYOffset = 0
     ;
+
+    /** @var int $iXOffset : Current Interpolant X Offset */
+    private int   $iXOffset = 0;
 
     /**
      * Constructor

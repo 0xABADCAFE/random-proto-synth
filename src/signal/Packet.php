@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
@@ -11,10 +13,10 @@ use \SPLFixedArray;
 class Packet {
 
     /** @var SPLFixedArray $oEmpty */
-    private static $oEmpty = null;
+    private static ?SPLFixedArray $oEmpty = null;
 
     /** @var SPLFixedArray */
-    private $oValues = null;
+    private SPLFixedArray $oValues;
 
     /**
      * Constructor. Accepts either an integer length for a new, zero initialised packet, or an array of values that

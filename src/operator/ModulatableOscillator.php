@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Operator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Oscillator;
 
@@ -14,12 +15,12 @@ use ABadCafe\Synth\Oscillator;
  */
 class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeModulated, IPhaseModulated {
 
-    protected
+    protected array
         /** @var IOperator[] $aModulators - keyed by instance ID */
-        $aModulators               = [],
+        $aModulators = [],
 
         /** @var float[] $aPhaseModulationIndex - keyed by instance ID */
-        $aPhaseModulationIndex     = [],
+        $aPhaseModulationIndex = [],
 
         /** @var float[] $aAmplidudeModulationIndex - keyed by instance ID */
         $aAmplitudeModulationIndex = []

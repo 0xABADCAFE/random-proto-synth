@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Signal\Generator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Signal\Generator;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
@@ -14,7 +15,7 @@ class Triangle extends NonFlat {
 
     const F_PERIOD = 2.0;
 
-    protected
+    protected float
         $fBiasLevel,
         $fScaleLevel
     ;

@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Operator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Map;
 
@@ -19,25 +20,29 @@ class ControlledFilter extends Base implements IProcessor {
         S_RESONANCE_PREFIX = 'resonance_'
     ;
 
-    /** @var IFilter $oFilter */
-    private $oFilter;
+    /** @var Signal\IFilter $oFilter */
+    private Signal\IFilter $oFilter;
 
-    /** @var IStream $oCutoffControl */
-    private $oCutoffControl    = null;
+    private ?Signal\IStream
+        /** @var IStream|null $oCutoffControl */
+        $oCutoffControl = null,
 
-    /** @var IStream $oResonanceControl */
-    private $oResonanceControl = null;
+        /** @var IStream|null $oResonanceControl */
+        $oResonanceControl = null
+    ;
 
-    /** @var IOperator[] $aOperators */
-    private $aOperators = [];
+    private array
+        /** @var IOperator[] $aOperators */
+        $aOperators = [],
 
-    /** @var float[] $aLevels */
-    private $aLevels    = [];
+        /** @var float[] $aLevels */
+        $aLevels    = [],
+
+        $aNoteMapForwards = []
+    ;
 
     /** @var int $iPosotion */
-    private $iPosition  = 0;
-
-    private $aNoteMapForwards = [];
+    private int $iPosition  = 0;
 
     /**
      * Constructor

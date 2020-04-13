@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Operator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,14 +14,16 @@ use ABadCafe\Synth\Signal;
  */
 class Summing extends Base implements IProcessor {
 
-    /** @var IOperator[] $aOperators */
-    private $aOperators = [];
+    private array
+        /** @var IOperator[] $aOperators */
+        $aOperators = [],
 
-    /** @var float[] $aLevels */
-    private $aLevels    = [];
+        /** @var float[] $aLevels */
+        $aLevels    = []
+    ;
 
     /** @var int $iPosotion */
-    private $iPosition  = 0;
+    private int $iPosition  = 0;
 
     public function __construct() {
         $this->oLastPacket = new Signal\Packet();

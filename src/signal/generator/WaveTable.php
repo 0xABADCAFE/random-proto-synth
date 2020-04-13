@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Signal\Generator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Signal\Generator;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 use function ABadCafe\Synth\Utility\clamp;
@@ -21,16 +22,14 @@ class WaveTable implements Signal\IGenerator {
         I_MAX_SIZE_EXP = 8
     ;
 
-    private
-        /** @var SPLFixedArray $oTable */
-        $oTable  = null,
+    /** @var SPLFixedArray $oTable */
+    private ?SPLFixedArray $oTable  = null;
 
-        /** @var float $fPeriod */
-        $fPeriod = 0,
+    /** @var float $fPeriod */
+    private float $fPeriod = 0;
 
-        /** @var int $iMask */
-        $iMask   = 0
-    ;
+    /** @var int $iMask */
+    private int $iMask = 0;
 
     /**
      * @param int $iSizeExp

@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Operator;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Utility;
 use ABadCafe\Synth\Map;
@@ -18,13 +19,11 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
 
     use Utility\TEnumeratedInstance;
 
-    protected
-        /** @var Packet $oLastPacket */
-        $oLastPacket,
+    /** @var Packet $oLastPacket */
+    protected Signal\Packet $oLastPacket;
 
-        /** @var int $iPacketIndex */
-        $iPacketIndex              = 0
-    ;
+    /** @var int $iPacketIndex */
+    protected int $iPacketIndex = 0;
 
     /**
      * @inheritdoc

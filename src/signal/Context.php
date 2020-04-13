@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Signal;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Signal;
 use \LogicException;
 use \RangeException;
 
@@ -15,18 +16,18 @@ use \RangeException;
 class Context {
 
     /** @var Context $oInstance */
-    private static $oInstance = null;
+    private static ?self $oInstance = null;
 
-    private
+    private int
         /** @var int $iProcessRate */
         $iProcessRate,
 
         /** @var int $iPacketLength */
-        $iPacketLength,
-
-        /** @var float $fSamplePeriod */
-        $fSamplePeriod
+        $iPacketLength
     ;
+
+    /** @var float $fSamplePeriod */
+    private float $fSamplePeriod;
 
     /**
      * One-time initialisation. If this is not called before we first obtain the context, the defaults will be used.

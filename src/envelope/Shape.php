@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Envelope;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Envelope;
 use \InvalidArgumentException;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,10 +14,8 @@ use \InvalidArgumentException;
  */
 class Shape implements IShape {
 
-    /**
-     * @var float[2][] $aPoints
-     */
-    private $aPoints = [
+    /** @var float[2][] $aPoints */
+    private array $aPoints = [
         0 => [0, 0]
     ];
 

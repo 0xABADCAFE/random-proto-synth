@@ -1,7 +1,8 @@
 <?php
 
-namespace ABadCafe\Synth\Signal\Filter;
+declare(strict_types = 1);
 
+namespace ABadCafe\Synth\Signal\Filter;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
@@ -83,13 +84,12 @@ interface IResonanceControlled extends ICutoffControlled {
  * Common base class for filter implementations
  */
 abstract class Base implements ICutoffControlled {
-    protected
-        /** @var SPLFixedArray $oCutoff */
-        $oCutoff,
 
-        /** @var float */
-        $fCutoff
-    ;
+    /** @var SPLFixedArray $oCutoff */
+    protected ?SPLFixedArray $oCutoff;
+
+    /** @var float $fCutoff */
+    protected float $fCutoff;
 
     /**
      * @inheritdoc
@@ -133,13 +133,12 @@ abstract class Base implements ICutoffControlled {
  * Common base class for resonant filter implementations
  */
 abstract class Resonant extends Base implements IResonanceControlled {
-    protected
-        /** @var SPLFixedArray $oResonance */
-        $oResonance,
 
-        /** @var float $fResonance */
-        $fResonance
-    ;
+    /** @var SPLFixedArray $oResonance */
+    protected ?SPLFixedArray $oResonance;
+
+    /** @var float $fResonance */
+    protected float $fResonance;
 
     /**
      * @inheritdoc
