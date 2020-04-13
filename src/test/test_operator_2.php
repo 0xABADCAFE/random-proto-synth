@@ -137,7 +137,7 @@ $oCarrier2->setNoteName('C4');
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Define the final summing output
-$oOutput = new Operator\PCMOutput(new Output\Wav);
+$oOutput = new Operator\PCMOutput(new Output\Play);
 $oOutput
     ->attachSignalInput($oModulator1, 0.1) // For fun, let's include a 10% mix of the direct output of this operator
     ->attachSignalInput($oCarrier1, 0.65)

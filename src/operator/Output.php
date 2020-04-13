@@ -2,10 +2,8 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Output\IPCMOutput;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Output;
 
 use function ABadCafe\Synth\Utility\dprintf;
 
@@ -14,19 +12,19 @@ use function ABadCafe\Synth\Utility\dprintf;
 /**
  * PCMOutput
  *
- * Extension of the basic Summing operator that pushes to an IPCMOutput stream.
+ * Extension of the basic Summing operator that pushes to an Output\Output\IPCMOutput stream.
  */
 class PCMOutput extends Summing implements IOutput {
 
-    /** @var IPCMOutput $oOutput */
+    /** @var Output\Output\IPCMOutput $oOutput */
     private $oPCMOutput;
 
     /**
      * Constructor, inject the desired file output type
      *
-     * @param IPCMOutput $oPCMOutput
+     * @param Output\IPCMOutput $oPCMOutput
      */
-    public function __construct(IPCMOutput $oPCMOutput) {
+    public function __construct(Output\IPCMOutput $oPCMOutput) {
         parent::__construct();
         $this->oPCMOutput = $oPCMOutput;
     }
@@ -39,7 +37,7 @@ class PCMOutput extends Summing implements IOutput {
      * @throws IOException
      */
     public function render(float $fSeconds) : IOutput {
-        $iMaxSamples = $this->getPosition() + (int)$fSeconds * Context::get()->getProcessRate();
+        $iMaxSamples = $this->getPosition() + (int)$fSeconds * Signal\Context::get()->getProcessRate();
         $fStart = microtime(true);
         do {
             $this->emit();
@@ -80,7 +78,7 @@ class PCMOutput extends Summing implements IOutput {
      * @inheritdoc
      * @see IStream
      */
-    public function emit() : Packet {
+    public function emit() : Signal\Packet {
         $oPacket = parent::emit();
         $this->oPCMOutput->write($oPacket);
         return $oPacket;

@@ -2,12 +2,9 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Utility\IEnumeratedInstance;
-use ABadCafe\Synth\Utility\TEnumeratedInstance;
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
-use AbadCafe\Synth\Map\Note\Invariant        as IMIDIInvariantNoteMap;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Utility;
+use ABadCafe\Synth\Map;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -17,9 +14,9 @@ use AbadCafe\Synth\Map\Note\Invariant        as IMIDIInvariantNoteMap;
  *
  * This class provides a mecahism where each emitted Packet has an index
  */
-abstract class Base implements IOperator, IEnumeratedInstance {
+abstract class Base implements IOperator, Utility\IEnumeratedInstance {
 
-    use TEnumeratedInstance;
+    use Utility\TEnumeratedInstance;
 
     protected
         /** @var Packet $oLastPacket */
@@ -32,7 +29,7 @@ abstract class Base implements IOperator, IEnumeratedInstance {
     /**
      * @inheritdoc
      */
-    public function emit() : Packet {
+    public function emit() : Signal\Packet {
         return $this->emitPacketForIndex($this->iPacketIndex + 1);
     }
 
@@ -54,7 +51,7 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase) : IMIDINoteMapAware {
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : Map\Note\IMIDINumberAware {
         return $this;
     }
 
@@ -63,10 +60,10 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      *
      * This is a stub and should be overridden by any implementation supporting a number map control
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumber
      */
-    public function getNoteNumberMap(string $sUseCase) : IMIDINoteMap {
-        return IMIDIInvariantNoteMap::get();
+    public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
+        return Map\Note\Invariant::get();
     }
 
     /**
@@ -74,9 +71,9 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      *
      * This is a stub and should be overridden by any implementation supporting a number map control
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
-    public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
+    public function setNoteNumber(int $iNote) : Map\Note\IMIDINumberAware {
         return $this;
     }
 
@@ -85,9 +82,9 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      *
      * This is a stub and should be overridden by any implementation supporting a number map control
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
-    public function setNoteName(string $sNote) : IMIDINoteMapAware {
+    public function setNoteName(string $sNote) : Map\Note\IMIDINumberAware {
         return $this;
     }
 
@@ -96,8 +93,8 @@ abstract class Base implements IOperator, IEnumeratedInstance {
      * must bumo the iPacketIndex for every new Packet that is calculated.
      *
      * @param  int $iPacketIndex
-     * @return Packet
+     * @return Signal\Packet
      */
-    protected abstract function emitPacketForIndex(int $iPacketIndex) : Packet;
+    protected abstract function emitPacketForIndex(int $iPacketIndex) : Signal\Packet;
 
 }

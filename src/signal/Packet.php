@@ -137,7 +137,7 @@ class Packet {
      *
      * @return SPLFixedArray
      */
-    public function quantize(int $iScaleValue, int $iMinValue, int $iMaxValue) : SPLFixedArray {
+    public function quantise(int $iScaleValue, int $iMinValue, int $iMaxValue) : SPLFixedArray {
         $oResult = clone $this->oValues;
         foreach ($oResult as $i => $mValue) {
             $mValue = (int)($mValue * $iScaleValue);

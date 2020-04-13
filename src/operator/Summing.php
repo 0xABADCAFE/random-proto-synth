@@ -2,13 +2,7 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Oscillator\IOscillator;
-use ABadCafe\Synth\Envelope\IGenerator as IEnvelopeGenerator;
-use ABadCafe\Synth\Utility\IEnumeratedInstance;
-use ABadCafe\Synth\Utility\TEnumeratedInstance;
+use ABadCafe\Synth\Signal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +23,7 @@ class Summing extends Base implements IProcessor {
     private $iPosition  = 0;
 
     public function __construct() {
-        $this->oLastPacket = new Packet();
+        $this->oLastPacket = new Signal\Packet();
         $this->assignInstanceID();
     }
 
@@ -58,7 +52,7 @@ class Summing extends Base implements IProcessor {
      * @inheritdoc
      * @see IStream
      */
-    public function reset() : IStream {
+    public function reset() : Signal\IStream {
         $this->iPosition = 0;
         $this->oLastPacket->fillWith(0);
         return $this;
@@ -76,8 +70,8 @@ class Summing extends Base implements IProcessor {
      * @inheritdoc
      * @see IStream
      */
-    public function emitPacketForIndex(int $iPacketIndex) : Packet {
-        $this->iPosition += Context::get()->getPacketLength();
+    public function emitPacketForIndex(int $iPacketIndex) : Signal\Packet {
+        $this->iPosition += Signal\Context::get()->getPacketLength();
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
         }

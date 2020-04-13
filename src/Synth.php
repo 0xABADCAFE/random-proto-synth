@@ -6,6 +6,10 @@
  */
 namespace ABadCafe\Synth;
 
+if (PHP_VERSION_ID < 70400) {
+    throw new \RuntimeExceptiom("Requires at least PHP 7.4");
+}
+
 require_once 'Utility.php';
 require_once 'Map.php';
 require_once 'Signal.php';

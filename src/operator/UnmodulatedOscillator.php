@@ -2,15 +2,9 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Oscillator\IOscillator;
-
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
-use ABadCafe\Synth\Map\Note\TwelveToneEqualTemperament;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Oscillator;
+use ABadCafe\Synth\Map;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +38,7 @@ class UnmodulatedOscillator extends Base implements ISource {
         /** @var IStream $oPitchControl */
         $oPitchControl,
 
-        /** @var IMIDINoteMap */
+        /** @var Map\Note\IMIDINumber */
         $oRootNoteMap,
 
         /** @var [] */
@@ -57,27 +51,27 @@ class UnmodulatedOscillator extends Base implements ISource {
     /**
      * Constructo
      *
-     * @param IOscillator       $oOscillator       : Waveform generator to use    (required)
-     * @param float             $fFrequencyRatio   : Multiple of root note
-     * @param float             $fDetune           : Frequency adjustment
-     * @param IStream|null      $oAmplitudeControl : Amplitude Envelope Generator (optional)
-     * @param IStream|null      $oPitchControl     : Pitch Envelope Generator     (optional)
-     * @param IMIDINoteMap|null $oRootNoteMap      : Basic notemap for pitch
+     * @param Oscillator\IOscillator    $oOscillator       : Waveform generator to use    (required)
+     * @param float                     $fFrequencyRatio   : Multiple of root note
+     * @param float                     $fDetune           : Frequency adjustment
+     * @param Signal\IStream|null       $oAmplitudeControl : Amplitude Envelope Generator (optional)
+     * @param Signal\IStream|null       $oPitchControl     : Pitch Envelope Generator     (optional)
+     * @param Map\Note\IMIDINumber|null $oRootNoteMap      : Basic notemap for pitch
      */
     public function __construct(
-        IOscillator  $oOscillator,
-        float        $fFrequencyRatio   = 1.0,
-        float        $fDetune           = 0.0,
-        IStream      $oAmplitudeControl = null,
-        IStream      $oPitchControl     = null,
-        IMIDINoteMap $oRootNoteMap      = null
+        Oscillator\IOscillator  $oOscillator,
+        float                   $fFrequencyRatio   = 1.0,
+        float                   $fDetune           = 0.0,
+        Signal\IStream          $oAmplitudeControl = null,
+        Signal\IStream          $oPitchControl     = null,
+        Map\Note\IMIDINumber    $oRootNoteMap      = null
     ) {
         $this->oOscillator       = $oOscillator;
         $this->fFrequencyRatio   = $fFrequencyRatio;
         $this->fDetune           = $fDetune;
         $this->oAmplitudeControl = $oAmplitudeControl;
         $this->oPitchControl     = $oPitchControl;
-        $this->oRootNoteMap      = $oRootNoteMap ?: TwelveToneEqualTemperament::getStandardNoteMap();
+        $this->oRootNoteMap      = $oRootNoteMap ?: Map\Note\TwelveToneEqualTemperament::getStandardNoteMap();
         $this->configureNoteMapBehaviours();
         $this->assignInstanceID();
     }
@@ -92,7 +86,7 @@ class UnmodulatedOscillator extends Base implements ISource {
     /**
      * @inheritdoc
      */
-    public function reset() : IStream {
+    public function reset() : Signal\IStream {
         $this->oOscillator->reset();
         if ($this->oAmplitudeControl) {
             $this->oAmplitudeControl->reset();
@@ -133,7 +127,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase) : IMIDINoteMapAware {
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : Map\Note\IMIDINumberAware {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
             $oEntity = $this->aNoteMapForwards[$sUseCase];
             $oEntity->oControl->setNoteNumberMap(
@@ -151,7 +145,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      *
      * @see IMIDINumberAware
      */
-    public function getNoteNumberMap(string $sUseCase) : IMIDINoteMap {
+    public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
             $oEntity = $this->aNoteMapForwards[$sUseCase];
             return $oEntity->oControl->getNoteNumberMap(
@@ -167,7 +161,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @inheritdoc
      * @see IMIDINumberAware
      */
-    public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
+    public function setNoteNumber(int $iNote) : Map\Note\IMIDINumberAware {
         $fFrequency = $this->fDetune + $this->fFrequencyRatio * $this->oRootNoteMap->mapByte($iNote);
         $this->oOscillator->setFrequency($fFrequency);
         if ($this->oAmplitudeControl instanceof IMIDINoteMapAware) {
@@ -183,7 +177,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @inheritdoc
      * @see IMIDINumberAware
      */
-    public function setNoteName(string $sNote) : IMIDINoteMapAware {
+    public function setNoteName(string $sNote) : Map\Note\IMIDINumberAware {
         return $this->setNoteNumber($this->oRootNoteMap->getNoteNumber($sNote));
     }
 
@@ -192,7 +186,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      *
      * @return IOscillator
      */
-    public function getOscillator() : IOscillator {
+    public function getOscillator() : Oscillator\IOscillator {
         return $this->oOscillator;
     }
 
@@ -222,7 +216,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @param  int
      * @return Packet
      */
-    protected function emitPacketForIndex(int $iPacketIndex) : Packet {
+    protected function emitPacketForIndex(int $iPacketIndex) : Signal\Packet {
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
         }

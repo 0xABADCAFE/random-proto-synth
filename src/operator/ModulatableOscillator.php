@@ -2,14 +2,9 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Oscillator\IOscillator;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Oscillator;
 
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -40,7 +35,7 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
     /**
      * @inheritdoc
      */
-    public function reset() : IStream {
+    public function reset() : Signal\IStream {
         $this->oOscillator->reset();
         if ($this->oAmplitudeControl) {
             $this->oAmplitudeControl->reset();
@@ -100,13 +95,13 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
      * @param  int
      * @return Packet
      */
-    protected function emitPacketForIndex(int $iPacketIndex) : Packet {
+    protected function emitPacketForIndex(int $iPacketIndex) : Signal\Packet {
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
         }
 
-        $oPhaseAccumulator     = empty($this->aPhaseModulationIndex)     ? null : new Packet();
-        $oAmplitudeAccumulator = empty($this->aAmplitudeModulationIndex) ? null : new Packet();
+        $oPhaseAccumulator     = empty($this->aPhaseModulationIndex)     ? null : new Signal\Packet();
+        $oAmplitudeAccumulator = empty($this->aAmplitudeModulationIndex) ? null : new Signal\Packet();
         foreach ($this->aModulators as $iInstanceID => $oOperator) {
             $oPacket = $oOperator->emitPacketForIndex($iPacketIndex);
             if (isset($this->aPhaseModulationIndex[$iInstanceID])) {

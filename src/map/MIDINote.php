@@ -2,7 +2,7 @@
 
 namespace ABadCafe\Synth\Map\Note;
 
-use ABadCafe\Synth\Map\MIDIByte;
+use ABadCafe\Synth\Map;
 use \OutOfBoundsException;
 
 use function ABadCafe\Synth\Utility\dprintf;
@@ -101,7 +101,7 @@ interface IMIDINumberAware {
  *
  * Used to allow IMIDINumberAware implementors to have a default "do nothing" map. All note values map to 1.0
  */
-class Invariant extends MIDIByte implements IMIDINumber {
+class Invariant extends Map\MIDIByte implements IMIDINumber {
 
     private static $oInstance = null;
 
@@ -149,7 +149,7 @@ class Invariant extends MIDIByte implements IMIDINumber {
  * Base class for all Twelve Tone Map classes. This defines all the allowed note names, mapping them back to a
  * compatible MIDI note number and provies a method for getting a mapped value by note name.
  */
-abstract class TwelveTone extends MIDIByte implements IMIDINumber {
+abstract class TwelveTone extends Map\MIDIByte implements IMIDINumber {
 
     /** @const int I_SEMIS_PER_OCTAVE */
     const I_SEMIS_PER_OCTAVE = 12;
