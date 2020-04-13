@@ -13,19 +13,17 @@ use \RangeException;
  */
 class Super extends Simple {
 
-    protected
-        /** @var float[] $aHarmonics */
-        $aHarmonics   = [],
+    /** @var float[] $aHarmonics */
+    protected array $aHarmonics        = [];
 
-        /** @var float[] $aIntensities*/
-        $aIntensities = [],
+    /** @var float[] $aIntensities*/
+    protected array $aIntensities      = [];
 
-        /** @var float[] $aInitPhases */
-        $aInitPhases = [],
+    /** @var float[] $aInitPhases */
+    protected array $aInitPhases       = [];
 
-        /** @var float[] $aPhaseCorrections */
-        $aPhaseCorrections = []
-    ;
+    /** @var float[] $aPhaseCorrections */
+    protected array $aPhaseCorrections = [];
 
     /**
      * Requires a generator and a Harmonic Stack which is an array of [float Harmonic, float Intensity, float Phase]

@@ -15,18 +15,16 @@ use \RangeException;
 class Context {
 
     /** @var Context $oInstance */
-    private static $oInstance = null;
+    private static ?self $oInstance = null;
 
-    private
-        /** @var int $iProcessRate */
-        $iProcessRate,
+    /** @var int $iProcessRate */
+    private int $iProcessRate;
 
-        /** @var int $iPacketLength */
-        $iPacketLength,
+    /** @var int $iPacketLength */
+    private int $iPacketLength;
 
-        /** @var float $fSamplePeriod */
-        $fSamplePeriod
-    ;
+    /** @var float $fSamplePeriod */
+    private float $fSamplePeriod;
 
     /**
      * One-time initialisation. If this is not called before we first obtain the context, the defaults will be used.

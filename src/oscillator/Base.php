@@ -15,34 +15,33 @@ abstract class Base implements IOscillator {
 
     const F_INV_TWELVE = 1.0/12.0;
 
-    protected
-        /** @var IGenerator $oGenerator */
-        $oGenerator,
+    /** @var Signal\IGenerator $oGenerator */
+    protected Signal\IGenerator $oGenerator;
 
-        /** @var Packet $oGeneratorInput */
-        $oGeneratorInput,
+    /** @var Signal\Packet $oGeneratorInput */
+    protected Signal\Packet $oGeneratorInput;
 
-        /** @var int $iSamplePosition */
-        $iSamplePosition = 0,
+    /** @var int $iSamplePosition */
+    protected int $iSamplePosition = 0;
 
-        /** @var float $fFrequency - The base frequency */
-        $fFrequency,
+    /** @var float $fFrequency - The base frequency */
+    protected float $fFrequency = ILimits::F_DEF_FREQ;
 
-        /** @var float $fCurrentFequency - The present instantaneous frequency considering any pitch control */
-        $fCurrentFrequency,
+    /** @var float $fCurrentFequency - The present instantaneous frequency considering any pitch control */
+    protected float $fCurrentFrequency = ILimits::F_DEF_FREQ;
 
-        /** @var float $fPhaseCorrection - The accumulated phase difference as a result of pitch control */
-        $fPhaseCorrection,
+    /** @var float $fPhaseCorrection - The accumulated phase difference as a result of pitch control */
+    protected float $fPhaseCorrection = 0;
 
-        /** @var float $fScaleVal */
-        $fScaleVal,
+    /** @var float $fScaleVal */
+    protected float $fScaleVal= 0;
 
-        /** @var SPLFixedArray $oPhaseShift */
-        $oPhaseShift,
+    /** @var \SPLFixedArray $oPhaseShift */
+    protected ?\SPLFixedArray $oPhaseShift = null;
 
-        /** @var SPLFixedArray $oPitchShift */
-        $oPitchShift
-    ;
+    /** @var \SPLFixedArray $oPitchShift */
+    protected ?\SPLFixedArray $oPitchShift = null;
+
 
     /**
      * Constructor.
@@ -118,6 +117,7 @@ abstract class Base implements IOscillator {
     public function setFrequency(float $fFrequency) : IOscillator {
         $this->fFrequency = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
         $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency * Signal\Context::get()->getSamplePeriod();
+        $this->fCurrentFreqency = $this->fFrequency;
         return $this;
     }
 
