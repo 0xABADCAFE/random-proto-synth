@@ -3,8 +3,11 @@
 Probably the least practical synthesizer ever realised, implemented in php7.
 This code does not conform to any specific PSR standards.
 
-## Versiom Requirements
-Requires PHP 7.4 or above.
+## Version Requirements
+Requires PHP 7.4 or above for the following:
+- Typed Properties
+- Strict Types
+- Covariance
 
 ## Key Ideas
 
