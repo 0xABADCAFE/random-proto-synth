@@ -2,16 +2,9 @@
 
 namespace ABadCafe\Synth\Operator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\IFilter;
-use ABadCafe\Synth\Signal\Filter\ICutoffControlled;
-use ABadCafe\Synth\Signal\Filter\IResonanceControlled;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Map;
 
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -49,17 +42,17 @@ class ControlledFilter extends Base implements IProcessor {
     /**
      * Constructor
      *
-     * @param IFilter $oFilter
-     * @param IStream $oCutoffControl    (optional)
-     * @param IStream $oResonanceControl (optional)
+     * @param Signal\IFilter $oFilter
+     * @param Signal\IStream $oCutoffControl    (optional)
+     * @param Signal\IStream $oResonanceControl (optional)
      */
     public function __construct(
-        IFilter $oFilter,
-        IStream $oCutoffControl    = null,
-        IStream $oResonanceControl = null
+        Signal\IFilter $oFilter,
+        Signal\IStream $oCutoffControl    = null,
+        Signal\IStream $oResonanceControl = null
     ) {
         $this->oFilter           = $oFilter;
-        $this->oLastPacket       = new Packet();
+        $this->oLastPacket       = new Signal\Packet();
         $this->oCutoffControl    = $oCutoffControl;
         $this->oResonanceControl = $oResonanceControl;
         $this->assignInstanceID();
@@ -91,7 +84,7 @@ class ControlledFilter extends Base implements IProcessor {
      * @inheritdoc
      * @see IStream
      */
-    public function reset() : IStream {
+    public function reset() : Signal\IStream {
         $this->iPosition = 0;
         $this->oLastPacket->fillWith(0);
         $this->oFilter->reset();
@@ -116,8 +109,8 @@ class ControlledFilter extends Base implements IProcessor {
      * @inheritdoc
      * @see IStream
      */
-    public function emitPacketForIndex(int $iPacketIndex) : Packet {
-        $this->iPosition += Context::get()->getPacketLength();
+    public function emitPacketForIndex(int $iPacketIndex) : Signal\Packet {
+        $this->iPosition += Signal\Context::get()->getPacketLength();
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
         }
@@ -127,10 +120,10 @@ class ControlledFilter extends Base implements IProcessor {
             $this->oLastPacket->accumulate($oOperator->emitPacketForIndex($iPacketIndex), $this->aLevels[$iInstanceID]);
         }
 
-        if ($this->oCutoffControl && $this->oFilter instanceof ICutoffControlled) {
+        if ($this->oCutoffControl && $this->oFilter instanceof Signal\Filter\ICutoffControlled) {
             $this->oFilter->setCutoffControl($this->oCutoffControl->emit());
         }
-        if ($this->oResonanceControl && $this->oFilter instanceof IResonanceControlled) {
+        if ($this->oResonanceControl && $this->oFilter instanceof Signal\Filter\IResonanceControlled) {
             $this->oFilter->setResonanceControl($this->oResonanceControl->emit());
         }
 
@@ -155,7 +148,7 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * @see IMIDINumberAware
      */
-    public function getNoteNumberMap(string $sUseCase) : IMIDINoteMap {
+    public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
             $oForwards = $this->aNoteMapForwards[$sUseCase];
             return $oForwards->oControl->getNoteNumberMap(
@@ -172,11 +165,11 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
-        if ($this->oCutoffControl instanceof IMIDINoteMapAware) {
+    public function setNoteNumber(int $iNote) : Map\Note\IMIDINumberAware {
+        if ($this->oCutoffControl instanceof Map\Note\IMIDINumberAware) {
             $this->oCutoffControl->setNoteNumber($iNote);
         }
-        if ($this->oResonanceControl instanceof IMIDINoteMapAware) {
+        if ($this->oResonanceControl instanceof Map\Note\IMIDINumberAware) {
             $this->oResonanceControl->setNoteNumber($iNote);
         }
         return $this;
@@ -189,11 +182,11 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteName(string $sNote) : IMIDINoteMapAware {
-        if ($this->oCutoffControl instanceof IMIDINoteMapAware) {
+    public function setNoteName(string $sNote) : Map\Note\IMIDINumberAware {
+        if ($this->oCutoffControl instanceof Map\Note\IMIDINumberAware) {
             $this->oCutoffControl->setNoteName($sNote);
         }
-        if ($this->oResonanceControl instanceof IMIDINoteMapAware) {
+        if ($this->oResonanceControl instanceof Map\Note\IMIDINumberAware) {
             $this->oResonanceControl->setNoteName($sNote);
         }
         return $this;
@@ -206,7 +199,7 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase) : IMIDINoteMapAware {
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : Map\Note\IMIDINumberAware {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
             $oForwards = $this->aNoteMapForwards[$sUseCase];
             $oForwards->oControl->setNoteNumberMap($oNoteMap, $oForwards->sUseCase);
@@ -222,7 +215,7 @@ class ControlledFilter extends Base implements IProcessor {
      */
     private function configureNoteMapBehaviours() {
         $this->aNoteMapForwards = [];
-        if ($this->oCutoffControl instanceof IMIDINoteMapAware) {
+        if ($this->oCutoffControl instanceof Map\Note\IMIDINumberAware) {
             $aCutoffCases = $this->oCutoffControl->getNoteNumberMapUseCases();
             foreach ($aCutoffCases as $sCutoffUseCase) {
                 $this->aNoteMapForwards[self::S_CUTOFF_PREFIX . $sCutoffUseCase] = (object)[
@@ -231,7 +224,7 @@ class ControlledFilter extends Base implements IProcessor {
                 ];
             }
         }
-        if ($this->oResonanceControl instanceof IMIDINoteMapAware) {
+        if ($this->oResonanceControl instanceof Map\Note\IMIDINumberAware) {
             $aResonanceCases = $this->oResonanceControl->getNoteNumberMapUseCases();
             foreach ($aResonanceCases as $sResonanceUseCase) {
                 $this->aNoteMapForwards[self::S_RESONANCE_PREFIX . $sResonanceUseCase] = (object)[

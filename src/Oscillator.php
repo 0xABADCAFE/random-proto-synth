@@ -5,10 +5,7 @@
  */
 namespace ABadCafe\Synth\Oscillator;
 
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Generator\IGenerator;
+use ABadCafe\Synth\Signal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +33,7 @@ interface ILimits {
  *
  * Interface for Oscillators
  */
-interface IOscillator extends IStream {
+interface IOscillator extends Signal\IStream {
 
     /**
      * Get the oscillator frequency in Hz
@@ -63,7 +60,7 @@ interface IOscillator extends IStream {
      * @param  Packet $oPitch
      * @return self
      */
-    public function setPitchModulation(Packet $oPitch = null) : self;
+    public function setPitchModulation(Signal\Packet $oPitch = null) : self;
 
     /**
      * Set a phase moulation, per sample, to be applied to the basic waveform. This is applied in subseuent calls to emit().
@@ -75,7 +72,7 @@ interface IOscillator extends IStream {
      * @param Packet $oPitch
      * @return self
      */
-    public function setPhaseModulation(Packet $oPhase = null) : self;
+    public function setPhaseModulation(Signal\Packet $oPhase = null) : self;
 
 }
 

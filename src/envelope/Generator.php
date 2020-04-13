@@ -2,15 +2,9 @@
 
 namespace ABadCafe\Synth\Envelope\Generator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Envelope\IShape;
-use ABadCafe\Synth\Envelope\IGenerator;
-
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\Invariant        as InvariantNoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
+use ABadCafe\Synth\Envelope;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Map;
 
 use function ABadCafe\Synth\Utility\dprintf;
 
@@ -19,9 +13,9 @@ use function ABadCafe\Synth\Utility\dprintf;
 /**
  * Generator
  *
- * Calculates the continuous signal packet stream for an envelope defined by a given IShape
+ * Calculates the continuous Signal\Packet stream for an envelope defined by a given Envelope\IShape
  */
-class LinearInterpolated implements IGenerator {
+class LinearInterpolated implements Envelope\IGenerator {
 
     const A_MAPS = [
         self::S_NOTE_MAP_SPEED => true,
@@ -29,28 +23,28 @@ class LinearInterpolated implements IGenerator {
     ];
 
     private
-        /** @var IShape $oShape : input IShape */
+        /** @var Envelope\IShape $oShape : input envelope shape */
         $oShape          = null,
 
-        /** @var IMIDINoteMap[] $aNoteMaps - keyed by use case */
+        /** @var Map\Note\IMIDINumber[] $aNoteMaps - keyed by use case */
         $aNoteMaps       = [],
 
         /** @var int $iNoteNumber */
-        $iNoteNumber     = IMIDINoteMap::CENTRE_REFERENCE,
+        $iNoteNumber     = Map\Note\IMIDINumber::CENTRE_REFERENCE,
 
         /** @var float $fTimeScale */
         $fTimeScale      = 1.0,
 
         /** @var float $fAmplitude Scale */
-        $fLevelScale = 1.0,
+        $fLevelScale     = 1.0,
 
-        /** @var Packet $oOutputPacket : Buffer for signal */
+        /** @var Signal\Control\Packet $oOutputPacket : Buffer for signal */
         $oOutputPacket   = null,
 
-        /** @var Packet $oFinalPacket : Fixed packet filled with the final envelope value */
+        /** @var Signal\Control\Packet $oFinalPacket : Fixed packet filled with the final envelope value */
         $oFinalPacket    = null,
 
-        /** @var {int, float}[] $aProcessPoints : Envelope IShape points, converted into Sample Position => Level pairs */
+        /** @var {int, float}[] $aProcessPoints : Envelope points, converted into Sample Position => Level pairs */
         $aProcessPoints  = [],
 
         /** @var int[] $aProcessPoints : Indexes to the Process Points array, keyed by the Sample Position they start at  */
@@ -78,18 +72,18 @@ class LinearInterpolated implements IGenerator {
      * Accepts the basic envelope shape and a pair of optional note maps that are used to scale the speed and level of the envelope points
      * depending on the note number.
      *
-     * @param IShape            $oShape
-     * @param IMIDINoteMap|null $oNoteMapSpeed (optional)
-     * @param IMIDINoteMap|null $oNoteMapLevel (optional)
+     * @param Envelope\IShape           $oShape
+     * @param Map\Note\IMIDINumber|null $oNoteMapSpeed (optional)
+     * @param Map\Note\IMIDINumber|null $oNoteMapLevel (optional)
      */
     public function __construct(
-        IShape       $oShape,
-        IMIDINoteMap $oNoteMapSpeed = null,
-        IMIDINoteMap $oNoteMapLevel = null
+        Envelope\IShape      $oShape,
+        Map\Note\IMIDINumber $oNoteMapSpeed = null,
+        Map\Note\IMIDINumber $oNoteMapLevel = null
     ) {
         $this->oShape        = $oShape;
-        $this->oOutputPacket = new Packet();
-        $this->oFinalPacket  = new Packet();
+        $this->oOutputPacket = new Signal\Packet();
+        $this->oFinalPacket  = new Signal\Packet();
         if ($oNoteMapSpeed) {
             $this->aNoteMaps[self::S_NOTE_MAP_SPEED] = $oNoteMapSpeed;
         }
@@ -102,14 +96,14 @@ class LinearInterpolated implements IGenerator {
     /**
      * @inheritdoc
      */
-    public function getShape() : IShape {
+    public function getShape() : Envelope\IShape {
         return $this->oShape;
     }
 
     /**
      * @inheritdoc
      */
-    public function setShape(IShape $oShape) : IGenerator {
+    public function setShape(Envelope\IShape $oShape) : Envelope\IGenerator {
         $this->oShape = $oShape;
         $this->reset();
         return $this;
@@ -128,9 +122,9 @@ class LinearInterpolated implements IGenerator {
     /**
      * Reset the envelope. This resets the sample output position and re-evaluates the IShape in case of any changes.
      *
-     * @return IStream
+     * @return Signal\IStream
      */
-    public function reset() : IStream {
+    public function reset() : Signal\IStream {
         $this->iSamplePosition = 0;
         $this->recalculate();
         return $this;
@@ -141,8 +135,8 @@ class LinearInterpolated implements IGenerator {
      *
      * @return Packet
      */
-    public function emit() : Packet {
-        $iLength = Context::get()->getPacketLength();
+    public function emit() : Signal\Packet {
+        $iLength = Signal\Context::get()->getPacketLength();
 
         // If we are at the end of the envelope, just return the final packet
         if ($this->iSamplePosition >= $this->iLastPosition) {
@@ -176,7 +170,7 @@ class LinearInterpolated implements IGenerator {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(IMIDINoteMap $oNoteMap, string $sUseCase) : IMIDINoteMapAware {
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : Map\Note\IMIDINumberAware {
         if (isset(self::A_MAPS[$sUseCase])) {
             $this->aNoteMaps[$sUseCase] = $oNoteMap;
             $this->recalculate();
@@ -189,12 +183,12 @@ class LinearInterpolated implements IGenerator {
      *
      * @see IMIDINumberAware
      */
-    public function getNoteNumberMap(string $sUseCase) : IMIDINoteMap {
+    public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
         if (null !== $sUseCase && isset($this->aNoteMaps[$sUseCase])) {
             return $this->aNoteMaps[$sUseCase];
         }
         // Fulfil the interface requirements by returning the invariant note map
-        return InvariantNoteMap::get();
+        return Map\Note\InvariantNoteMap::get();
     }
 
     /**
@@ -202,7 +196,7 @@ class LinearInterpolated implements IGenerator {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumber(int $iNote) : IMIDINoteMapAware {
+    public function setNoteNumber(int $iNote) : Map\Note\IMIDINumberAware {
         // If the note number has changed, use the key scale map to obtain the time scaling to use for that note
         if ($iNote != $this->iNoteNumber) {
             $this->fTimeScale = isset($this->aNoteMaps[self::S_NOTE_MAP_SPEED]) ?
@@ -233,7 +227,7 @@ class LinearInterpolated implements IGenerator {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteName(string $sNote) : IMIDINoteMapAware {
+    public function setNoteName(string $sNote) : Map\Note\IMIDINumberAware {
         // Just use the first Note Map, if any, to convert the note name.
         foreach ($this->aNoteMaps as $oNoteMap) {
             return $this->setNoteNumber($oNoteMap->getNoteNumber($sNote));
@@ -246,7 +240,7 @@ class LinearInterpolated implements IGenerator {
      */
     private function recalculate() {
         $this->aProcessPoints  = [];
-        $iProcessRate = Context::get()->getProcessRate();
+        $iProcessRate = Signal\Context::get()->getProcessRate();
         $fTimeTotal   = 0.0;
         $i = 0;
         foreach ($this->oShape->getAll() as $aPoint) {

@@ -2,10 +2,7 @@
 
 namespace ABadCafe\Synth\Oscillator;
 
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Signal\Context;
-use ABadCafe\Synth\Signal\IGenerator;
-use ABadCafe\Synth\Signal\Packet;
+use ABadCafe\Synth\Signal;
 use \InvalidArgumentException;
 use \RangeException;
 
@@ -42,19 +39,19 @@ class Super extends Simple {
      * For this Oscillator to be useful, at least two harmonics need to be present. For this reason an exception is
      * thrown if the harmonic array has fewer than two entries.
      *
-     * @param IGenerator $oGenerator
-     * @param float[3][] $aHarmonicStack
-     * @param float      $fFrequency
+     * @param Signal\IGenerator $oGenerator
+     * @param float[3][]        $aHarmonicStack
+     * @param float             $fFrequency
      *
      * @throws InvalidArgumentException
      */
     public function __construct(
-        IGenerator $oGenerator,
-        array      $aHarmonicStack,
-        float      $fFrequency  = ILimits::F_DEF_FREQ
+        Signal\IGenerator $oGenerator,
+        array             $aHarmonicStack,
+        float             $fFrequency  = ILimits::F_DEF_FREQ
     ) {
         $this->oGenerator      = $oGenerator;
-        $this->oGeneratorInput = new Packet();
+        $this->oGeneratorInput = new Signal\Packet();
         $this->setFrequency($fFrequency);
         $this->initHarmonicStack($aHarmonicStack);
     }
@@ -62,15 +59,15 @@ class Super extends Simple {
     /**
      * @inheritdoc
      */
-    public function emit() : Packet {
-        $oOutput = new Packet();
+    public function emit() : Signal\Packet {
+        $oOutput = new Signal\Packet();
         $oValues = $this->oGeneratorInput->getValues();
         $iSamplePosition = 0;
 
         // Handle pitch control
         if ($this->oPitchShift) {
             $fCyclePeriod      = $this->oGenerator->getPeriod();
-            $fSamplePeriod     = Context::get()->getSamplePeriod();
+            $fSamplePeriod     = Signal\Context::get()->getSamplePeriod();
             $fCurrentFrequency = $this->fCurrentFrequency;
             // Process each harmonic term
             foreach ($this->aHarmonics as $iHarmonicID => $fHarmonic) {
@@ -125,7 +122,7 @@ class Super extends Simple {
     /**
      * @overriden
      */
-    public function reset() : IStream {
+    public function reset() : Signal\IStream {
         parent::reset();
         $this->aPhaseCorrections = $this->aInitPhases;
         return $this;

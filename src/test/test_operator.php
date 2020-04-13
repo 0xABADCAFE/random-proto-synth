@@ -88,7 +88,7 @@ $oModulator1->setNoteName('C4');
 $oCarrier->setNoteName('C4');
 
 // Define the final summing output and render
-$oOutput = new Operator\PCMOutput(new Output\Wav);
+$oOutput = new Operator\PCMOutput(new Output\Play);
 $oOutput
     ->attachSignalInput($oCarrier, 1.0)
     ->open('output/operator.wav')

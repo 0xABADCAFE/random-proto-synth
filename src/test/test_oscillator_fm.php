@@ -44,7 +44,7 @@ $oCarrierShape
 
 $oCarrierEnvelope = new Envelope\Generator\LinearInterpolated($oCarrierShape);
 
-$oOutput = new Output\Wav;
+$oOutput = new Output\Play;
 $oOutput->open('output/test_fm.wav');
 
 $fStart = microtime(true);

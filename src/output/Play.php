@@ -2,15 +2,19 @@
 
 namespace ABadCafe\Synth\Output;
 
-use ABadCafe\Synth\Signal\Packet;
-use ABadCafe\Synth\Signal\Context;
+use ABadCafe\Synth\Signal;
+
+use function ABadCafe\Synth\Utility\clamp;
+use function ABadCafe\Synth\Utility\dprintf;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Raw
  *
  * Base class for raw output
  */
-class Play implements IPCMOutput {
+class Play implements IPCMOutput, Signal\IChannelMode {
 
     const
         I_MIN_LEVEL = -32767,
@@ -21,15 +25,21 @@ class Play implements IPCMOutput {
     /**
      * @param resource $rOutput
      */
-    protected $rOutput = null;
+    private $rOutput = null;
 
-    protected $aPipeDescriptors  = [
+    private $aPipeDescriptors  = [
         0 => ['pipe', 'r'],
         1 => ['file', '/dev/null', 'a'],
         2 => ['file', '/dev/null', 'a']
     ];
 
-    protected $aPipes;
+    private $aPipes;
+
+    private $iChannelMode;
+
+    public function __construct(int $iChannelMode = self::I_CHAN_MONO) {
+        $this->iChannelMode = clamp($iChannelMode, self::I_CHAN_MONO, self::I_CHAN_STEREO);
+    }
 
     public function __destruct() {
         $this->close();
@@ -40,8 +50,9 @@ class Play implements IPCMOutput {
      */
     public function open(string $sPath) {
         $sCommand = sprintf(
-            'play -t raw -b 16 -c 1 -e signed --endian=little -r %d --buffer %d -',
-            Context::get()->getProcessRate(),
+            'play -t raw -b 16 -c %d -e signed --endian=little -r %d --buffer %d -',
+            $this->iChannelMode,
+            Signal\Context::get()->getProcessRate(),
             self::I_BUFFER
         );
 
@@ -50,6 +61,8 @@ class Play implements IPCMOutput {
             !($this->rOutput = proc_open($sCommand, $this->aPipeDescriptors, $this->aPipes))
         ) {
             throw new IOException();
+        } else {
+            dprintf("SOX: %s\n", $sCommand);
         }
     }
 
@@ -72,9 +85,9 @@ class Play implements IPCMOutput {
     /**
      * @inheritdoc
      */
-    public function write(Packet $oPacket) {
+    public function write(Signal\Packet $oPacket) {
         $aOutput = $oPacket
-            ->quantize(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)
+            ->quantise(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)
             ->toArray();
         fwrite($this->aPipes[0], pack('v*', ...$aOutput));
     }
