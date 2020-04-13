@@ -22,31 +22,29 @@ class UnmodulatedOscillator extends Base implements ISource {
         S_PITCH_PREFIX     = 'pitch_'
     ;
 
-    protected
-        /** @var IOscillator $oOscillator */
-        $oOscillator,
+    /** @var IOscillator $oOscillator */
+    protected Oscillator\IOscillator $oOscillator;
 
-        /** @var float $fFrequencyRatio */
-        $fFrequencyRatio,
+    /** @var float $fFrequencyRatio */
+    protected float $fFrequencyRatio;
 
-        /** @var float $fDetune */
-        $fDetune,
+    /** @var float $fDetune */
+    protected float $fDetune;
 
-        /** @var IStream $oAmplitudeControl */
-        $oAmplitudeControl,
+    /** @var IStream $oAmplitudeControl */
+    protected ?Signal\IStream $oAmplitudeControl;
 
-        /** @var IStream $oPitchControl */
-        $oPitchControl,
+    /** @var IStream $oPitchControl */
+    protected ?Signal\IStream $oPitchControl;
 
-        /** @var Map\Note\IMIDINumber */
-        $oRootNoteMap,
+    /** @var Map\Note\IMIDINumber */
+    protected Map\Note\IMIDINumber $oRootNoteMap;
 
-        /** @var [] */
-        $aNoteMapForwards = [],
+    /** @var [] */
+    protected array $aNoteMapForwards = [];
 
-        /** @var string[] $aNoteMapUseCases */
-        $aNoteMapUseCases = []
-    ;
+    /** @var string[] $aNoteMapUseCases */
+    protected array $aNoteMapUseCases = [];
 
     /**
      * Constructo

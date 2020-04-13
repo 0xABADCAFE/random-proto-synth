@@ -14,16 +14,14 @@ use ABadCafe\Synth\Oscillator;
  */
 class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeModulated, IPhaseModulated {
 
-    protected
-        /** @var IOperator[] $aModulators - keyed by instance ID */
-        $aModulators               = [],
+    /** @var IOperator[] $aModulators - keyed by instance ID */
+    protected array $aModulators = [];
 
-        /** @var float[] $aPhaseModulationIndex - keyed by instance ID */
-        $aPhaseModulationIndex     = [],
+    /** @var float[] $aPhaseModulationIndex - keyed by instance ID */
+    protected array $aPhaseModulationIndex = [];
 
-        /** @var float[] $aAmplidudeModulationIndex - keyed by instance ID */
-        $aAmplitudeModulationIndex = []
-    ;
+    /** @var float[] $aAmplidudeModulationIndex - keyed by instance ID */
+    protected array $aAmplitudeModulationIndex = [];
 
     /**
      * @inheritdoc

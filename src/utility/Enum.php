@@ -11,7 +11,7 @@ trait TEnum {
    /**
     * @var self[] $aDefinedValues, keyed by the scalar
     */
-    private static $aDefinedValues = [];
+    private static array $aDefinedValues = [];
 
     /**
      * @var mixed $mValue

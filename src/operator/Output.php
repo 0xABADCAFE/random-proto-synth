@@ -16,8 +16,8 @@ use function ABadCafe\Synth\Utility\dprintf;
  */
 class PCMOutput extends Summing implements IOutput {
 
-    /** @var Output\Output\IPCMOutput $oOutput */
-    private $oPCMOutput;
+    /** @var Output\IPCMOutput $oOutput */
+    private Output\IPCMOutput $oPCMOutput;
 
     /**
      * Constructor, inject the desired file output type

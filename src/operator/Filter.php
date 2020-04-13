@@ -20,24 +20,24 @@ class ControlledFilter extends Base implements IProcessor {
     ;
 
     /** @var IFilter $oFilter */
-    private $oFilter;
+    private IFilter $oFilter;
 
     /** @var IStream $oCutoffControl */
-    private $oCutoffControl    = null;
+    private ?IStream $oCutoffControl = null;
 
     /** @var IStream $oResonanceControl */
-    private $oResonanceControl = null;
+    private ?IStream $oResonanceControl = null;
 
     /** @var IOperator[] $aOperators */
-    private $aOperators = [];
+    private array $aOperators = [];
 
     /** @var float[] $aLevels */
-    private $aLevels    = [];
+    private array $aLevels    = [];
 
     /** @var int $iPosotion */
-    private $iPosition  = 0;
+    private int $iPosition  = 0;
 
-    private $aNoteMapForwards = [];
+    private array $aNoteMapForwards = [];
 
     /**
      * Constructor

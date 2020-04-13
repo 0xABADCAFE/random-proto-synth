@@ -27,10 +27,10 @@ interface IEnumeratedInstance {
 trait TEnumeratedInstance {
 
     /** @var int $iNextInstanceID */
-    private static $iNextInstanceID = 0;
+    private static int $iNextInstanceID = 0;
 
     /** @var int $iInstanceID */
-    protected $iInstanceID = 0;
+    protected int $iInstanceID = 0;
 
     /**
      * Perform the ID assignment. Should be called at the end of construction whithin the incorporating class.

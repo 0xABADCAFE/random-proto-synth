@@ -103,7 +103,7 @@ interface IMIDINumberAware {
  */
 class Invariant extends Map\MIDIByte implements IMIDINumber {
 
-    private static $oInstance = null;
+    private static ?self $oInstance = null;
 
     /**
      * Singleton
@@ -243,22 +243,20 @@ abstract class TwelveTone extends Map\MIDIByte implements IMIDINumber {
  */
 class TwelveToneEqualTemperament extends TwelveTone {
 
-    private
-        /**
-         * @var float $fCentreValue - value at CENTRE_REFERENCE
-         */
-        $fCentreValue,
+    /**
+     * @var float $fCentreValue - value at CENTRE_REFERENCE
+     */
+    private float $fCentreValue;
 
-        /**
-         * @var float $fScalePerOctave
-         */
-        $fScalePerOctave,
+    /**
+     * @var float $fScalePerOctave
+     */
+    private float $fScalePerOctave;
 
-        /**
-         * @var bool $bInversed
-         */
-        $bInversed
-    ;
+    /**
+     * @var bool $bInversed
+     */
+    private bool $bInversed;
 
     /**
      * Constructor

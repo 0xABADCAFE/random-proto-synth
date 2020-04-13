@@ -18,13 +18,11 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
 
     use Utility\TEnumeratedInstance;
 
-    protected
-        /** @var Packet $oLastPacket */
-        $oLastPacket,
+    /** @var Packet $oLastPacket */
+    protected Signal\Packet $oLastPacket;
 
-        /** @var int $iPacketIndex */
-        $iPacketIndex              = 0
-    ;
+    /** @var int $iPacketIndex */
+    protected int $iPacketIndex = 0;
 
     /**
      * @inheritdoc

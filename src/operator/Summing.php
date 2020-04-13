@@ -14,13 +14,13 @@ use ABadCafe\Synth\Signal;
 class Summing extends Base implements IProcessor {
 
     /** @var IOperator[] $aOperators */
-    private $aOperators = [];
+    private array $aOperators = [];
 
     /** @var float[] $aLevels */
-    private $aLevels    = [];
+    private array $aLevels    = [];
 
     /** @var int $iPosotion */
-    private $iPosition  = 0;
+    private int $iPosition  = 0;
 
     public function __construct() {
         $this->oLastPacket = new Signal\Packet();
