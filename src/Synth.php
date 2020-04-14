@@ -1,6 +1,17 @@
 <?php
 
 /**
+ *      _/_/_/  _/_/_/  _/      _/  _/_/_/      _/_/_/
+ *   _/          _/    _/_/  _/_/  _/    _/  _/
+ *  _/  _/_/    _/    _/  _/  _/  _/_/_/      _/_/
+ * _/    _/    _/    _/      _/  _/              _/
+ *  _/_/_/  _/_/_/  _/      _/  _/        _/_/_/
+ *
+ *  - Grossly Impractical Modular PHP Synthesiser -
+ *
+ */
+
+/**
  * In the absence of an autoloader, we use a simple C-like header. Each top level include pulls in whatever is defined
  * within it's corresponding subdirectory.
  */
