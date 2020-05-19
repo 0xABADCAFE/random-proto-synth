@@ -63,7 +63,7 @@ class Super extends Simple {
         float             $fFrequency  = ILimits::F_DEF_FREQ
     ) {
         $this->oGenerator      = $oGenerator;
-        $this->oGeneratorInput = new Signal\Packet();
+        $this->oGeneratorInput = new Signal\Audio\Packet();
         $this->setFrequency($fFrequency);
         $this->initHarmonicStack($aHarmonicStack);
     }
@@ -72,7 +72,7 @@ class Super extends Simple {
      * @inheritdoc
      */
     public function emit() : Signal\Audio\Packet {
-        $oOutput = new Signal\Packet();
+        $oOutput = new Signal\Audio\Packet();
         $oValues = $this->oGeneratorInput->getValues();
         $iSamplePosition = 0;
 

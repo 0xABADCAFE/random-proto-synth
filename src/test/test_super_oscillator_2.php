@@ -6,7 +6,7 @@ require_once '../Synth.php';
 
 $iSamples = 4 * Signal\Context::get()->getProcessRate();
 
-$oOscillator = new Oscillator\Super(
+$oOscillator = new Oscillator\Audio\Super(
     new Signal\Generator\SawDown(),
     [
         [1.001,     0.25, 0.0],
@@ -23,12 +23,12 @@ $oOscillator = new Oscillator\Super(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oCutoffEnvelope = new Oscillator\Simple(
+$oCutoffEnvelope = new Oscillator\Control\Simple(
     new Signal\Generator\SawDown(0.05, 1.0),
     8
 );
 
-$oVolumeEnvelope = new Oscillator\Simple(
+$oVolumeEnvelope = new Oscillator\Control\Simple(
     new Signal\Generator\SawDown(0.5, 0.75),
     8
 );

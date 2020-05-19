@@ -37,7 +37,7 @@ $iOneSecond = Signal\Context::get()->getProcessRate();
 $oOutput    = new Output\Play;
 
 foreach ($aGenerators as $sName => $oGenerator) {
-    $oOscillator = new Oscillator\Simple(
+    $oOscillator = new Oscillator\Audio\Simple(
         $oGenerator,
         440
     );
