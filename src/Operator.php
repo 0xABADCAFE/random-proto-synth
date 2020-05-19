@@ -17,11 +17,10 @@ declare(strict_types = 1);
  * Operator
  */
 namespace ABadCafe\Synth\Operator;
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Oscillator\IOscillator;
-use ABadCafe\Synth\Utility\TEnum;
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Oscillator;
+use ABadCafe\Synth\Map;
+use ABadCafe\Synth\Utility;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -32,7 +31,7 @@ use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
  */
 final class InputKind {
 
-    use TEnum;
+    use Utility\TEnum;
 
     const
         E_SIGNAL    = 0,
@@ -56,7 +55,7 @@ final class InputKind {
  *
  * Basic interface for linkable Operators. Operators combine Oscillators and control sources to sculpt sounds.
  */
-interface IOperator extends IStream, IMIDINoteMapAware {
+interface IOperator extends Signal\Audio\IStream, Map\Note\IMIDINumberAware {
 
     /**
      * Generic input attachment: Attaches another Operator as an input. Some Operators may support more than one
@@ -86,7 +85,7 @@ interface IProcessor {
      *
      * @param  IOperator $oOperator
      * @param  float     $fLevel
-     * @return self
+     * @return IOperator
      */
     public function attachSignalInput(IOperator $oOperator, float $fLevel) : self;
 
@@ -146,7 +145,7 @@ interface ISource {
      *
      * @return IOscillator
      */
-    public function getOscillator() : IOscillator;
+    public function getOscillator() : Oscillator\Audio\IOscillator;
 
     /**
      * Get the frequency ratio for the operator. This is a multiple of the frequency of the root

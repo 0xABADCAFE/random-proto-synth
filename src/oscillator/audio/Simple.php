@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Oscillator;
+namespace ABadCafe\Synth\Oscillator\Audio;
 use ABadCafe\Synth\Signal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ class Simple extends Base {
     /**
      * @inheritdoc
      */
-    public function emit() : Signal\Packet {
+    public function emit() : Signal\Audio\Packet {
 
         $oValues = $this->oGeneratorInput->getValues();
 

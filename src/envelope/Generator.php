@@ -33,28 +33,20 @@ class LinearInterpolated implements Envelope\IGenerator {
         self::S_NOTE_MAP_LEVEL => true
     ];
 
-    /** @var Envelope\IShape $oShape : input envelope shape */
     private Envelope\IShape $oShape;
 
-    private Signal\Packet
-        /** @var Signal\Packet $oOutputPacket : Buffer for signal */
-        $oOutputPacket,
-
-        /** @var Signal\Packet $oFinalPacket : Fixed packet filled with the final envelope value */
-        $oFinalPacket
+    private Signal\Control\Packet
+        $oOutputPacket, // Buffer for control signal
+        $oFinalPacket   // Fixed packet filled with the final envelope value
     ;
 
     /** @var Map\Note\IMIDINumber[] $aNoteMaps - keyed by use case */
     private array $aNoteMaps = [];
 
-    /** @var int $iNoteNumber */
     private int   $iNoteNumber = Map\Note\IMIDINumber::CENTRE_REFERENCE;
 
     private float
-        /** @var float $fTimeScale */
-        $fTimeScale = 1.0,
-
-        /** @var float $fAmplitude Scale */
+        $fTimeScale  = 1.0,
         $fLevelScale = 1.0
     ;
 
@@ -67,23 +59,16 @@ class LinearInterpolated implements Envelope\IGenerator {
     ;
 
     private int
-        /** @var int $iSamplePosition : Current Sample Position */
-        $iSamplePosition = 0,
-
-        /** @var int $iLastPosition : Used to early out and return the fixed packet */
-        $iLastPosition = 0
+        $iSamplePosition = 0, // Current Sample Position
+        $iLastPosition   = 0    // Used to early out and return the fixed packet
     ;
 
     private float
-        /** @var float $fGradient : Current Interpolant Gradient */
-        $fGradient = 0,
-
-        /** @var float $fYOffset : Current Interpolant Y Offset */
-        $fYOffset = 0
+        $fGradient = 0, // Current Interpolant Gradient
+        $fYOffset  = 0  //  Current Interpolant Y Offset
     ;
 
-    /** @var int $iXOffset : Current Interpolant X Offset */
-    private int   $iXOffset = 0;
+    private int   $iXOffset = 0; //  Current Interpolant X Offset
 
     /**
      * Constructor
@@ -101,8 +86,8 @@ class LinearInterpolated implements Envelope\IGenerator {
         Map\Note\IMIDINumber $oNoteMapLevel = null
     ) {
         $this->oShape        = $oShape;
-        $this->oOutputPacket = new Signal\Packet();
-        $this->oFinalPacket  = new Signal\Packet();
+        $this->oOutputPacket = new Signal\Control\Packet();
+        $this->oFinalPacket  = new Signal\Control\Packet();
         if ($oNoteMapSpeed) {
             $this->aNoteMaps[self::S_NOTE_MAP_SPEED] = $oNoteMapSpeed;
         }
@@ -122,7 +107,7 @@ class LinearInterpolated implements Envelope\IGenerator {
     /**
      * @inheritdoc
      */
-    public function setShape(Envelope\IShape $oShape) : Envelope\IGenerator {
+    public function setShape(Envelope\IShape $oShape) : self {
         $this->oShape = $oShape;
         $this->reset();
         return $this;
@@ -141,9 +126,9 @@ class LinearInterpolated implements Envelope\IGenerator {
     /**
      * Reset the envelope. This resets the sample output position and re-evaluates the IShape in case of any changes.
      *
-     * @return Signal\IStream
+     * @return Signal\Control\IStream
      */
-    public function reset() : Signal\IStream {
+    public function reset() : self {
         $this->iSamplePosition = 0;
         $this->recalculate();
         return $this;
@@ -154,7 +139,7 @@ class LinearInterpolated implements Envelope\IGenerator {
      *
      * @return Packet
      */
-    public function emit() : Signal\Packet {
+    public function emit() : Signal\Control\Packet {
         $iLength = Signal\Context::get()->getPacketLength();
 
         // If we are at the end of the envelope, just return the final packet
@@ -189,7 +174,7 @@ class LinearInterpolated implements Envelope\IGenerator {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : Map\Note\IMIDINumberAware {
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : self {
         if (isset(self::A_MAPS[$sUseCase])) {
             $this->aNoteMaps[$sUseCase] = $oNoteMap;
             $this->recalculate();
@@ -215,7 +200,7 @@ class LinearInterpolated implements Envelope\IGenerator {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumber(int $iNote) : Map\Note\IMIDINumberAware {
+    public function setNoteNumber(int $iNote) : self {
         // If the note number has changed, use the key scale map to obtain the time scaling to use for that note
         if ($iNote != $this->iNoteNumber) {
             $this->fTimeScale = isset($this->aNoteMaps[self::S_NOTE_MAP_SPEED]) ?
@@ -246,7 +231,7 @@ class LinearInterpolated implements Envelope\IGenerator {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteName(string $sNote) : Map\Note\IMIDINumberAware {
+    public function setNoteName(string $sNote) : self {
         // Just use the first Note Map, if any, to convert the note name.
         foreach ($this->aNoteMaps as $oNoteMap) {
             return $this->setNoteNumber($oNoteMap->getNoteNumber($sNote));

@@ -78,7 +78,7 @@ interface IShape extends Countable {
  *
  * Basic tag interface for Envelope Generators
  */
-interface IGenerator extends Signal\IStream, Map\Note\IMIDINumberAware {
+interface IGenerator extends Signal\Control\IStream, Map\Note\IMIDINumberAware {
 
     const
         // Use cases for Map\Note\IMIDINumberAware

@@ -60,7 +60,7 @@ class Shape implements IShape {
     /**
      * @inheritdoc
      */
-    public function initial(float $fLevel) : IShape {
+    public function initial(float $fLevel) : self {
         $this->aPoints[0][0] = $fLevel;
         return $this;
     }
@@ -68,7 +68,7 @@ class Shape implements IShape {
     /**
      * @inheritdoc
      */
-    public function append(float $fLevel, float $fTime) : IShape {
+    public function append(float $fLevel, float $fTime) : self {
         $this->aPoints[] = [
             $fLevel,
             min(max($fTime, ILimits::F_MIN_TIME), ILimits::F_MAX_TIME)

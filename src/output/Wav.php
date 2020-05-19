@@ -119,7 +119,7 @@ class Wav implements IPCMOutput, Signal\IChannelMode {
     /**
      * @inheritdoc
      */
-    public function write(Signal\Packet $oPacket) {
+    public function write(Signal\IPacket $oPacket) {
         $aOutput = $oPacket
             ->quantise($this->iQuantize, -$this->iQuantize, $this->iQuantize)
             ->toArray();

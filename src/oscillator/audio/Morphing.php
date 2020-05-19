@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Oscillator;
+namespace ABadCafe\Synth\Oscillator\Audio;
 use ABadCafe\Synth\Signal;
 use function ABadCafe\Synth\Utility\clamp;
 
@@ -34,7 +34,7 @@ use function ABadCafe\Synth\Utility\clamp;
         $oMixingGenerator
     ;
 
-    protected Signal\Packet
+    protected Signal\Audio\Packet
         $oSecondaryInput,
         $oMixingInput
     ;
@@ -58,12 +58,12 @@ use function ABadCafe\Synth\Utility\clamp;
         $this->fSecondaryRatio     = clamp($fSecondaryRatio, self::F_MIN_RATIO, self::F_MAX_RATIO);
         $this->oSecondaryGenerator = $oSecondaryGenerator;
         $this->oMixingGenerator    = $oMixingGenerator;
-        $this->oSecondaryInput     = new Signal\Packet();
-        $this->oMixingInput        = new Signal\Packet();
+        $this->oSecondaryInput     = new Signal\Audio\Packet();
+        $this->oMixingInput        = new Signal\Audio\Packet();
         parent::__construct($oPrimaryGenerator, $fPrimaryFrequency);
     }
 
-    public function setFrequency(float $fFrequency) : IOscillator {
+    public function setFrequency(float $fFrequency) : self {
         parent::setFrequency($fFrequency);
         $fRate = 1.0 / (float)Signal\Context::get()->getProcessRate();
         $this->fSecondaryScaleVal = $this->oSecondaryGenerator->getPeriod() * $this->fFrequency * $this->fSecondaryRatio * $fRate;
@@ -76,7 +76,7 @@ use function ABadCafe\Synth\Utility\clamp;
      *
      * @todo - Reimplement to apply pitch and phase modulation as in the Simple oscillator.
      */
-    public function emit() : Signal\Packet {
+    public function emit() : Signal\Audio\Packet {
         $oValues          = $this->oGeneratorInput->getValues();
         $oSecondaryValues = $this->oSecondaryInput->getValues();
         $oMixingValues    = $this->oMixingInput->getValues();

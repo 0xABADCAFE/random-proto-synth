@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Oscillator;
+namespace ABadCafe\Synth\Oscillator\Audio;
 use ABadCafe\Synth\Signal;
 use function ABadCafe\Synth\Utility\clamp;
 
@@ -30,7 +30,7 @@ abstract class Base implements IOscillator {
     protected Signal\IGenerator $oGenerator;
 
     /** @var Signal\Packet $oGeneratorInput */
-    protected Signal\Packet $oGeneratorInput;
+    protected Signal\Audio\Packet $oGeneratorInput;
 
     /** @var int $iSamplePosition */
     protected int $iSamplePosition = 0;
@@ -71,7 +71,7 @@ abstract class Base implements IOscillator {
         float             $fPhase      = 0.0
     ) {
         $this->oGenerator       = $oGenerator;
-        $this->oGeneratorInput  = new Signal\Packet();
+        $this->oGeneratorInput  = new Signal\Audio\Packet();
         $this->setFrequency($fFrequency);
         $this->fPhaseCorrection = $oGenerator->getPeriod() * $fPhase;
     }
@@ -114,7 +114,7 @@ abstract class Base implements IOscillator {
      *
      * @return self
      */
-    public function reset() : Signal\IStream {
+    public function reset() : self {
         $this->iSamplePosition  = 0;
         $this->oPhaseShift      = null;
         $this->oPitchShift      = null;
@@ -129,7 +129,7 @@ abstract class Base implements IOscillator {
      * @param  float $fFrequency
      * @return self
      */
-    public function setFrequency(float $fFrequency) : IOscillator {
+    public function setFrequency(float $fFrequency) : self {
         $this->fFrequency = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
         $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency * Signal\Context::get()->getSamplePeriod();
         $this->fCurrentFreqency = $this->fFrequency;
@@ -139,7 +139,7 @@ abstract class Base implements IOscillator {
     /**
      * @inheritdoc
      */
-    public function setPitchModulation(Signal\Packet $oPitch = null) : IOscillator {
+    public function setPitchModulation(Signal\Control\Packet $oPitch = null) : self {
         if ($oPitch) {
             // Convert the linear semitone based shifts into absolute multiples of the base frequency
             $this->oPitchShift = clone $oPitch->getValues();
@@ -156,7 +156,7 @@ abstract class Base implements IOscillator {
     /**
      * @inheritdoc
      */
-    public function setPhaseModulation(Signal\Packet $oPhase = null) : IOscillator {
+    public function setPhaseModulation(Signal\Audio\Packet $oPhase = null) : self {
         if ($oPhase) {
             $fPhaseSize = $this->oGenerator->getPeriod();
             $this->oPhaseShift = clone $oPhase->getValues();
