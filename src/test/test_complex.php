@@ -9,7 +9,7 @@ require_once '../Synth.php';
 $oModulator = new Operator\ModulatableOscillator(
 
     // Wave function
-    new Oscillator\Simple(
+    new Oscillator\Audio\Simple(
         new Signal\Generator\Sine()
     ),
 
@@ -47,7 +47,7 @@ $oModulator = new Operator\ModulatableOscillator(
 $oCarrier = new Operator\ModulatableOscillator(
 
     // Wave function
-    new Oscillator\Simple(
+    new Oscillator\Audio\Simple(
         new Signal\Generator\Square()
     ),
 
@@ -83,7 +83,7 @@ $oCarrier = new Operator\ModulatableOscillator(
 $oCarrier2 = new Operator\ModulatableOscillator(
 
     // Wave function
-    new Oscillator\Simple(
+    new Oscillator\Audio\Simple(
         new Signal\Generator\SawDown()
     ),
 
@@ -119,7 +119,7 @@ $oCarrier2 = new Operator\ModulatableOscillator(
 $oFilter = new Operator\ControlledFilter(
 
     // Filter type
-    new Signal\Filter\ResonantLowPass(),
+    new Signal\Audio\Filter\ResonantLowPass(),
 
     // Cutoff Control
     new Envelope\Generator\LinearInterpolated(

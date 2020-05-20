@@ -139,7 +139,7 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
 
         // Apply any amplitude control
         if ($this->oAmplitudeControl) {
-            $oOscillatorPacket->modulateWith($this->oAmplitudeControl->emit());
+            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit());
         }
 
         // Apply any amplitude modulation

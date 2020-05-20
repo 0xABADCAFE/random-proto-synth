@@ -15,7 +15,7 @@ $aGenerators = [
 
 const I_STEPS = 16;
 
-$oInputPacket = new Signal\Packet();
+$oInputPacket = new Signal\Control\Packet();
 $oInputData   = $oInputPacket->getValues();
 
 foreach ($aGenerators as $sName => $oGenerator) {

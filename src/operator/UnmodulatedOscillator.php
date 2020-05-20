@@ -240,7 +240,7 @@ class UnmodulatedOscillator extends Base implements ISource {
 
         // Apply any amplitude control
         if ($this->oAmplitudeControl) {
-            $oOscillatorPacket->modulateWith($this->oAmplitudeControl->emit());
+            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit());
         }
 
         $this->oLastPacket        = $oOscillatorPacket;

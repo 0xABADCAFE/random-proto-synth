@@ -53,7 +53,7 @@ class ControlledFilter extends Base implements IProcessor {
     /**
      * Constructor
      *
-     * @param Signal\Audop\IFilter   $oFilter
+     * @param Signal\Audio\IFilter   $oFilter
      * @param Signal\Control\IStream $oCutoffControl    (optional)
      * @param Signal\Control\IStream $oResonanceControl (optional)
      */

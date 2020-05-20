@@ -9,7 +9,7 @@ require_once '../Synth.php';
 $oCarrier = new Operator\UnmodulatedOscillator(
 
     // Wave function
-    new Oscillator\Super(
+    new Oscillator\Audio\Super(
         new Signal\Generator\Square(),
         [
             [1.0,  0.5, 0.0],
@@ -45,7 +45,7 @@ $oFilter = new Operator\ControlledFilter(
 
     // TODO - bandbass here
     // Filter type
-    new Signal\Filter\KarlsenBandPass(0.12, 0.35)
+    new Signal\Audio\Filter\KarlsenBandPass(0.12, 0.35)
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
