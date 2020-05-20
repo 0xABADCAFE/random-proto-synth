@@ -26,6 +26,7 @@ use function ABadCafe\Synth\Utility\dprintf;
  * Enumerates MIDI note numbers
  */
 interface IMIDINumber {
+
     const
         CENTRE_REFERENCE = 69; // LMAO: A4
 
@@ -255,16 +256,10 @@ abstract class TwelveTone extends Map\MIDIByte implements IMIDINumber {
 class TwelveToneEqualTemperament extends TwelveTone {
 
     private float
-        /** @var float $fCentreValue - value at CENTRE_REFERENCE */
-        $fCentreValue,
-
-        /** @var float $fScalePerOctave */
+        $fCentreValue,   // value at CENTRE_REFERENCE
         $fScalePerOctave
     ;
 
-    /**
-     * @var bool $bInversed
-     */
     private bool $bInversed;
 
     /**

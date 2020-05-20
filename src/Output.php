@@ -51,10 +51,10 @@ interface IPCMOutput {
     /**
      * Write a signal packet
      *
-     * @param  Signal\Packet $oPacket
+     * @param  Signal\IPacket $oPacket
      * @throws IOException
      */
-    public function write(Signal\Packet $oPacket);
+    public function write(Signal\IPacket $oPacket);
 
     /**
      * Close the output stream

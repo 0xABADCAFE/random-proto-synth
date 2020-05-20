@@ -26,18 +26,13 @@ use \RangeException;
  */
 class Context {
 
-    /** @var Context $oInstance */
     private static ?self $oInstance = null;
 
     private int
-        /** @var int $iProcessRate */
         $iProcessRate,
-
-        /** @var int $iPacketLength */
         $iPacketLength
     ;
 
-    /** @var float $fSamplePeriod */
     private float $fSamplePeriod;
 
     /**

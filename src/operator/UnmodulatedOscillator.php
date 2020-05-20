@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
-use ABadCafe\Synth\Oscillator;
+use ABadCafe\Synth\Oscillator\Audio;
 use ABadCafe\Synth\Map;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,22 +34,15 @@ class UnmodulatedOscillator extends Base implements ISource {
         S_PITCH_PREFIX     = 'pitch_'
     ;
 
-    /** @var IOscillator $oOscillator */
-    protected Oscillator\IOscillator $oOscillator;
+    protected Audio\IOscillator $oOscillator;
 
     protected float
-        /** @var float $fFrequencyRatio */
         $fFrequencyRatio,
-
-        /** @var float $fDetune */
         $fDetune
     ;
 
-    protected ?Signal\IStream
-        /** @var IStream|null $oAmplitudeControl */
+    protected ?Signal\Control\IStream
         $oAmplitudeControl,
-
-        /** @var IStream|null $oPitchControl */
         $oPitchControl
     ;
 
@@ -67,19 +60,19 @@ class UnmodulatedOscillator extends Base implements ISource {
     /**
      * Constructo
      *
-     * @param Oscillator\IOscillator    $oOscillator       : Waveform generator to use    (required)
-     * @param float                     $fFrequencyRatio   : Multiple of root note
-     * @param float                     $fDetune           : Frequency adjustment
-     * @param Signal\IStream|null       $oAmplitudeControl : Amplitude Envelope Generator (optional)
-     * @param Signal\IStream|null       $oPitchControl     : Pitch Envelope Generator     (optional)
-     * @param Map\Note\IMIDINumber|null $oRootNoteMap      : Basic notemap for pitch
+     * @param Audio\IOscillator           $oOscillator       : Waveform generator to use    (required)
+     * @param float                       $fFrequencyRatio   : Multiple of root note
+     * @param float                       $fDetune           : Frequency adjustment
+     * @param Signal\Control\IStream|null $oAmplitudeControl : Amplitude Envelope Generator (optional)
+     * @param Signal\Control\IStream|null $oPitchControl     : Pitch Envelope Generator     (optional)
+     * @param Map\Note\IMIDINumber|null   $oRootNoteMap      : Basic notemap for pitch
      */
     public function __construct(
-        Oscillator\IOscillator  $oOscillator,
+        Audio\IOscillator       $oOscillator,
         float                   $fFrequencyRatio   = 1.0,
         float                   $fDetune           = 0.0,
-        Signal\IStream          $oAmplitudeControl = null,
-        Signal\IStream          $oPitchControl     = null,
+        Signal\Control\IStream  $oAmplitudeControl = null,
+        Signal\Control\IStream  $oPitchControl     = null,
         Map\Note\IMIDINumber    $oRootNoteMap      = null
     ) {
         $this->oOscillator       = $oOscillator;
@@ -102,7 +95,7 @@ class UnmodulatedOscillator extends Base implements ISource {
     /**
      * @inheritdoc
      */
-    public function reset() : Signal\IStream {
+    public function reset() : Signal\Audio\IStream {
         $this->oOscillator->reset();
         if ($this->oAmplitudeControl) {
             $this->oAmplitudeControl->reset();
@@ -143,7 +136,7 @@ class UnmodulatedOscillator extends Base implements ISource {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : Map\Note\IMIDINumberAware {
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : self {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
             $oEntity = $this->aNoteMapForwards[$sUseCase];
             $oEntity->oControl->setNoteNumberMap(
@@ -177,13 +170,13 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @inheritdoc
      * @see IMIDINumberAware
      */
-    public function setNoteNumber(int $iNote) : Map\Note\IMIDINumberAware {
+    public function setNoteNumber(int $iNote) : self {
         $fFrequency = $this->fDetune + $this->fFrequencyRatio * $this->oRootNoteMap->mapByte($iNote);
         $this->oOscillator->setFrequency($fFrequency);
-        if ($this->oAmplitudeControl instanceof IMIDINoteMapAware) {
+        if ($this->oAmplitudeControl instanceof Map\Note\IMIDINumberAware) {
             $this->oAmplitudeControl->setNoteNumber($iNote);
         }
-        if ($this->oPitchControl instanceof IMIDINoteMapAware) {
+        if ($this->oPitchControl instanceof IMIDMap\Note\IMIDINumberAwareINoteMapAware) {
             $this->oPitchControl->setNoteNumber($iNote);
         }
         return $this;
@@ -193,16 +186,16 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @inheritdoc
      * @see IMIDINumberAware
      */
-    public function setNoteName(string $sNote) : Map\Note\IMIDINumberAware {
+    public function setNoteName(string $sNote) : self {
         return $this->setNoteNumber($this->oRootNoteMap->getNoteNumber($sNote));
     }
 
     /**
      * Get the principle oscillator of the source signal
      *
-     * @return IOscillator
+     * @return Audio\IOscillator
      */
-    public function getOscillator() : Oscillator\IOscillator {
+    public function getOscillator() : Audio\IOscillator {
         return $this->oOscillator;
     }
 
@@ -230,9 +223,9 @@ class UnmodulatedOscillator extends Base implements ISource {
      * of it being a modulator twice in the overall algorithm lattice.
      *
      * @param  int
-     * @return Packet
+     * @return Signal\Audio\Packet
      */
-    protected function emitPacketForIndex(int $iPacketIndex) : Signal\Packet {
+    protected function emitPacketForIndex(int $iPacketIndex) : Signal\Audio\Packet {
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
         }
@@ -247,7 +240,7 @@ class UnmodulatedOscillator extends Base implements ISource {
 
         // Apply any amplitude control
         if ($this->oAmplitudeControl) {
-            $oOscillatorPacket->modulateWith($this->oAmplitudeControl->emit());
+            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit());
         }
 
         $this->oLastPacket        = $oOscillatorPacket;

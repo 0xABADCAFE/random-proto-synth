@@ -10,7 +10,7 @@ $iMaxSamples = I_DURATION * Signal\Context::get()->getProcessRate();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oOscillator = new Oscillator\Simple(
+$oOscillator = new Oscillator\Audio\Simple(
     new Signal\Generator\Noise()
 );
 
@@ -29,7 +29,7 @@ $oCutoffEnvelope = new Envelope\Generator\LinearInterpolated(
 $oOutput = new Output\Play;
 $oOutput->open('output/test_filter_2.wav');
 
-$oFilter = new Signal\Filter\ResonantLowPass;
+$oFilter = new Signal\Audio\Filter\ResonantLowPass;
 
 do {
     $oFilter

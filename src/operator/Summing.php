@@ -23,7 +23,7 @@ use ABadCafe\Synth\Signal;
  *
  * Basic summing output implementation of IOperator. Acts as a fixed mixer.
  */
-class Summing extends Base implements IProcessor {
+class Summing extends Base implements IOperator, IProcessor {
 
     private array
         /** @var IOperator[] $aOperators */
@@ -33,11 +33,10 @@ class Summing extends Base implements IProcessor {
         $aLevels    = []
     ;
 
-    /** @var int $iPosotion */
     private int $iPosition  = 0;
 
     public function __construct() {
-        $this->oLastPacket = new Signal\Packet();
+        $this->oLastPacket = new Signal\Audio\Packet();
         $this->assignInstanceID();
     }
 
@@ -47,7 +46,7 @@ class Summing extends Base implements IProcessor {
      *
      * The InputKind parameter is ignored, all inputs are treated as E_SIGNAL
      */
-    public function attachInput(IOperator $oOperator, float $fLevel, InputKind $oKind = null) : IOperator {
+    public function attachInput(IOperator $oOperator, float $fLevel, InputKind $oKind = null) : self {
         return $this->attachSignalInput($oOperator, $fLevel);
     }
 
@@ -55,7 +54,7 @@ class Summing extends Base implements IProcessor {
      * @inheritdoc
      * @see IProcessor
      */
-    public function attachSignalInput(IOperator $oOperator, float $fLevel) : IProcessor {
+    public function attachSignalInput(IOperator $oOperator, float $fLevel) : self {
         $iInstanceID = $oOperator->getInstanceID();
         $this->aOperators[$iInstanceID] = $oOperator;
         $this->aLevels[$iInstanceID]    = $fLevel;
@@ -66,7 +65,7 @@ class Summing extends Base implements IProcessor {
      * @inheritdoc
      * @see IStream
      */
-    public function reset() : Signal\IStream {
+    public function reset() : self {
         $this->iPosition = 0;
         $this->oLastPacket->fillWith(0);
         return $this;
@@ -84,7 +83,7 @@ class Summing extends Base implements IProcessor {
      * @inheritdoc
      * @see IStream
      */
-    public function emitPacketForIndex(int $iPacketIndex) : Signal\Packet {
+    public function emitPacketForIndex(int $iPacketIndex) : Signal\Audio\Packet {
         $this->iPosition += Signal\Context::get()->getPacketLength();
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
@@ -95,6 +94,6 @@ class Summing extends Base implements IProcessor {
             $this->oLastPacket->accumulate($oOperator->emitPacketForIndex($iPacketIndex), $this->aLevels[$iInstanceID]);
         }
         $this->iPacketIndex = $iPacketIndex;
-        return $this->oLastPacket;;
+        return $this->oLastPacket;
     }
 }

@@ -9,7 +9,7 @@ require_once '../Synth.php';
 $oModulator1 = new Operator\UnmodulatedOscillator(
 
     // Wave function
-    new Oscillator\Simple(
+    new Oscillator\Audio\Simple(
         new Signal\Generator\Sine()
     ),
 
@@ -39,7 +39,7 @@ $oModulator1 = new Operator\UnmodulatedOscillator(
 $oModulator2 = new Operator\UnmodulatedOscillator(
 
     // Wave function
-    new Oscillator\Simple(
+    new Oscillator\Audio\Simple(
         new Signal\Generator\Sine(),
         3
     )
@@ -51,7 +51,7 @@ $oModulator2 = new Operator\UnmodulatedOscillator(
 $oCarrier = new Operator\ModulatableOscillator(
 
     // Wave function
-    new Oscillator\Simple(
+    new Oscillator\Audio\Simple(
         new Signal\Generator\Sine()
     ),
 

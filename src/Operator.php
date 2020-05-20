@@ -17,11 +17,10 @@ declare(strict_types = 1);
  * Operator
  */
 namespace ABadCafe\Synth\Operator;
-use ABadCafe\Synth\Signal\IStream;
-use ABadCafe\Synth\Oscillator\IOscillator;
-use ABadCafe\Synth\Utility\TEnum;
-use ABadCafe\Synth\Map\Note\IMIDINumber      as IMIDINoteMap;
-use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
+use ABadCafe\Synth\Signal;
+use ABadCafe\Synth\Oscillator;
+use ABadCafe\Synth\Map;
+use ABadCafe\Synth\Utility;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -32,7 +31,7 @@ use ABadCafe\Synth\Map\Note\IMIDINumberAware as IMIDINoteMapAware;
  */
 final class InputKind {
 
-    use TEnum;
+    use Utility\TEnum;
 
     const
         E_SIGNAL    = 0,
@@ -56,7 +55,7 @@ final class InputKind {
  *
  * Basic interface for linkable Operators. Operators combine Oscillators and control sources to sculpt sounds.
  */
-interface IOperator extends IStream, IMIDINoteMapAware {
+interface IOperator extends Signal\Audio\IStream, Map\Note\IMIDINumberAware {
 
     /**
      * Generic input attachment: Attaches another Operator as an input. Some Operators may support more than one
@@ -76,7 +75,7 @@ interface IOperator extends IStream, IMIDINoteMapAware {
 /**
  * IProcessor
  *
- * Tag interface for general signal processing operators, e.g. summing outputs or filters.
+ * Tag interface for general signal processing IOperator implementations, e.g. summing outputs or filters.
  */
 interface IProcessor {
 
@@ -86,9 +85,9 @@ interface IProcessor {
      *
      * @param  IOperator $oOperator
      * @param  float     $fLevel
-     * @return self
+     * @return IOperator
      */
-    public function attachSignalInput(IOperator $oOperator, float $fLevel) : self;
+    public function attachSignalInput(IOperator $oOperator, float $fLevel) : IOperator;
 
 }
 
@@ -106,9 +105,9 @@ interface IAmplitudeModulated {
      *
      * @param  IOperator $oOperator
      * @param  float     $fLevel
-     * @return self
+     * @return IOperator
      */
-    public function attachAmplitudeModulatorInput(IOperator $oOperator, float $fLevel) : self;
+    public function attachAmplitudeModulatorInput(IOperator $oOperator, float $fLevel) : IOperator;
 
 }
 
@@ -126,9 +125,9 @@ interface IPhaseModulated {
      *
      * @param  IOperator $oOperator
      * @param  float     $fLevel
-     * @return self
+     * @return IOperator
      */
-    public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : self;
+    public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : IOperator;
 
 }
 
@@ -146,7 +145,7 @@ interface ISource {
      *
      * @return IOscillator
      */
-    public function getOscillator() : IOscillator;
+    public function getOscillator() : Oscillator\Audio\IOscillator;
 
     /**
      * Get the frequency ratio for the operator. This is a multiple of the frequency of the root
@@ -170,17 +169,17 @@ interface ISource {
 /**
  * IOutput
  *
- * Tag interface for operators that render to output
+ * Tag interface for IOperator implementations that render to output
  */
 interface IOutput extends IProcessor {
 
     /**
      * Render audio. The time period requested will be converted into the nearest number of Packet lengths.
      *
-     * @param  float $fSeconds
-     * @return self  fluent
+     * @param  float     $fSeconds
+     * @return IOperator fluent
      */
-    public function render(float $fSeconds) : self;
+    public function render(float $fSeconds) : IOperator;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

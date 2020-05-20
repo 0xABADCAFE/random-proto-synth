@@ -31,14 +31,10 @@ class ControlledFilter extends Base implements IProcessor {
         S_RESONANCE_PREFIX = 'resonance_'
     ;
 
-    /** @var Signal\IFilter $oFilter */
-    private Signal\IFilter $oFilter;
+    private Signal\Audio\IFilter $oFilter;
 
-    private ?Signal\IStream
-        /** @var IStream|null $oCutoffControl */
-        $oCutoffControl = null,
-
-        /** @var IStream|null $oResonanceControl */
+    private ?Signal\Control\IStream
+        $oCutoffControl    = null,
         $oResonanceControl = null
     ;
 
@@ -52,23 +48,22 @@ class ControlledFilter extends Base implements IProcessor {
         $aNoteMapForwards = []
     ;
 
-    /** @var int $iPosotion */
     private int $iPosition  = 0;
 
     /**
      * Constructor
      *
-     * @param Signal\IFilter $oFilter
-     * @param Signal\IStream $oCutoffControl    (optional)
-     * @param Signal\IStream $oResonanceControl (optional)
+     * @param Signal\Audio\IFilter   $oFilter
+     * @param Signal\Control\IStream $oCutoffControl    (optional)
+     * @param Signal\Control\IStream $oResonanceControl (optional)
      */
     public function __construct(
-        Signal\IFilter $oFilter,
-        Signal\IStream $oCutoffControl    = null,
-        Signal\IStream $oResonanceControl = null
+        Signal\Audio\IFilter $oFilter,
+        Signal\Control\IStream $oCutoffControl    = null,
+        Signal\Control\IStream $oResonanceControl = null
     ) {
         $this->oFilter           = $oFilter;
-        $this->oLastPacket       = new Signal\Packet();
+        $this->oLastPacket       = new Signal\Audio\Packet();
         $this->oCutoffControl    = $oCutoffControl;
         $this->oResonanceControl = $oResonanceControl;
         $this->assignInstanceID();
@@ -89,7 +84,7 @@ class ControlledFilter extends Base implements IProcessor {
      * @inheritdoc
      * @see IProcessor
      */
-    public function attachSignalInput(IOperator $oOperator, float $fLevel) : IProcessor {
+    public function attachSignalInput(IOperator $oOperator, float $fLevel) : self {
         $iInstanceID = $oOperator->getInstanceID();
         $this->aOperators[$iInstanceID] = $oOperator;
         $this->aLevels[$iInstanceID]    = $fLevel;
@@ -98,9 +93,9 @@ class ControlledFilter extends Base implements IProcessor {
 
     /**
      * @inheritdoc
-     * @see IStream
+     * @see Signal\Audio\IStream
      */
-    public function reset() : Signal\IStream {
+    public function reset() : Signal\Audio\IStream {
         $this->iPosition = 0;
         $this->oLastPacket->fillWith(0);
         $this->oFilter->reset();
@@ -125,7 +120,7 @@ class ControlledFilter extends Base implements IProcessor {
      * @inheritdoc
      * @see IStream
      */
-    public function emitPacketForIndex(int $iPacketIndex) : Signal\Packet {
+    public function emitPacketForIndex(int $iPacketIndex) : Signal\Audio\Packet {
         $this->iPosition += Signal\Context::get()->getPacketLength();
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
@@ -136,17 +131,17 @@ class ControlledFilter extends Base implements IProcessor {
             $this->oLastPacket->accumulate($oOperator->emitPacketForIndex($iPacketIndex), $this->aLevels[$iInstanceID]);
         }
 
-        if ($this->oCutoffControl && $this->oFilter instanceof Signal\Filter\ICutoffControlled) {
+        if ($this->oCutoffControl && $this->oFilter instanceof Signal\Audio\Filter\ICutoffControlled) {
             $this->oFilter->setCutoffControl($this->oCutoffControl->emit());
         }
-        if ($this->oResonanceControl && $this->oFilter instanceof Signal\Filter\IResonanceControlled) {
+        if ($this->oResonanceControl && $this->oFilter instanceof Signal\Audio\Filter\IResonanceControlled) {
             $this->oFilter->setResonanceControl($this->oResonanceControl->emit());
         }
 
         $this->oLastPacket = $this->oFilter->filter($this->oLastPacket);
 
         $this->iPacketIndex = $iPacketIndex;
-        return $this->oLastPacket;;
+        return $this->oLastPacket;
     }
 
     /**
@@ -162,7 +157,7 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * Return the whichever note map use case has been mapped to either the cutoff or resonance controls.
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
     public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
@@ -179,9 +174,9 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * Pass the note number to any mapped input controls
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
-    public function setNoteNumber(int $iNote) : Map\Note\IMIDINumberAware {
+    public function setNoteNumber(int $iNote) : self {
         if ($this->oCutoffControl instanceof Map\Note\IMIDINumberAware) {
             $this->oCutoffControl->setNoteNumber($iNote);
         }
@@ -198,7 +193,7 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteName(string $sNote) : Map\Note\IMIDINumberAware {
+    public function setNoteName(string $sNote) : self {
         if ($this->oCutoffControl instanceof Map\Note\IMIDINumberAware) {
             $this->oCutoffControl->setNoteName($sNote);
         }
@@ -215,7 +210,7 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * @see IMIDINumberAware
      */
-    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : Map\Note\IMIDINumberAware {
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : self {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
             $oForwards = $this->aNoteMapForwards[$sUseCase];
             $oForwards->oControl->setNoteNumberMap($oNoteMap, $oForwards->sUseCase);

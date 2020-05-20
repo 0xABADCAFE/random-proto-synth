@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Filter;
+namespace ABadCafe\Synth\Signal\Audio\Filter;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
@@ -52,7 +52,7 @@ class ResonantLowPass extends Resonant {
     /**
      * @inheritdoc
      */
-    public function reset() : Signal\IFilter {
+    public function reset() : self {
         parent::reset();
         $this->fIn1  = 0;
         $this->fIn2  = 0;
@@ -70,7 +70,7 @@ class ResonantLowPass extends Resonant {
     /**
      * @inheritdoc
      */
-    public function filter(Signal\Packet $oInput) : Signal\Packet {
+    public function filter(Signal\Audio\Packet $oInput) : Signal\Audio\Packet {
         $oOutput    = clone $oInput;
         $oSamples   = $oOutput->getValues();
         $iCase      = ($this->oCutoff ? 1 : 0) | ($this->oResonance ? 2 : 0);

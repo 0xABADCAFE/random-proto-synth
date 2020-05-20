@@ -38,7 +38,6 @@ interface IMIDIByteLimits {
  */
 abstract class MIDIByte implements IMIDIByteLimits {
 
-    /** @var SPLFixedArray $oMap */
     protected SPLFixedArray $oMap;
 
     /**

@@ -20,6 +20,7 @@ use \OutOfBoundsException;
  * Mixin to allow the definition of enumerated values as distinct value-object types.
  */
 trait TEnum {
+
    /**
     * @var self[] $aDefinedValues, keyed by the scalar
     */

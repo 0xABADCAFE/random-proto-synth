@@ -97,7 +97,7 @@ class Play implements IPCMOutput, Signal\IChannelMode {
     /**
      * @inheritdoc
      */
-    public function write(Signal\Packet $oPacket) {
+    public function write(Signal\IPacket $oPacket) {
         $aOutput = $oPacket
             ->quantise(self::I_MAX_LEVEL, self::I_MIN_LEVEL, self::I_MAX_LEVEL)
             ->toArray();

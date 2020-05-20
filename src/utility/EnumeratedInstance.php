@@ -39,10 +39,7 @@ interface IEnumeratedInstance {
  */
 trait TEnumeratedInstance {
 
-    /** @var int $iNextInstanceID */
     private static int $iNextInstanceID = 0;
-
-    /** @var int $iInstanceID */
     protected int $iInstanceID = 0;
 
     /**

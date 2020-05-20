@@ -8,7 +8,7 @@ require_once '../Synth.php';
 
 $oOperator = new Operator\UnmodulatedOscillator(
     // Wave function
-    new Oscillator\Simple(
+    new Oscillator\Audio\Simple(
         new Signal\Generator\Sine(),
         440
     ),

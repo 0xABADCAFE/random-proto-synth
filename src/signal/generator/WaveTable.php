@@ -33,14 +33,9 @@ class WaveTable implements Signal\IGenerator {
         I_MAX_SIZE_EXP = 8
     ;
 
-    /** @var SPLFixedArray $oTable */
     private ?SPLFixedArray $oTable  = null;
-
-    /** @var float $fPeriod */
-    private float $fPeriod = 0;
-
-    /** @var int $iMask */
-    private int $iMask = 0;
+    private float          $fPeriod = 0;
+    private int            $iMask   = 0;
 
     /**
      * @param int $iSizeExp
@@ -69,7 +64,7 @@ class WaveTable implements Signal\IGenerator {
     /**
      * @inheritdoc
      */
-    public function map(Signal\Packet $oInput) : Signal\Packet {
+    public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {

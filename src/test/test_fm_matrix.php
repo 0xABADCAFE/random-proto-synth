@@ -40,7 +40,7 @@ $aRatios = [
     'double' => 2.0
 ];
 
-$oOutput = new Output\Wav;
+$oOutput = new Output\Play;
 
 foreach ($aGenerators as $sCarrierName => $oCarrierGenerator) {
     echo "Testing Carrier : ", $sCarrierName, "\n";
@@ -50,13 +50,13 @@ foreach ($aGenerators as $sCarrierName => $oCarrierGenerator) {
 
             echo "\tModulator : ", $sModulatorName, " @ ", $fRatio, " x Carrier\n";
 
-            $oModulator = new Oscillator\Simple(
+            $oModulator = new Oscillator\Audio\Simple(
                 $oModulatorGenerator,
                 F_CARRIER * $fRatio
             );
             $oModulatorEnvelope->reset();
 
-            $oCarrier = new Oscillator\Simple(
+            $oCarrier = new Oscillator\Audio\Simple(
                 $oCarrierGenerator,
                 F_CARRIER
             );
@@ -72,7 +72,7 @@ foreach ($aGenerators as $sCarrierName => $oCarrierGenerator) {
                 $oCarrier->setPhaseModulation(
                     $oModulator
                         ->emit()
-                        ->modulateWith(
+                        ->levelControl(
                             $oModulatorEnvelope->emit()
                         )
                 );

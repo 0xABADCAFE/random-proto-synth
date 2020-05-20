@@ -25,6 +25,7 @@ use \SPLFixedArray;
  * Maps input values to a upwards sawtooth output.
  */
 class SawUp extends NonFlat {
+
     const F_PERIOD  = 1.0;
 
     protected float
@@ -41,7 +42,7 @@ class SawUp extends NonFlat {
     /**
      * @inheritdoc
      */
-    public function map(Signal\Packet $oInput) : Signal\Packet {
+    public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {
@@ -70,7 +71,7 @@ class SawDown extends SawUp {
     /**
      * @inheritdoc
      */
-    public function map(Signal\Packet $oInput) : Signal\Packet {
+    public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {

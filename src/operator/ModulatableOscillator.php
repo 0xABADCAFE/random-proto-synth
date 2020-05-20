@@ -47,7 +47,7 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
     /**
      * @inheritdoc
      */
-    public function reset() : Signal\IStream {
+    public function reset() : Signal\Audio\IStream {
         $this->oOscillator->reset();
         if ($this->oAmplitudeControl) {
             $this->oAmplitudeControl->reset();
@@ -75,7 +75,7 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
             case InputKind::E_AMPLITUDE:
                 return $this->attachAmplitudeModulatorInput($oOperator, $fLevel);
             case InputKind::E_PHASE:
-                return $this->attachPhaseModulatorInput($oOperator, $fLevel);;
+                return $this->attachPhaseModulatorInput($oOperator, $fLevel);
         }
         return $this;
     }
@@ -84,7 +84,7 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
      * @inheritdoc
      * @see IAmplitudeModulated
      */
-    public function attachAmplitudeModulatorInput(IOperator $oOperator, float $fLevel) : IAmplitudeModulated {
+    public function attachAmplitudeModulatorInput(IOperator $oOperator, float $fLevel) : self {
         $this->aModulators[$oOperator->iInstanceID]               = $oOperator;
         $this->aAmplitudeModulationIndex[$oOperator->iInstanceID] = $fLevel;
         return $this;
@@ -94,7 +94,7 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
      * @inheritdoc
      * @see IPhaseModulated
      */
-    public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : IPhaseModulated {
+    public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : self {
         $this->aModulators[$oOperator->iInstanceID]           = $oOperator;
         $this->aPhaseModulationIndex[$oOperator->iInstanceID] = $fLevel;
         return $this;
@@ -105,15 +105,15 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
      * of it being a modulator twice in the overall algorithm lattice.
      *
      * @param  int
-     * @return Packet
+     * @return Signal\Audio\Packet
      */
-    protected function emitPacketForIndex(int $iPacketIndex) : Signal\Packet {
+    protected function emitPacketForIndex(int $iPacketIndex) : Signal\Audio\Packet {
         if ($iPacketIndex == $this->iPacketIndex) {
             return $this->oLastPacket;
         }
 
-        $oPhaseAccumulator     = empty($this->aPhaseModulationIndex)     ? null : new Signal\Packet();
-        $oAmplitudeAccumulator = empty($this->aAmplitudeModulationIndex) ? null : new Signal\Packet();
+        $oPhaseAccumulator     = empty($this->aPhaseModulationIndex)     ? null : new Signal\Audio\Packet();
+        $oAmplitudeAccumulator = empty($this->aAmplitudeModulationIndex) ? null : new Signal\Audio\Packet();
         foreach ($this->aModulators as $iInstanceID => $oOperator) {
             $oPacket = $oOperator->emitPacketForIndex($iPacketIndex);
             if (isset($this->aPhaseModulationIndex[$iInstanceID])) {
@@ -139,7 +139,7 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
 
         // Apply any amplitude control
         if ($this->oAmplitudeControl) {
-            $oOscillatorPacket->modulateWith($this->oAmplitudeControl->emit());
+            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit());
         }
 
         // Apply any amplitude modulation

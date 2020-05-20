@@ -27,7 +27,6 @@ use function ABadCafe\Synth\Utility\dprintf;
  */
 class PCMOutput extends Summing implements IOutput {
 
-    /** @var Output\IPCMOutput $oOutput */
     private Output\IPCMOutput $oPCMOutput;
 
     /**
@@ -47,7 +46,7 @@ class PCMOutput extends Summing implements IOutput {
      * @return IOutput
      * @throws IOException
      */
-    public function render(float $fSeconds) : IOutput {
+    public function render(float $fSeconds) : self {
         $iMaxSamples = $this->getPosition() + (int)$fSeconds * Signal\Context::get()->getProcessRate();
         $fStart = microtime(true);
         do {
@@ -89,7 +88,7 @@ class PCMOutput extends Summing implements IOutput {
      * @inheritdoc
      * @see IStream
      */
-    public function emit() : Signal\Packet {
+    public function emit() : Signal\Audio\Packet {
         $oPacket = parent::emit();
         $this->oPCMOutput->write($oPacket);
         return $oPacket;

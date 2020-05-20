@@ -2,7 +2,7 @@
 
 namespace ABadCafe\Synth;
 
-require 'profiling.php';
+//require 'profiling.php';
 
 require_once '../Signal.php';
 

@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Oscillator;
+namespace ABadCafe\Synth\Oscillator\Audio;
 use ABadCafe\Synth\Signal;
 use \InvalidArgumentException;
 use \RangeException;
@@ -63,7 +63,7 @@ class Super extends Simple {
         float             $fFrequency  = ILimits::F_DEF_FREQ
     ) {
         $this->oGenerator      = $oGenerator;
-        $this->oGeneratorInput = new Signal\Packet();
+        $this->oGeneratorInput = new Signal\Audio\Packet();
         $this->setFrequency($fFrequency);
         $this->initHarmonicStack($aHarmonicStack);
     }
@@ -71,8 +71,8 @@ class Super extends Simple {
     /**
      * @inheritdoc
      */
-    public function emit() : Signal\Packet {
-        $oOutput = new Signal\Packet();
+    public function emit() : Signal\Audio\Packet {
+        $oOutput = new Signal\Audio\Packet();
         $oValues = $this->oGeneratorInput->getValues();
         $iSamplePosition = 0;
 
@@ -134,7 +134,7 @@ class Super extends Simple {
     /**
      * @overriden
      */
-    public function reset() : Signal\IStream {
+    public function reset() : self {
         parent::reset();
         $this->aPhaseCorrections = $this->aInitPhases;
         return $this;

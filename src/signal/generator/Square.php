@@ -38,7 +38,7 @@ class Square extends NonFlat {
     /**
      * @inheritdoc
      */
-    public function map(Signal\Packet $oInput) : Signal\Packet {
+    public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
         foreach ($oValues as $i => $fValue) {

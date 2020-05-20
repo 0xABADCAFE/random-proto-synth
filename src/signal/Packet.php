@@ -17,17 +17,14 @@ namespace ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
 /**
- * Packet
+ * TPacketImplementation
  *
- * Represents a packet of a signal. All Packet instances have the same length, configured in Signal\Context
+ * Mixin to provide common Packet operations
  */
-class Packet {
+trait TPacketImplementation {
 
-    /** @var SPLFixedArray $oEmpty */
     private static ?SPLFixedArray $oEmpty = null;
-
-    /** @var SPLFixedArray */
-    private SPLFixedArray $oValues;
+    private SPLFixedArray         $oValues;
 
     /**
      * Constructor. Accepts either an integer length for a new, zero initialised packet, or an array of values that
@@ -91,7 +88,7 @@ class Packet {
      * @param  Packet $oPacket
      * @return Packet fluent
      */
-    public function modulateWith(Packet $oPacket) : self {
+    public function modulateWith(self $oPacket) : self {
         foreach ($this->oValues as $i => $fValue) {
             $this->oValues[$i] = $fValue * $oPacket->oValues[$i];
         }
@@ -104,7 +101,7 @@ class Packet {
      * @param  Packet $oPacket
      * @return Packet fluent
      */
-    public function sumWith(Packet $oPacket) : self {
+    public function sumWith(self $oPacket) : self {
         foreach ($this->oValues as $i => $fValue) {
             $this->oValues[$i] = $fValue + $oPacket->oValues[$i];
         }
@@ -118,7 +115,7 @@ class Packet {
      * @param  float  $fScale
      * @return Packet fluent
      */
-    public function accumulate(Packet $oPacket, float $fScale) : self {
+    public function accumulate(self $oPacket, float $fScale) : self {
         foreach ($this->oValues as $i => $fValue) {
             $this->oValues[$i] = $fValue + $oPacket->oValues[$i] * $fScale;
         }
@@ -131,7 +128,7 @@ class Packet {
      * @param  Packet $oPacket
      * @return Packet fluent
      */
-    public function diffWith(Packet $oPacket) : self {
+    public function diffWith(self $oPacket) : self {
         foreach ($this->oValues as $i => $fValue) {
             $this->oValues[$i] = $fValue - $oPacket->oValues[$i];
         }

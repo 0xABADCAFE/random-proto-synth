@@ -29,6 +29,7 @@ use \Countable;
  * Defines limits for envelope data.
  */
 interface ILimits {
+
     const
         F_MIN_TIME = 0.0001,
         F_MAX_TIME = 100.0
@@ -78,7 +79,7 @@ interface IShape extends Countable {
  *
  * Basic tag interface for Envelope Generators
  */
-interface IGenerator extends Signal\IStream, Map\Note\IMIDINumberAware {
+interface IGenerator extends Signal\Control\IStream, Map\Note\IMIDINumberAware {
 
     const
         // Use cases for Map\Note\IMIDINumberAware

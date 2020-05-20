@@ -30,16 +30,13 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
 
     use Utility\TEnumeratedInstance;
 
-    /** @var Packet $oLastPacket */
-    protected Signal\Packet $oLastPacket;
-
-    /** @var int $iPacketIndex */
+    protected Signal\Audio\Packet $oLastPacket;
     protected int $iPacketIndex = 0;
 
     /**
      * @inheritdoc
      */
-    public function emit() : Signal\Packet {
+    public function emit() : Signal\Audio\Packet {
         return $this->emitPacketForIndex($this->iPacketIndex + 1);
     }
 
@@ -48,7 +45,7 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
      *
      * This is a stub and should be overridden by any implementation supporting a number map control
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
     public function getNoteNumberMapUseCases() : array {
         return [];
@@ -59,9 +56,9 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
      *
      * This is a stub and should be overridden by any implementation supporting a number map control
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
-    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : Map\Note\IMIDINumberAware {
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : self {
         return $this;
     }
 
@@ -83,7 +80,7 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
      *
      * @see Map\Note\IMIDINumberAware
      */
-    public function setNoteNumber(int $iNote) : Map\Note\IMIDINumberAware {
+    public function setNoteNumber(int $iNote) : self {
         return $this;
     }
 
@@ -94,7 +91,7 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
      *
      * @see Map\Note\IMIDINumberAware
      */
-    public function setNoteName(string $sNote) : Map\Note\IMIDINumberAware {
+    public function setNoteName(string $sNote) : self {
         return $this;
     }
 
@@ -103,8 +100,8 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
      * must bumo the iPacketIndex for every new Packet that is calculated.
      *
      * @param  int $iPacketIndex
-     * @return Signal\Packet
+     * @return Signal\Audio\Packet
      */
-    protected abstract function emitPacketForIndex(int $iPacketIndex) : Signal\Packet;
+    protected abstract function emitPacketForIndex(int $iPacketIndex) : Signal\Audio\Packet;
 
 }

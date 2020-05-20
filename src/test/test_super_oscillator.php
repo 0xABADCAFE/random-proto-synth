@@ -6,7 +6,7 @@ require_once '../Synth.php';
 
 $iSamples = 5 * Signal\Context::get()->getProcessRate();
 
-$oOscillator = new Oscillator\Super(
+$oOscillator = new Oscillator\Audio\Super(
     new Signal\Generator\SawUp(),
     [
         [1.0,   0.5, 0], // Fundamental harmonic
