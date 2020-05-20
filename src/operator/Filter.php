@@ -93,7 +93,7 @@ class ControlledFilter extends Base implements IProcessor {
 
     /**
      * @inheritdoc
-     * @see IStream
+     * @see Signal\Audio\IStream
      */
     public function reset() : Signal\Audio\IStream {
         $this->iPosition = 0;
@@ -157,7 +157,7 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * Return the whichever note map use case has been mapped to either the cutoff or resonance controls.
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
     public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
         if (isset($this->aNoteMapForwards[$sUseCase])) {
@@ -174,7 +174,7 @@ class ControlledFilter extends Base implements IProcessor {
      *
      * Pass the note number to any mapped input controls
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
     public function setNoteNumber(int $iNote) : self {
         if ($this->oCutoffControl instanceof Map\Note\IMIDINumberAware) {

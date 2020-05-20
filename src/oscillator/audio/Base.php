@@ -26,34 +26,19 @@ abstract class Base implements IOscillator {
 
     const F_INV_TWELVE = 1.0/12.0;
 
-    /** @var Signal\IGenerator $oGenerator */
-    protected Signal\IGenerator $oGenerator;
-
-    /** @var Signal\Packet $oGeneratorInput */
+    protected Signal\IGenerator   $oGenerator;
     protected Signal\Audio\Packet $oGeneratorInput;
-
-    /** @var int $iSamplePosition */
-    protected int $iSamplePosition = 0;
+    protected int                 $iSamplePosition = 0;
 
     protected float
-        /** @var float $fFrequency - The base frequency */
-        $fFrequency = ILimits::F_DEF_FREQ,
-
-        /** @var float $fCurrentFequency - The present instantaneous frequency considering any pitch control */
-        $fCurrentFrequency = ILimits::F_DEF_FREQ,
-
-        /** @var float $fPhaseCorrection - The accumulated phase difference as a result of pitch control */
-        $fPhaseCorrection = 0.0,
-
-        /** @var float $fScaleVal */
-        $fScaleVal = 0.0
+        $fFrequency        = ILimits::F_DEF_FREQ, // The base frequency
+        $fCurrentFrequency = ILimits::F_DEF_FREQ, // The present instantaneous frequency considering any pitch control
+        $fPhaseCorrection  = 0.0,                 // The accumulated phase difference as a result of pitch control */
+        $fScaleVal         = 0.0
     ;
 
     protected ?\SPLFixedArray
-        /** @var \SPLFixedArray|null $oPhaseShift */
         $oPhaseShift = null,
-
-        /** @var \SPLFixedArray|null $oPitchShift */
         $oPitchShift = null
     ;
 

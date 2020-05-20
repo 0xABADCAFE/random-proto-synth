@@ -27,7 +27,15 @@ use \SPLFixedArray;
  *
  */
 class Packet implements Signal\IPacket {
-   use Signal\TPacketImplementation;
+    use Signal\TPacketImplementation;
+
+    public function levelControl(Signal\Control\Packet $oLevel) : self {
+        $oLevelValues = $oLevel->getValues();
+        foreach ($this->oValues as $i => $fValue) {
+            $this->oValues[$i] = $fValue * $oLevelValues[$i];
+        }
+        return $this;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

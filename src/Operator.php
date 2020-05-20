@@ -75,7 +75,7 @@ interface IOperator extends Signal\Audio\IStream, Map\Note\IMIDINumberAware {
 /**
  * IProcessor
  *
- * Tag interface for general signal processing operators, e.g. summing outputs or filters.
+ * Tag interface for general signal processing IOperator implementations, e.g. summing outputs or filters.
  */
 interface IProcessor {
 
@@ -87,7 +87,7 @@ interface IProcessor {
      * @param  float     $fLevel
      * @return IOperator
      */
-    public function attachSignalInput(IOperator $oOperator, float $fLevel) : self;
+    public function attachSignalInput(IOperator $oOperator, float $fLevel) : IOperator;
 
 }
 
@@ -105,9 +105,9 @@ interface IAmplitudeModulated {
      *
      * @param  IOperator $oOperator
      * @param  float     $fLevel
-     * @return self
+     * @return IOperator
      */
-    public function attachAmplitudeModulatorInput(IOperator $oOperator, float $fLevel) : self;
+    public function attachAmplitudeModulatorInput(IOperator $oOperator, float $fLevel) : IOperator;
 
 }
 
@@ -125,9 +125,9 @@ interface IPhaseModulated {
      *
      * @param  IOperator $oOperator
      * @param  float     $fLevel
-     * @return self
+     * @return IOperator
      */
-    public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : self;
+    public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : IOperator;
 
 }
 
@@ -169,17 +169,17 @@ interface ISource {
 /**
  * IOutput
  *
- * Tag interface for operators that render to output
+ * Tag interface for IOperator implementations that render to output
  */
 interface IOutput extends IProcessor {
 
     /**
      * Render audio. The time period requested will be converted into the nearest number of Packet lengths.
      *
-     * @param  float $fSeconds
-     * @return self  fluent
+     * @param  float     $fSeconds
+     * @return IOperator fluent
      */
-    public function render(float $fSeconds) : self;
+    public function render(float $fSeconds) : IOperator;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

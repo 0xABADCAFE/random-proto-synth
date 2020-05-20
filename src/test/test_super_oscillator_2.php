@@ -23,14 +23,16 @@ $oOscillator = new Oscillator\Audio\Super(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oCutoffEnvelope = new Oscillator\Control\Simple(
+$oCutoffEnvelope = new Oscillator\Control\LFO(
     new Signal\Generator\SawDown(0.05, 1.0),
-    8
+    8,
+    1
 );
 
-$oVolumeEnvelope = new Oscillator\Control\Simple(
+$oVolumeEnvelope = new Oscillator\Control\LFO(
     new Signal\Generator\SawDown(0.5, 0.75),
-    8
+    8,
+    1
 );
 
 
@@ -90,7 +92,7 @@ $oPitchEnvelope = new Envelope\Generator\LinearInterpolated(
 $oOutput = new Output\Play;
 $oOutput->open('output/test_super2.wav');
 
-$oFilter = new Signal\Filter\ResonantLowPass;
+$oFilter = new Signal\Audio\Filter\ResonantLowPass;
 
 do {
     $oOscillator
@@ -101,7 +103,7 @@ do {
     $oOutput->write(
         $oFilter->filter(
             $oOscillator->emit()
-        )->modulateWith($oVolumeEnvelope->emit())
+        )->levelControl($oVolumeEnvelope->emit())
     );
 } while ($oOscillator->getPosition() < $iSamples);
 

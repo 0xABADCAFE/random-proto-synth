@@ -128,7 +128,7 @@ class LinearInterpolated implements Envelope\IGenerator {
      *
      * @return Signal\Control\IStream
      */
-    public function reset() : self {
+    public function reset() : Signal\Control\IStream {
         $this->iSamplePosition = 0;
         $this->recalculate();
         return $this;
@@ -137,7 +137,7 @@ class LinearInterpolated implements Envelope\IGenerator {
     /**
      * Emit the next signal Packet.
      *
-     * @return Packet
+     * @return Signal\Control\Packet
      */
     public function emit() : Signal\Control\Packet {
         $iLength = Signal\Context::get()->getPacketLength();
@@ -163,7 +163,7 @@ class LinearInterpolated implements Envelope\IGenerator {
     /**
      * @inheritdoc
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
     public function getNoteNumberMapUseCases() : array {
         return array_keys(self::A_MAPS);
@@ -172,7 +172,7 @@ class LinearInterpolated implements Envelope\IGenerator {
     /**
      * @inheritdoc
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
     public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : self {
         if (isset(self::A_MAPS[$sUseCase])) {
@@ -185,7 +185,7 @@ class LinearInterpolated implements Envelope\IGenerator {
     /**
      * @inheritdoc
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
     public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
         if (null !== $sUseCase && isset($this->aNoteMaps[$sUseCase])) {
@@ -198,7 +198,7 @@ class LinearInterpolated implements Envelope\IGenerator {
     /**
      * @inheritdoc
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
     public function setNoteNumber(int $iNote) : self {
         // If the note number has changed, use the key scale map to obtain the time scaling to use for that note
@@ -229,7 +229,7 @@ class LinearInterpolated implements Envelope\IGenerator {
     /**
      * @inheritdoc
      *
-     * @see IMIDINumberAware
+     * @see Map\Note\IMIDINumberAware
      */
     public function setNoteName(string $sNote) : self {
         // Just use the first Note Map, if any, to convert the note name.
