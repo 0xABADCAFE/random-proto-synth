@@ -26,6 +26,7 @@ use function ABadCafe\Synth\Utility\dprintf;
  * Enumerates MIDI note numbers
  */
 interface IMIDINumber {
+
     const
         CENTRE_REFERENCE = 69; // LMAO: A4
 

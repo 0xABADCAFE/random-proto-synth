@@ -23,11 +23,8 @@ use \SPLFixedArray;
  */
 trait TPacketImplementation {
 
-    /** @var SPLFixedArray $oEmpty */
     private static ?SPLFixedArray $oEmpty = null;
-
-    /** @var SPLFixedArray */
-    private SPLFixedArray $oValues;
+    private SPLFixedArray         $oValues;
 
     /**
      * Constructor. Accepts either an integer length for a new, zero initialised packet, or an array of values that

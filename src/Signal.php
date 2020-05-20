@@ -59,6 +59,7 @@ interface ILimits {
  *
  */
 interface IChannelMode {
+
     const
         I_CHAN_MONO   = 1,
         I_CHAN_STEREO = 2

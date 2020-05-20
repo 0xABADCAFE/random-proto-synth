@@ -25,6 +25,7 @@ use \SPLFixedArray;
  * Maps input values to a upwards sawtooth output.
  */
 class SawUp extends NonFlat {
+
     const F_PERIOD  = 1.0;
 
     protected float

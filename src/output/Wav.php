@@ -51,7 +51,11 @@ class Wav implements IPCMOutput, Signal\IChannelMode {
 
     const S_HEADER_PACK = 'a4Va4a4VvvVVvva4V';
 
+    /**
+     * @param resource $rOutput
+     */
     private $rOutput = null;
+
     private int
         $iSampleRate,
         $iBitsPerSample,

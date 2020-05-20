@@ -29,6 +29,7 @@ use \Countable;
  * Defines limits for envelope data.
  */
 interface ILimits {
+
     const
         F_MIN_TIME = 0.0001,
         F_MAX_TIME = 100.0

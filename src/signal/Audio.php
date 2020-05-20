@@ -27,6 +27,7 @@ use \SPLFixedArray;
  *
  */
 class Packet implements Signal\IPacket {
+
     use Signal\TPacketImplementation;
 
     public function levelControl(Signal\Control\Packet $oLevel) : self {
