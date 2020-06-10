@@ -34,9 +34,9 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
     protected int $iPacketIndex = 0;
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function emit() : Signal\Audio\Packet {
+    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
         return $this->emitPacketForIndex($this->iPacketIndex + 1);
     }
 

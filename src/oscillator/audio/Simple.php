@@ -24,9 +24,9 @@ use ABadCafe\Synth\Signal;
 class Simple extends Base {
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function emit() : Signal\Audio\Packet {
+    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
 
         $oValues = $this->oGeneratorInput->getValues();
 

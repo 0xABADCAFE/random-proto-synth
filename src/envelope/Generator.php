@@ -139,7 +139,7 @@ class LinearInterpolated implements Envelope\IGenerator {
      *
      * @return Signal\Control\Packet
      */
-    public function emit() : Signal\Control\Packet {
+    public function emit(?int $iIndex = null) : Signal\Control\Packet {
         $iLength = Signal\Context::get()->getPacketLength();
 
         // If we are at the end of the envelope, just return the final packet

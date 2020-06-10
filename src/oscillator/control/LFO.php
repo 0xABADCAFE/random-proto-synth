@@ -127,9 +127,9 @@ class LFO implements IOscillator {
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function emit() : Signal\Control\Packet {
+    public function emit(?int $iIndex = null) : Signal\Control\Packet {
 
         $oValues = $this->oGeneratorInput->getValues();
 

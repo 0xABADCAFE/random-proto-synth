@@ -39,11 +39,15 @@ interface IStream extends Signal\IStream {
 
     /**
      * Reset the stream
+     *
+     * @inheritDoc
      */
     public function reset() : self; // Covariant return
 
     /**
      * Emit a Packet
+     *
+     * @inheritDoc
      */
-    public function emit() : Packet; // Covariant return
+    public function emit(?int $iIndex = null) : Packet; // Covariant return
 }

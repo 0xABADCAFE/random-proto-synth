@@ -69,9 +69,9 @@ class Super extends Simple {
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function emit() : Signal\Audio\Packet {
+    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
         $oOutput = new Signal\Audio\Packet();
         $oValues = $this->oGeneratorInput->getValues();
         $iSamplePosition = 0;

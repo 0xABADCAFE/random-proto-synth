@@ -130,13 +130,20 @@ interface IStream {
 
     /**
      * Reset the stream
+     *
+     * @return IStream
      */
     public function reset() : self;
 
     /**
-     * Emit a Packet
+     * Emit a Packet. An optional index parameter allows the stream to ascertain if it is being asked repeatedly for
+     * the last generated Packet of data and if so, return it. This becomes necessary in complex signal routing where
+     * one IStream implementation's output is consumed by multiple inputs.
+     *
+     * @param  int|null $iIndex
+     * @return IPacket
      */
-    public function emit() : IPacket;
+    public function emit(?int $iIndex = null) : IPacket;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

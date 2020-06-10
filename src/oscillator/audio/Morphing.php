@@ -72,11 +72,11 @@ use function ABadCafe\Synth\Utility\clamp;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      *
      * @todo - Reimplement to apply pitch and phase modulation as in the Simple oscillator.
      */
-    public function emit() : Signal\Audio\Packet {
+    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
         $oValues          = $this->oGeneratorInput->getValues();
         $oSecondaryValues = $this->oSecondaryInput->getValues();
         $oMixingValues    = $this->oMixingInput->getValues();
