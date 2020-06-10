@@ -89,7 +89,7 @@ class PCMOutput extends Summing implements IOutput {
      * @see IStream
      */
     public function emit(?int $iIndex = null) : Signal\Audio\Packet {
-        $oPacket = parent::emit();
+        $oPacket = parent::emit($iIndex);
         $this->oPCMOutput->write($oPacket);
         return $oPacket;
     }

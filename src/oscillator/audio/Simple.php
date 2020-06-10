@@ -23,10 +23,16 @@ use ABadCafe\Synth\Signal;
  */
 class Simple extends Base {
 
+    use Signal\TContextIndexAware;
+
     /**
      * @inheritDoc
      */
     public function emit(?int $iIndex = null) : Signal\Audio\Packet {
+
+        if ($this->useLast($iIndex)) {
+            return $this->oLastOutput;
+        }
 
         $oValues = $this->oGeneratorInput->getValues();
 
@@ -54,7 +60,8 @@ class Simple extends Base {
             }
         }
 
-        return $this->oGenerator->map($this->oGeneratorInput);
+        $this->oLastOutput = $this->oGenerator->map($this->oGeneratorInput);
+        return $this->oLastOutput;
     }
 
 }

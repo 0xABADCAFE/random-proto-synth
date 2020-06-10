@@ -30,7 +30,8 @@ class Context {
 
     private int
         $iProcessRate,
-        $iPacketLength
+        $iPacketLength,
+        $iNextIndex
     ;
 
     private float $fSamplePeriod;
@@ -97,6 +98,13 @@ class Context {
     }
 
     /**
+     * @return int
+     */
+    public function getNextIndex() : int {
+        return ++$this->iNextIndex;
+    }
+
+    /**
      * Private constructor
      *
      * @param  int $iProcessRate
@@ -129,5 +137,34 @@ class Context {
         $this->iProcessRate  = $iProcessRate;
         $this->iPacketLength = $iPacketLength;
         $this->fSamplePeriod = 1.0 / (float)$iProcessRate;
+        $this->iNextIndex    = 0;
+    }
+}
+
+/**
+ * Mixin for any classes that need to keep track of indexes.
+ *
+ * This will primarily be used for implementors of IStream::emit() implementations.
+ */
+trait TContextIndexAware {
+    private $iLastIndex = 0;
+
+    /**
+     * Checks to see whether or not we can use the last calculated data for a given input index.
+     *
+     * If null is provided, we ask the Context for the next index, assign it and return false. Otherwise
+     * if the index provided is different than the index we last saw, we update it and return false.
+     * Finally if the index provided is the same as the last index we saw, we return true as this case
+     * indicates we've been asked for the most recent data more than once.
+     */
+    private function useLast(?int $iIndex) : bool {
+        if (null === $iIndex) {
+            $this->iLastIndex = Context::get()->getNextIndex();
+            return false;
+        } else if ($this->iLastIndex !== $iIndex) {
+            $this->iLastIndex = $iIndex;
+            return false;
+        }
+        return true;
     }
 }

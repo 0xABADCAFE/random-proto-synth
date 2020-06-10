@@ -24,6 +24,8 @@ use function ABadCafe\Synth\Utility\clamp;
  */
  class Morphing extends Simple {
 
+    use Signal\TContextIndexAware;
+
     const
         F_MIN_RATIO = 0.125,
         F_MAX_RATIO = 8.0
@@ -60,6 +62,7 @@ use function ABadCafe\Synth\Utility\clamp;
         $this->oMixingGenerator    = $oMixingGenerator;
         $this->oSecondaryInput     = new Signal\Audio\Packet();
         $this->oMixingInput        = new Signal\Audio\Packet();
+        $this->oLastOutput         = new Signal\Audio\Packet();
         parent::__construct($oPrimaryGenerator, $fPrimaryFrequency);
     }
 
@@ -77,6 +80,11 @@ use function ABadCafe\Synth\Utility\clamp;
      * @todo - Reimplement to apply pitch and phase modulation as in the Simple oscillator.
      */
     public function emit(?int $iIndex = null) : Signal\Audio\Packet {
+
+        if ($this->useLast($iIndex)) {
+            return $this->oLastOutput;
+        }
+
         $oValues          = $this->oGeneratorInput->getValues();
         $oSecondaryValues = $this->oSecondaryInput->getValues();
         $oMixingValues    = $this->oMixingInput->getValues();
@@ -93,6 +101,7 @@ use function ABadCafe\Synth\Utility\clamp;
             $fMixValue = 0.5 * ($oMixingValues[$i] + Signal\ILimits::F_MAX_LEVEL_NO_CLIP);
             $oOutputValues[$i] = ($fPrimary * $fMixValue) + ((1.0 - $fMixValue)*$oSecondaryValues[$i]);
         }
+        $this->oLastOutput = $oOutputPacket;
         return $oOutputPacket;
     }
 

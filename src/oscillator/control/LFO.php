@@ -26,8 +26,13 @@ use function ABadCafe\Synth\Utility\clamp;
 
 class LFO implements IOscillator {
 
+    use Signal\TContextIndexAware;
+
     protected Signal\IGenerator     $oGenerator;
-    protected Signal\Control\Packet $oGeneratorInput;
+    protected Signal\Control\Packet
+        $oGeneratorInput,
+        $oLastOutput
+    ;
     protected int                   $iSamplePosition = 0;
 
     protected float
@@ -40,7 +45,6 @@ class LFO implements IOscillator {
 
     protected ?SPLFixedArray         $oFrequencyShift      = null;
     protected ?Signal\Control\Packet $oIntensityModulation = null;
-
 
     /**
      * Constructor.
@@ -56,27 +60,28 @@ class LFO implements IOscillator {
     ) {
         $this->oGenerator       = $oGenerator;
         $this->oGeneratorInput  = new Signal\Control\Packet();
+        $this->oLastOutput      = new Signal\Control\Packet();
         $this->setFrequency($fFrequency);
         $this->fPhaseCorrection = 0;
         $this->fIntensity       = $fIntensity;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getPosition() : int {
         return $this->iSamplePosition;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getFrequency() : float {
         return $this->fFrequency;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function reset() : self {
         $this->iSamplePosition      = 0;
@@ -130,6 +135,9 @@ class LFO implements IOscillator {
      * @inheritDoc
      */
     public function emit(?int $iIndex = null) : Signal\Control\Packet {
+        if ($this->useLast($iIndex)) {
+            return $this->oLastOutput;
+        }
 
         $oValues = $this->oGeneratorInput->getValues();
 
@@ -156,6 +164,7 @@ class LFO implements IOscillator {
         } else {
             $oOutput->scaleBy($this->fIntensity);
         }
+        $this->oLastOutput = $oOutput;
         return $oOutput;
     }
 }

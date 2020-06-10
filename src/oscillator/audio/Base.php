@@ -26,9 +26,12 @@ abstract class Base implements IOscillator {
 
     const F_INV_TWELVE = 1.0/12.0;
 
-    protected Signal\IGenerator   $oGenerator;
-    protected Signal\Audio\Packet $oGeneratorInput;
-    protected int                 $iSamplePosition = 0;
+    protected Signal\IGenerator $oGenerator;
+    protected Signal\Audio\Packet
+        $oGeneratorInput,
+        $oLastOutput
+    ;
+    protected int $iSamplePosition = 0;
 
     protected float
         $fFrequency        = ILimits::F_DEF_FREQ, // The base frequency
@@ -57,6 +60,7 @@ abstract class Base implements IOscillator {
     ) {
         $this->oGenerator       = $oGenerator;
         $this->oGeneratorInput  = new Signal\Audio\Packet();
+        $this->oLastOutput      = new Signal\Audio\Packet();
         $this->setFrequency($fFrequency);
         $this->fPhaseCorrection = $oGenerator->getPeriod() * $fPhase;
     }
