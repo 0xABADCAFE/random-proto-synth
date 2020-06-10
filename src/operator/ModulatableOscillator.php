@@ -101,21 +101,17 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
     }
 
     /**
-     * Emit a Packet for a given input Index. This is used to ensure that we don't end up repeatedly asking an Operator for subsequent Packets as a consequence
-     * of it being a modulator twice in the overall algorithm lattice.
+     * This is called whenever the emit() is invoked and useLast() returns false. This ensures we don;t repeatedly call stuff
+     * in an unnecessary way.
      *
-     * @param  int
-     * @return Signal\Audio\Packet
+     * @inheritDoc
      */
-    protected function emitPacketForIndex(int $iPacketIndex) : Signal\Audio\Packet {
-        if ($iPacketIndex == $this->iPacketIndex) {
-            return $this->oLastPacket;
-        }
+    protected function emitNew() : Signal\Audio\Packet {
 
         $oPhaseAccumulator     = empty($this->aPhaseModulationIndex)     ? null : new Signal\Audio\Packet();
         $oAmplitudeAccumulator = empty($this->aAmplitudeModulationIndex) ? null : new Signal\Audio\Packet();
         foreach ($this->aModulators as $iInstanceID => $oOperator) {
-            $oPacket = $oOperator->emitPacketForIndex($iPacketIndex);
+            $oPacket = $oOperator->emit($this->iLastIndex);
             if (isset($this->aPhaseModulationIndex[$iInstanceID])) {
                 $oPhaseAccumulator->accumulate($oPacket, $this->aPhaseModulationIndex[$iInstanceID]);
             }
@@ -131,15 +127,15 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
 
         // Apply any pitch control
         if ($this->oPitchControl) {
-            $this->oOscillator->setPitchModulation($this->oPitchControl->emit());
+            $this->oOscillator->setPitchModulation($this->oPitchControl->emit($this->iLastIndex));
         }
 
         // Get the raw oscillator output
-        $oOscillatorPacket = $this->oOscillator->emit();
+        $oOscillatorPacket = $this->oOscillator->emit($this->iLastIndex);
 
         // Apply any amplitude control
         if ($this->oAmplitudeControl) {
-            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit());
+            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit($this->iLastIndex));
         }
 
         // Apply any amplitude modulation
@@ -147,8 +143,7 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
             $oOscillatorPacket->modulateWith($oAmplitudeAccumulator);
         }
 
-        $this->oLastPacket        = $oOscillatorPacket;
-        $this->iPacketIndex       = $iPacketIndex;
+        $this->oLastPacket = $oOscillatorPacket;
         return $this->oLastPacket;
     }
 

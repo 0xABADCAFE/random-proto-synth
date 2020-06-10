@@ -219,32 +219,24 @@ class UnmodulatedOscillator extends Base implements ISource {
     }
 
     /**
-     * Emit a Packet for a given input Index. This is used to ensure that we don't end up repeatedly asking an Operator for subsequent Packets as a consequence
-     * of it being a modulator twice in the overall algorithm lattice.
-     *
-     * @param  int
-     * @return Signal\Audio\Packet
+     * @inheritDoc
      */
-    protected function emitPacketForIndex(int $iPacketIndex) : Signal\Audio\Packet {
-        if ($iPacketIndex == $this->iPacketIndex) {
-            return $this->oLastPacket;
-        }
+    protected function emitNew() : Signal\Audio\Packet {
 
         // Apply any pitch control
         if ($this->oPitchControl) {
-            $this->oOscillator->setPitchModulation($this->oPitchControl->emit());
+            $this->oOscillator->setPitchModulation($this->oPitchControl->emit($this->iLastIndex));
         }
 
         // Get the raw oscillator output
-        $oOscillatorPacket = $this->oOscillator->emit();
+        $oOscillatorPacket = $this->oOscillator->emit($this->iLastIndex);
 
         // Apply any amplitude control
         if ($this->oAmplitudeControl) {
-            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit());
+            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit($this->iLastIndex));
         }
 
         $this->oLastPacket        = $oOscillatorPacket;
-        $this->iPacketIndex       = $iPacketIndex;
         return $this->oLastPacket;
     }
 

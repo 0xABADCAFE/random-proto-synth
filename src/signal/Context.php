@@ -147,7 +147,7 @@ class Context {
  * This will primarily be used for implementors of IStream::emit() implementations.
  */
 trait TContextIndexAware {
-    private $iLastIndex = 0;
+    protected $iLastIndex = 0;
 
     /**
      * Checks to see whether or not we can use the last calculated data for a given input index.
@@ -157,7 +157,7 @@ trait TContextIndexAware {
      * Finally if the index provided is the same as the last index we saw, we return true as this case
      * indicates we've been asked for the most recent data more than once.
      */
-    private function useLast(?int $iIndex) : bool {
+    protected function useLast(?int $iIndex) : bool {
         if (null === $iIndex) {
             $this->iLastIndex = Context::get()->getNextIndex();
             return false;
