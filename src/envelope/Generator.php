@@ -28,6 +28,8 @@ use function ABadCafe\Synth\Utility\dprintf;
  */
 class LinearInterpolated implements Envelope\IGenerator {
 
+    use Signal\TContextIndexAware;
+
     const A_MAPS = [
         self::S_NOTE_MAP_SPEED => true,
         self::S_NOTE_MAP_LEVEL => true
@@ -139,7 +141,12 @@ class LinearInterpolated implements Envelope\IGenerator {
      *
      * @return Signal\Control\Packet
      */
-    public function emit() : Signal\Control\Packet {
+    public function emit(?int $iIndex = null) : Signal\Control\Packet {
+
+        if ($this->useLast($iIndex)) {
+            return $this->oOutputPacket;
+        }
+
         $iLength = Signal\Context::get()->getPacketLength();
 
         // If we are at the end of the envelope, just return the final packet

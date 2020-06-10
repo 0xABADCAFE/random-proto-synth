@@ -117,30 +117,23 @@ class ControlledFilter extends Base implements IProcessor {
     }
 
     /**
-     * @inheritdoc
-     * @see IStream
+     * @inheritDoc
      */
-    public function emitPacketForIndex(int $iPacketIndex) : Signal\Audio\Packet {
+    public function emitNew() : Signal\Audio\Packet {
         $this->iPosition += Signal\Context::get()->getPacketLength();
-        if ($iPacketIndex == $this->iPacketIndex) {
-            return $this->oLastPacket;
-        }
-
         $this->oLastPacket->fillWith(0);
         foreach ($this->aOperators as $iInstanceID => $oOperator) {
-            $this->oLastPacket->accumulate($oOperator->emitPacketForIndex($iPacketIndex), $this->aLevels[$iInstanceID]);
+            $this->oLastPacket->accumulate($oOperator->emit($this->iLastIndex), $this->aLevels[$iInstanceID]);
         }
 
         if ($this->oCutoffControl && $this->oFilter instanceof Signal\Audio\Filter\ICutoffControlled) {
-            $this->oFilter->setCutoffControl($this->oCutoffControl->emit());
+            $this->oFilter->setCutoffControl($this->oCutoffControl->emit($this->iLastIndex));
         }
         if ($this->oResonanceControl && $this->oFilter instanceof Signal\Audio\Filter\IResonanceControlled) {
-            $this->oFilter->setResonanceControl($this->oResonanceControl->emit());
+            $this->oFilter->setResonanceControl($this->oResonanceControl->emit($this->iLastIndex));
         }
 
         $this->oLastPacket = $this->oFilter->filter($this->oLastPacket);
-
-        $this->iPacketIndex = $iPacketIndex;
         return $this->oLastPacket;
     }
 

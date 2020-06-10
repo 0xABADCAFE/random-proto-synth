@@ -25,6 +25,8 @@ use \RangeException;
  */
 class Super extends Simple {
 
+    use Signal\TContextIndexAware;
+
     protected array
         /** @var float[] $aHarmonics */
         $aHarmonics        = [],
@@ -69,9 +71,14 @@ class Super extends Simple {
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function emit() : Signal\Audio\Packet {
+    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
+
+        if ($this->useLast($iIndex)) {
+            return $this->oLastOutput;
+        }
+
         $oOutput = new Signal\Audio\Packet();
         $oValues = $this->oGeneratorInput->getValues();
         $iSamplePosition = 0;
@@ -128,6 +135,7 @@ class Super extends Simple {
             }
         }
         $this->iSamplePosition = $iSamplePosition;
+        $this->oLastOutput = $oOutput;
         return $oOutput;
     }
 

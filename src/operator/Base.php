@@ -29,15 +29,18 @@ use ABadCafe\Synth\Map;
 abstract class Base implements IOperator, Utility\IEnumeratedInstance {
 
     use Utility\TEnumeratedInstance;
+    use Signal\TContextIndexAware;
 
     protected Signal\Audio\Packet $oLastPacket;
-    protected int $iPacketIndex = 0;
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function emit() : Signal\Audio\Packet {
-        return $this->emitPacketForIndex($this->iPacketIndex + 1);
+    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
+        if ($this->useLast($iIndex)) {
+            return $this->oLastPacket;
+        }
+        return $this->emitNew();
     }
 
     /**
@@ -96,12 +99,10 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
     }
 
     /**
-     * Generate the actual packet or return the last one if the index is unchanged. Implementors of this method
-     * must bumo the iPacketIndex for every new Packet that is calculated.
+     * Generate a new packet
      *
-     * @param  int $iPacketIndex
      * @return Signal\Audio\Packet
      */
-    protected abstract function emitPacketForIndex(int $iPacketIndex) : Signal\Audio\Packet;
+    protected abstract function emitNew() : Signal\Audio\Packet;
 
 }
