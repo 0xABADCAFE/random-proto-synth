@@ -10,12 +10,12 @@ $iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
 
 $oGenerator = new Signal\Generator\Sine();
 
-$oLFO = new Oscillator\Simple(
+$oLFO = new Oscillator\Audio\Simple(
     $oGenerator,
     0.1
 );
 
-$oModulator = new Oscillator\Simple(
+$oModulator = new Oscillator\Audio\Simple(
     $oGenerator,
     55
 );
@@ -30,7 +30,7 @@ $oModulatorShape
     ->append(0, 4);
 $oModulatorEnvelope = new Envelope\Generator\LinearInterpolated($oModulatorShape);
 
-$oCarrier = new Oscillator\Simple(
+$oCarrier = new Oscillator\Audio\Simple(
     new Signal\Generator\Square(),
     220
 );
@@ -55,13 +55,13 @@ do {
     $oCarrier->setPhaseModulation(
         $oModulator
             ->emit()
-            ->modulateWith(
+            ->levelControl(
                 $oModulatorEnvelope->emit()
             )
     );
 
     $oOutput->write(
-        $oCarrier->emit()->modulateWith(
+        $oCarrier->emit()->levelControl(
             $oCarrierEnvelope->emit()
         )
     );
