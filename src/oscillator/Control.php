@@ -49,16 +49,14 @@ interface ILimits {
 interface IOscillator extends Oscillator\IOscillator, Signal\Control\IStream {
 
     /**
-     * @param  Signal\Control\Packet $oRate
+     * Set the depth of the oscillator.
+     *
+     * @param  float $fDepth
      * @return self
      */
-    public function setRateModulation(Signal\Control\Packet $oRate = null) : self;
-
-    /**
-     * @param  Signal\Control\Packet $oIntensity
-     * @return self
-     */
-    public function setIntensityModulation(Signal\Control\Packet $oIntensity = null) : self;
+    public function setDepth(float $fDepth) : self;
 }
 
-require_once 'control/LFO.php';
+require_once 'control/Base.php';
+require_once 'control/FixedLFO.php';
+require_once 'control/ControlledLFO.php';

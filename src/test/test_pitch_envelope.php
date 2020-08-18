@@ -11,15 +11,30 @@ $oOscillator = new Oscillator\Audio\Simple(
     220
 );
 
-$oEnvelopeGenerator = new Envelope\Generator\LinearInterpolated(
+$oLFORateControl = new Envelope\Generator\LinearInterpolated(
     new Envelope\Shape(
         0, [
             [0.0, 0.5],
-            [-1.0, 0.5],
-            [-1.0, 0.5],
-            [0.0, 0.5]
+            [5, 0.5],
+            [10.0, 0.5],
         ]
     )
+);
+
+$oLFODepthControl = new Envelope\Generator\LinearInterpolated(
+    new Envelope\Shape(
+        0, [
+            [0.0, 0.5],
+            [1.0, 0.5],
+            [0.2, 1.0],
+        ]
+    )
+);
+
+$oControlledLFO = new Oscillator\Control\ControlledLFO(
+    new Signal\Generator\Sine(),
+    $oLFORateControl,
+    $oLFODepthControl
 );
 
 $oOutput   = new Output\Play;
@@ -27,9 +42,9 @@ $oOutput->open('output/test_pitch_output.wav');
 
 
 do {
-    $oPitch = $oEnvelopeGenerator->emit();
+    $oPitch = $oControlledLFO->emit();
     $oOscillator->setPitchModulation($oPitch);
     $oOutput->write($oOscillator->emit());
 } while ($oOscillator->getPosition() < $iMaxSamples);
-$oEnvelope->close();
+
 $oOutput->close();

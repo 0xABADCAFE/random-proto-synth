@@ -23,13 +23,13 @@ $oOscillator = new Oscillator\Audio\Super(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oCutoffEnvelope = new Oscillator\Control\LFO(
+$oCutoffEnvelope = new Oscillator\Control\FixedLFO(
     new Signal\Generator\SawDown(0.05, 1.0),
     8,
     1
 );
 
-$oVolumeEnvelope = new Oscillator\Control\LFO(
+$oVolumeEnvelope = new Oscillator\Control\FixedLFO(
     new Signal\Generator\SawDown(0.5, 0.75),
     8,
     1
