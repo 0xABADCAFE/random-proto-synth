@@ -4,7 +4,7 @@ namespace ABadCafe\Synth;
 
 require_once '../Synth.php';
 
-const I_SECONDS    = 5;
+const I_SECONDS    = 6;
 const I_NUM_OSC    = 1024;
 const F_MAX_OUTPUT = 16.0/I_NUM_OSC;
 
@@ -19,13 +19,14 @@ for ($i = 0; $i < I_NUM_OSC; ++$i) {
     );
 
     $fDetune     = 0.00025 * mt_rand(-1000, 1000);
-    $fStartRatio = mt_rand(-60, -36);
-    $fEndRatio   = 12*mt_rand(-1, 1);
+    $fStartRatio = 0.1 * mt_rand(-600, -360);
+    $fEndRatio   = 12*mt_rand(-2, 2);
 
     $aEnvelopes[$i] = new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             $fStartRatio + $fDetune, [
                 [$fEndRatio + $fDetune, 4.0],
+                [$fEndRatio + $fDetune/4, 1.0]
             ]
         )
     );
