@@ -22,7 +22,7 @@ use \SPLFixedArray;
 /**
  * Base class for non-flat generator functions
  */
-abstract class NonFlat implements Signal\IGenerator {
+abstract class Base implements Signal\IGenerator {
 
     protected float
         $fMinLevel,
@@ -58,4 +58,4 @@ require_once 'generator/Saw.php';
 require_once 'generator/Triangle.php';
 require_once 'generator/Noise.php';
 require_once 'generator/WaveTable.php';
-
+require_once 'generator/Factory.php';
