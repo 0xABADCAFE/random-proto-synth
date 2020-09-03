@@ -23,7 +23,7 @@ use function Utility\dprintf;
 /**
  * Factory for IGenerator implementations
  */
-class Factory {
+class Factory implements Utility\IFactory {
 
     use Utility\TSingleton;
 
@@ -45,7 +45,7 @@ class Factory {
      * @return Signal\IGenerator
      * @throws \Exception
      */
-    public function create(object $oDescription) : Signal\IGenerator {
+    public function createFrom(object $oDescription) : Signal\IGenerator {
         $sType          = strtolower($oDescription->type ?? '<none>');
         $sSimpleProduct = self::SIMPLE_TYPES[$sType] ?? null;
         if ($sSimpleProduct) {

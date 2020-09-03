@@ -17,23 +17,18 @@ namespace ABadCafe\Synth;
 
 require_once '../Synth.php';
 
-$oFactory = Signal\Generator\Factory::get();
+const S_EXAMPLE = '
+{
+    "type":"fixed",
+    "generator":{
+        "type":"sine",
+        "min":-0.75,
+        "max":0.75
+    }
+}';
 
-$oDescription = (object)[
-    'type' => 'Sine',
-    'min'  => -0.75,
-    'max'  => 0.75,
-];
+$oDefinition = json_decode(S_EXAMPLE);
 
-$oGenerator = $oFactory->create($oDescription);
+$oOscillator = Oscillator\Control\Factory::get()->createFrom($oDefinition);
 
-print_r($oGenerator);
-
-$oDescription = (object)[
-    'type' => 'table',
-    'data'  => [-1, 0, 1, 0],
-];
-
-$oGenerator = $oFactory->create($oDescription);
-
-print_r($oGenerator);
+print_r($oOscillator);
