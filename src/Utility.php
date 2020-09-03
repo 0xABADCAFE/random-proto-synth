@@ -42,3 +42,4 @@ function clamp($mValue, $mMin, $mMax) {
 require_once 'utility/Enum.php';
 require_once 'utility/EnumeratedInstance.php';
 require_once 'utility/Singleton.php';
+require_once 'utility/Factory.php';
