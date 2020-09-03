@@ -13,10 +13,7 @@
 
 declare(strict_types = 1);
 
-/**
- * Control
- */
-namespace ABadCafe\Synth\Oscillator\Control;
+namespace ABadCafe\Synth\Oscillator\Audio;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Oscillator;
 use ABadCafe\Synth\Utility;
@@ -32,7 +29,8 @@ class Factory implements Utility\IFactory {
     use Utility\TSingleton;
 
     const PRODUCT_TYPES = [
-        'lfo' => 'createFixedLFO',
+        'simple' => 'createSimple',
+        'super'  => 'createSuper',
     ];
 
     /**
@@ -48,7 +46,7 @@ class Factory implements Utility\IFactory {
             $cCreator = [$this, $sProduct];
             return $cCreator($oDescription, $oGenerator);
         }
-        throw new \Exception('Unknown Control Oscillator Type ' . $sType);
+        throw new \Exception('Unknown Audio Oscillator Type ' . $sType);
     }
 
     /**
@@ -67,7 +65,7 @@ class Factory implements Utility\IFactory {
      */
     private function getGenerator(object $oDescription) : Signal\IGenerator {
         if (!isset($oDescription->generator) || !is_object($oDescription->generator)) {
-            throw new \Exception('Control Oscillator missing generator');
+            throw new \Exception('Audio Oscillator missing generator');
         }
         return Signal\Generator\Factory::get()->createFrom($oDescription->generator);
     }
@@ -75,13 +73,24 @@ class Factory implements Utility\IFactory {
     /**
      * @param  object $oDescription
      * @param  Signal\IGenerator $oGenerator
-     * @return FixedLFO
+     * @return Simple
      */
-    private function createFixedLFO(object $oDescription, Signal\IGenerator $oGenerator) : IOscillator {
-        return new FixedLFO(
+    private function createSimple(object $oDescription, Signal\IGenerator $oGenerator) : Simple {
+        return new Simple(
             $oGenerator,
-            (float)($oDescription->rate ??  ILimits::F_DEF_FREQ),
-            (float)($oDescription->depth ?? 0.5)
+            (float)($oDescription->freq ??  ILimits::F_DEF_FREQ),
+            (float)($oDescription->phase ?? 0)
+        );
+    }
+
+    private function createSuper(object $oDescription, Signal\IGenerator $oGenerator) : Super {
+        if (!isset($oDescription->stack) || !is_array($oDescription->stack)) {
+            throw new \Exception('Missing or empty harmonic stack for Super Oscillator');
+        }
+        return new Super(
+            $oGenerator,
+            $oDescription->stack,
+            (float)($oDescription->freq ??  ILimits::F_DEF_FREQ)
         );
     }
 }

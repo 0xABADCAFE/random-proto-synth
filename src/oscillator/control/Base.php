@@ -51,4 +51,15 @@ abstract class Base implements IOscillator {
     public function getPosition() : int {
         return $this->iSamplePosition;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString() : string {
+        return sprintf(
+            "%s [%s]",
+            static::class,
+            get_class($this->oGenerator),
+        );
+    }
 }
