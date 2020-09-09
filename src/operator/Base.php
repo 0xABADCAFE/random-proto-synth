@@ -33,6 +33,10 @@ abstract class Base implements IOperator, Utility\IEnumeratedInstance {
 
     protected Signal\Audio\Packet $oLastPacket;
 
+    public function __toString() {
+        return static::class;
+    }
+
     /**
      * @inheritDoc
      */
