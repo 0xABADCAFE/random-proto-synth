@@ -90,7 +90,6 @@ print_r($oMap);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 // Envelope
 const S_EXAMPLE_5 = '
 {
@@ -122,4 +121,30 @@ $oDefinition = json_decode(S_EXAMPLE_5);
 $oEnvelope = Envelope\Factory::get()->createFrom($oDefinition);
 print_r($oEnvelope);
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+// Filter 1
+const S_EXAMPLE_6 = '
+{
+    "type":"lowpass",
+    "cutoff":2.0,
+    "resonance":3.5
+}';
+
+$oDefinition = json_decode(S_EXAMPLE_6);
+$oFilter = Signal\Audio\Filter\Factory::get()->createFrom($oDefinition);
+print_r($oFilter);
+
+// Filter 2
+const S_EXAMPLE_7 = '
+{
+    "type":"karlsen",
+    "mode":"notch",
+    "cutoff":1.0,
+    "resonance":3.5
+}';
+
+$oDefinition = json_decode(S_EXAMPLE_7);
+$oFilter = Signal\Audio\Filter\Factory::get()->createFrom($oDefinition);
+print_r($oFilter);
