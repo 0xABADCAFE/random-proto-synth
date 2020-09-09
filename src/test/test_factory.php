@@ -161,3 +161,59 @@ const S_EXAMPLE_8 = '
 $oDefinition = json_decode(S_EXAMPLE_8);
 $oOutput = Output\Factory::get()->createFrom($oDefinition);
 print_r($oOutput);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Control 1
+const S_EXAMPLE_9 = '
+{
+    "type":"envelope",
+    "config":{
+        "type":"custom",
+        "shape":{
+            "initial":0.0,
+            "points":[
+                [1.0, 0.1],
+                [0.75, 1.0],
+                [0.25, 5.0],
+                [0.0, 10]
+            ]
+        },
+        "keyscale_speed":{
+            "type":"12tone_scaled",
+            "center":0.75,
+            "scale":1.25,
+            "invert":false
+        },
+        "keyscale_level":{
+            "type":"12tone_scaled",
+            "center":1.0,
+            "scale":1.0,
+            "invert":true
+        }
+    }
+}';
+
+$oDefinition = json_decode(S_EXAMPLE_9);
+$oControl = Signal\Control\Factory::get()->createFrom($oDefinition);
+print_r($oControl);
+
+// Control 1
+const S_EXAMPLE_10 = '
+{
+    "type":"oscillator",
+    "config":{
+        "type":"lfo",
+        "rate":15.0,
+        "depth":0.66,
+        "generator":{
+            "type":"sine",
+            "min":-0.75,
+            "max":0.75
+        }
+    }
+}';
+
+$oDefinition = json_decode(S_EXAMPLE_10);
+$oControl = Signal\Control\Factory::get()->createFrom($oDefinition);
+print_r($oControl);
