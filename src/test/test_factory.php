@@ -148,3 +148,16 @@ const S_EXAMPLE_7 = '
 $oDefinition = json_decode(S_EXAMPLE_7);
 $oFilter = Signal\Audio\Filter\Factory::get()->createFrom($oDefinition);
 print_r($oFilter);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// Filter 1
+const S_EXAMPLE_8 = '
+{
+    "type":"play"
+}';
+
+$oDefinition = json_decode(S_EXAMPLE_8);
+$oOutput = Output\Factory::get()->createFrom($oDefinition);
+print_r($oOutput);

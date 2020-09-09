@@ -14,13 +14,15 @@
 declare(strict_types = 1);
 
 namespace ABadCafe\Synth\Envelope;
-use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Map;
 use ABadCafe\Synth\Utility;
 use function ABadCafe\Synth\Utility\dprintf;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Factory class for envelope generators
+ */
 class Factory implements Utility\IFactory {
 
     use Utility\TSingleton;

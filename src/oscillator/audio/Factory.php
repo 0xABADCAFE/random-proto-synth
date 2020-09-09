@@ -22,7 +22,7 @@ use function Utility\dprintf;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Factory for IOscillator implementations
+ * Factory for audio oscillators
  */
 class Factory implements Utility\IFactory {
 

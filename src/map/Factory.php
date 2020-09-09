@@ -19,6 +19,9 @@ use function ABadCafe\Synth\Utility\dprintf;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Factory class for note maps
+ */
 class Factory implements Utility\IFactory {
 
     use Utility\TSingleton;

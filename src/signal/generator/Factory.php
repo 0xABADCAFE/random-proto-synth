@@ -21,7 +21,7 @@ use function Utility\dprintf;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Factory for IGenerator implementations
+ * Factory for signal generators
  */
 class Factory implements Utility\IFactory {
 

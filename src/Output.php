@@ -67,3 +67,4 @@ interface IPCMOutput {
 require_once 'output/Raw.php';
 require_once 'output/Wav.php';
 require_once 'output/Play.php';
+require_once 'output/Factory.php';

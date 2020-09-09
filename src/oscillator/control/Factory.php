@@ -13,9 +13,6 @@
 
 declare(strict_types = 1);
 
-/**
- * Control
- */
 namespace ABadCafe\Synth\Oscillator\Control;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Oscillator;
@@ -25,7 +22,7 @@ use function Utility\dprintf;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Factory for IOscillator implementations
+ * Factory for control oscillators (e.g. LFOs etc)
  */
 class Factory implements Utility\IFactory {
 
