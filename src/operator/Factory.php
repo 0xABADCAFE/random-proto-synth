@@ -16,6 +16,8 @@ declare(strict_types = 1);
 namespace ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Output;
+use ABadCafe\Synth\Map;
+use ABadCafe\Synth\Oscillator;
 use ABadCafe\Synth\Utility;
 use function ABadCafe\Synth\Utility\dprintf;
 
@@ -31,10 +33,8 @@ class Factory implements Utility\IFactory {
     const PRODUCT_TYPES = [
         'output'      => 'createOutput',
         'mixer'       => 'createSumming',
-        'simple'      => 'createUnmodulatedOscillator',
-        'modulatable' => 'createModulatableOscillator',
         'filter'      => 'createFilter',
-
+        'oscillator'  => 'createOscillator'
     ];
 
     /**
@@ -72,26 +72,32 @@ class Factory implements Utility\IFactory {
         );
     }
 
+    /**
+     * @param object $oDescription
+     * @return Summing
+     */
     private function createSumming(object $oDescription) : Summing {
         return new Summing();
     }
 
+    /**
+     * @param object $oDescription
+     * @return ControlledFilter
+     */
     private function createFilter(object $oDescription) : ControlledFilter {
-
+        // Mandatory
         if (!isset($oDescription->model) || !is_object($oDescription->model)) {
             throw new \Exception('Missing model for Filter operator');
         }
-
-        // Mandatory
         $oModel = Signal\Audio\Filter\Factory::get()->createFrom($oDescription->model);
 
         // Optional
-        $oCutoffControl = isset($oDescription->cutoff) && is_object($oDescription->cutoff) ?
-            Signal\Control\Factory::get()->createFrom($oDescription->cutoff) : null;
+        $oCutoffControl = isset($oDescription->cutoff_control) && is_object($oDescription->cutoff_control) ?
+            Signal\Control\Factory::get()->createFrom($oDescription->cutoff_control) : null;
 
         // Optional
-        $oResonanceControl = isset($oDescription->resonance) && is_object($oDescription->resonance) ?
-            Signal\Control\Factory::get()->createFrom($oDescription->resonance) : null;
+        $oResonanceControl = isset($oDescription->resonance_control) && is_object($oDescription->resonance_control) ?
+            Signal\Control\Factory::get()->createFrom($oDescription->resonance_control) : null;
 
         return new ControlledFilter(
             $oModel,
@@ -99,4 +105,54 @@ class Factory implements Utility\IFactory {
             $oResonanceControl
         );
     }
+
+    /**
+     * @param object $oDescription
+     * @return UnmodulatedOscillator|ModulatableOscillator
+     */
+    private function createOscillator(object $oDescription) : UnmodulatedOscillator {
+        // Mandatory
+        if (!isset($oDescription->model) || !is_object($oDescription->model)) {
+            throw new \Exception('Missing model for UnmodulatedOscillator operator');
+        }
+        $oOscillator = Oscillator\Audio\Factory::get()->createFrom($oDescription->model);
+
+        // Amplitude Control Source
+        $oLevelControl = isset($oDescription->level_control) && is_object($oDescription->level_control) ?
+            Signal\Control\Factory::get()->createFrom($oDescription->level_control) : null;
+
+        // Pitch Control Source
+        $oPitchControl = isset($oDescription->pitch_control) && is_object($oDescription->pitch_control) ?
+            Signal\Control\Factory::get()->createFrom($oDescription->pitch_control) : null;
+
+        // Basic Key Scale for pitch
+        $oKeyscaleMap  = isset($oDescription->keyscale_pitch) && is_object($oDescription->keyscale_pitch) ?
+            Map\Note\Factory::get()->createFrom($oDescription->keyscale_pitch) : null;
+
+        $fFreqRatio    = (float)($oDescription->ratio  ?? 1.0);
+        $fDetune       = (float)($oDescription->detune ?? 0.0);
+        $bUnmodulated  = (bool)($oDescription->unmodulated ?? false);
+
+        if ($bUnmodulated) {
+            return new UnmodulatedOscillator(
+                $oOscillator,
+                $fFreqRatio,
+                $fDetune,
+                $oLevelControl,
+                $oPitchControl,
+                $oKeyscaleMap
+            );
+        } else {
+            // ModulatableOscillator extends UnmodulatedOscillator
+            return new ModulatableOscillator(
+                $oOscillator,
+                $fFreqRatio,
+                $fDetune,
+                $oLevelControl,
+                $oPitchControl,
+                $oKeyscaleMap
+            );
+        }
+    }
+
 }

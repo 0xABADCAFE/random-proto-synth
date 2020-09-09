@@ -92,7 +92,7 @@ const S_FILTER_EXAMPLES  = '[
             "cutoff":2.0,
             "resonance":3.5
         },
-        "cutoff":{
+        "cutoff_control":{
             "type":"oscillator",
             "config":{
                 "type":"lfo",
@@ -114,7 +114,7 @@ const S_FILTER_EXAMPLES  = '[
             "cutoff":2.0,
             "resonance":3.5
         },
-        "cutoff":{
+        "cutoff_control":{
             "type":"envelope",
             "config":{
                 "comment":"Custom envelope shape with rate and level key scales",
@@ -152,7 +152,7 @@ const S_FILTER_EXAMPLES  = '[
             "cutoff":2.0,
             "resonance":3.5
         },
-        "cutoff":{
+        "cutoff_control":{
             "type":"envelope",
             "config":{
                 "comment":"Custom envelope shape with rate and level key scales",
@@ -180,14 +180,14 @@ const S_FILTER_EXAMPLES  = '[
                 }
             }
         },
-        "resonance":{
+        "resonance_control":{
             "type":"oscillator",
             "config":{
                 "type":"lfo",
                 "rate":15.0,
                 "depth":0.66,
                 "generator":{
-                    "type":"sine",
+                    "type":"triangle",
                     "min":-0.75,
                     "max":0.75
                 }
@@ -200,3 +200,125 @@ foreach(json_decode(S_FILTER_EXAMPLES) as $oDefinition) {
     $oOperator = Operator\Factory::get()->createFrom($oDefinition);
     echo $oOperator, "\n\n";
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const S_OSCILLATOR_EXAMPLES  = '[
+    {
+        "comment":"Oscillator Operator: Trivial Sine wave",
+        "type":"oscillator",
+        "unmodulated":true,
+        "model":{
+            "type":"simple",
+            "generator":{
+                "type":"sine",
+                "min":-1.0,
+                "max":1.0
+            }
+        }
+    },
+    {
+        "comment":"Oscillator Operator: Trivial Saw wave, with level envelope and pitch LFO",
+        "type":"oscillator",
+        "unmodulated":true,
+        "model":{
+            "type":"simple",
+            "generator":{
+                "type":"sawdown",
+                "min":-1.0,
+                "max":1.0
+            }
+        },
+        "level_control":{
+            "type":"envelope",
+            "config":{
+                "comment":"Custom envelope shape",
+                "type":"custom",
+                "shape":{
+                    "initial":0.0,
+                    "points":[
+                        [1.0, 0.1],
+                        [0.75, 1.0],
+                        [0.25, 5.0],
+                        [0.0, 10]
+                    ]
+                }
+            }
+        },
+        "pitch_control":{
+            "comment":"simple unchanging 5Hz LFO",
+            "type":"oscillator",
+            "config":{
+                "type":"lfo",
+                "rate":5.0,
+                "depth":0.1,
+                "generator":{
+                    "type":"sine"
+                }
+            }
+        }
+    },
+    {
+        "comment":"Oscillator Operator: Rich example microtonal multisaw",
+        "type":"oscillator",
+        "model":{
+            "type":"super",
+            "stack":[
+                [1.0, 0.5, 0.0],
+                [2.0, 0.25, 0.0],
+                [3.0, 0.25, 0.0]
+            ],
+            "generator":{
+                "type":"sawdown",
+                "min":-0.75,
+                "max":0.75
+            }
+        },
+        "level_control":{
+            "type":"envelope",
+            "config":{
+                "comment":"Custom envelope shape",
+                "type":"custom",
+                "shape":{
+                    "initial":0.0,
+                    "points":[
+                        [1.0, 0.1],
+                        [0.75, 1.0],
+                        [0.25, 5.0],
+                        [0.0, 10]
+                    ]
+                },
+                "keyscale_level":{
+                    "type":"12tone_scaled",
+                    "center":1.0,
+                    "scale":1.0,
+                    "invert":true
+                }
+            }
+        },
+        "pitch_control":{
+            "comment":"simple unchanging 5Hz LFO",
+            "type":"oscillator",
+            "config":{
+                "type":"lfo",
+                "rate":5.0,
+                "depth":0.1,
+                "generator":{
+                    "type":"sine"
+                }
+            }
+        },
+        "keyscale_pitch":{
+            "type":"12tone_scaled",
+            "center":1.0,
+            "scale":0.5,
+            "invert":true
+        }
+    }
+]';
+
+foreach(json_decode(S_OSCILLATOR_EXAMPLES) as $oDefinition) {
+    $oOperator = Operator\Factory::get()->createFrom($oDefinition);
+    echo $oOperator, "\n\n";
+}
+
