@@ -59,8 +59,16 @@ class Factory implements Utility\IFactory {
         if (!isset($oDescription->shape) || !is_object($oDescription->shape)) {
             throw new \Exception('Missing or malformed Shape definition');
         }
+
+        $oSpeedScale = isset($oDescription->keyscale_speed) && is_object($oDescription->keyscale_speed) ?
+            $this->createMap($oDescription->keyscale_speed) : null;
+        $oLevelScale = isset($oDescription->keyscale_level) && is_object($oDescription->keyscale_level) ?
+            $this->createMap($oDescription->keyscale_level) : null;
+
         return new Generator\LinearInterpolated(
-            $this->createShape($oDescription->shape)
+            $this->createShape($oDescription->shape),
+            $oSpeedScale,
+            $oLevelScale
         );
     }
 
@@ -76,5 +84,13 @@ class Factory implements Utility\IFactory {
             (float)$oDescription->initial ?? 0.0,
             $oDescription->points
         );
+    }
+
+    /**
+     * @param  object $oDescription
+     * @return Map\Note\IMIDINumber
+     */
+    private function createMap(object $oDescription) : Map\Note\IMIDINumber {
+        return Map\Note\Factory::get()->createFrom($oDescription);
     }
 }

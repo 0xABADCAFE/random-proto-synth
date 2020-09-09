@@ -75,8 +75,24 @@ echo $oOscillator, "\n";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Envelope
+// Map
 const S_EXAMPLE_4 = '
+{
+    "type":"12tone_scaled",
+    "center":0.75,
+    "scale":1.25,
+    "invert":false
+}';
+
+$oDefinition = json_decode(S_EXAMPLE_4);
+$oMap = Map\Note\Factory::get()->createFrom($oDefinition);
+print_r($oMap);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// Envelope
+const S_EXAMPLE_5 = '
 {
     "type":"custom",
     "shape":{
@@ -87,9 +103,23 @@ const S_EXAMPLE_4 = '
             [0.25, 5.0],
             [0.0, 10]
         ]
+    },
+    "keyscale_speed":{
+        "type":"12tone_scaled",
+        "center":0.75,
+        "scale":1.25,
+        "invert":false
+    },
+    "keyscale_level":{
+        "type":"12tone_scaled",
+        "center":1.0,
+        "scale":1.0,
+        "invert":true
     }
 }';
 
-$oDefinition = json_decode(S_EXAMPLE_4);
+$oDefinition = json_decode(S_EXAMPLE_5);
 $oEnvelope = Envelope\Factory::get()->createFrom($oDefinition);
 print_r($oEnvelope);
+
+
