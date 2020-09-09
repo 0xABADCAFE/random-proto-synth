@@ -74,7 +74,7 @@ class Factory implements Utility\IFactory {
      * @param  Signal\IGenerator $oGenerator
      * @return FixedLFO
      */
-    private function createFixedLFO(object $oDescription, Signal\IGenerator $oGenerator) : IOscillator {
+    private function createFixedLFO(object $oDescription, Signal\IGenerator $oGenerator) : FixedLFO {
         return new FixedLFO(
             $oGenerator,
             (float)($oDescription->rate ??  ILimits::F_DEF_FREQ),

@@ -51,3 +51,5 @@ interface IStream extends Signal\IStream {
      */
     public function emit(?int $iIndex = null) : Packet; // Covariant return
 }
+
+require_once 'control/Factory.php';
