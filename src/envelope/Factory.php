@@ -55,7 +55,7 @@ class Factory implements Utility\IFactory {
 
     /**
      * @param  object $oDescription
-     * @return LinearInterpolated
+     * @return Generator\LinearInterpolated
      */
     private function createLinearInterpolated(object $oDescription) : Generator\LinearInterpolated {
         if (!isset($oDescription->shape) || !is_object($oDescription->shape)) {

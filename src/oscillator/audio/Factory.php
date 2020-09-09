@@ -83,6 +83,11 @@ class Factory implements Utility\IFactory {
         );
     }
 
+    /**
+     * @param  object $oDescription
+     * @param  Signal\IGenerator $oGenerator
+     * @return Super
+     */
     private function createSuper(object $oDescription, Signal\IGenerator $oGenerator) : Super {
         if (!isset($oDescription->stack) || !is_array($oDescription->stack)) {
             throw new \Exception('Missing or empty harmonic stack for Super Oscillator');

@@ -30,7 +30,6 @@ class Factory implements Utility\IFactory {
         '12tone_scaled' => 'createTwelveToneEqualTemperament',
     ];
 
-
     /**
      * @param  object $oDescription
      * @return IMIDINumber
@@ -53,6 +52,10 @@ class Factory implements Utility\IFactory {
 
     }
 
+    /**
+     * @param  object $oDescription
+     * @return TwelveToneEqualTemperament
+     */
     private function createTwelveToneEqualTemperament(object $oDescription) : TwelveToneEqualTemperament {
         return new TwelveToneEqualTemperament(
             (float)($oDescription->center ?? 1.0),
