@@ -72,3 +72,24 @@ const S_EXAMPLE_3 = '
 $oDefinition = json_decode(S_EXAMPLE_3);
 $oOscillator = Oscillator\Audio\Factory::get()->createFrom($oDefinition);
 echo $oOscillator, "\n";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Envelope
+const S_EXAMPLE_4 = '
+{
+    "type":"custom",
+    "shape":{
+        "initial":0.0,
+        "points":[
+            [1.0, 0.1],
+            [0.75, 1.0],
+            [0.25, 5.0],
+            [0.0, 10]
+        ]
+    }
+}';
+
+$oDefinition = json_decode(S_EXAMPLE_4);
+$oEnvelope = Envelope\Factory::get()->createFrom($oDefinition);
+print_r($oEnvelope);
