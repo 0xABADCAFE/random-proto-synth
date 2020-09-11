@@ -15,15 +15,17 @@ declare(strict_types = 1);
 
 namespace ABadCafe\Synth\Patch;
 
-use  ABadCafe\Synth\Operator;
+use ABadCafe\Synth\Map;
+use ABadCafe\Synth\Operator;
 
 use function ABadCafe\Synth\Utility\dprintf;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Module
  */
-class Module {
+class Module implements Map\Note\IMIDINumberAware {
 
     const S_KEY_OUTPUT = 'out';
 
@@ -36,7 +38,7 @@ class Module {
         'phase'     => Operator\InputKind::E_PHASE,
     ];
 
-    /** @var IOperator[] $aOperators */
+    /** @var Operator\IOperator[] $aOperators */
     protected array $aOperatorList     = [];
 
     /** @var float[][][] $aModulationMatrix */
@@ -63,6 +65,68 @@ class Module {
      */
     public function getOutputOperator() : Operator\IOperator {
         return $this->aOperatorList[self::S_KEY_OUTPUT];
+    }
+
+    /**
+     * Obtain a list of use cases that IMIDINumber maps can be set for.
+     *
+     * @return string[]
+     */
+    public function getNoteNumberMapUseCases() : array {
+        return [];
+    }
+
+    /**
+     * Set a new Note Map. An implementor may use multiple Note Maps for multiple things, for exanple, the effect of
+     * note number on envelope speeds, amplitudes, filter cutoff etc. The use cases are specific to the implementor.
+     *
+     * @param  Map\Note\IMIDINumber $oNoteMap
+     * @param  string               $sUseCase
+     * @return self
+     */
+    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : self {
+        return $this;
+    }
+
+    /**
+     * Get the current Note Map.
+     *
+     * @param string $sUseCase
+     *
+     * @return Map\Note\IMIDINumber
+     */
+    public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
+        return Map\Note\Invariant::get();
+    }
+
+    /**
+     * Set the note number to use. The expectation is that the consuming class will use the Note Map to derive some
+     * control paramter base on the note.
+     *
+     * @param  int $iNote
+     * @return self
+     * @throws OutOfRangeException
+     */
+    public function setNoteNumber(int $iNote) : self {
+        foreach ($this->aOperatorList as $oOperator) {
+            $oOperator->setNoteNumber($iNote);
+        }
+        return $this;
+    }
+
+    /**
+     * Set the note to use, by name. The expectation is that the consuming class will use the Note Map to derive some
+     * control paramter base on the note.
+     *
+     * @param  string $sNote
+     * @return self
+     * @throws OutOfBoundsException
+     */
+    public function setNoteName(string $sNote) : self {
+        foreach ($this->aOperatorList as $oOperator) {
+            $oOperator->setNoteName($sNote);
+        }
+        return $this;
     }
 
     /**
@@ -177,3 +241,85 @@ class Module {
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Loader
+ */
+class Loader {
+
+    /**
+     * @param  string $sFile
+     * @return Module
+     * @throws \Exception
+     */
+    public function load(string $sFile) : Module {
+        $this->assertFileReadable($sFile);
+        $oData = $this->deserialiseFileContent($sFile);
+        $this->assertBasicDataStructure($oData);
+        return new Module(
+            $this->buildOperators($oData),
+            $this->buildModulationMatrix($oData)
+        );
+    }
+
+    /**
+     * @param  object $oData
+     * @return Operator\IOperator[]
+     */
+    private function buildOperators(object $oData) : array {
+        $aOperatorList = [];
+        $oFactory = Operator\Factory::get();
+        foreach ($oData->operators as $sIdentity => $oDescription) {
+            $aOperatorList[$sIdentity] = $oFactory->createFrom($oDescription);
+        }
+        return $aOperatorList;
+    }
+
+    /**
+     * @param  object $oData
+     * @return float[][][]
+     */
+    private function buildModulationMatrix(object $oData) : array {
+        $aMatrix = [];
+        foreach ($oData->matrix as $sCarrierIdentity => $oInputs) {
+            $aMatrix[$sCarrierIdentity] = [];
+            foreach ($oInputs as $sModulatorIdentity => $oLevels) {
+                $aMatrix[$sCarrierIdentity][$sModulatorIdentity] = (array)$oLevels;
+            }
+        }
+        return $aMatrix;
+    }
+
+    /**
+     * @param  string $sFile
+     * @throws \Exception
+     */
+    private function assertFileReadable(string $sFile) {
+        if (!is_file($sFile) || !is_readable($sFile)) {
+            throw new \Exception('"' . $sFile . '" is not a readable file.');
+        }
+    }
+
+    /**
+     * @param  object $oData
+     * @throws \Exception
+     */
+    private function assertBasicDataStructure(object $oData) {
+        if (!isset($oData->operators) || !is_object($oData->operators)) {
+            throw new \Exception('Missing required operators section');
+        }
+        if (!isset($oData->matrix) || !is_object($oData->matrix)) {
+            throw new \Exception('Missing required matrix section');
+        }
+    }
+
+    /**
+     * @param  string $sFile
+     * @return object
+     * @throws \Exception
+     */
+    private function deserialiseFileContent(string $sFile) : object {
+        return json_decode(file_get_contents($sFile), false, 512, JSON_THROW_ON_ERROR);
+    }
+}
