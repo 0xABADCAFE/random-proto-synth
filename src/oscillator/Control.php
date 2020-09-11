@@ -60,3 +60,4 @@ interface IOscillator extends Oscillator\IOscillator, Signal\Control\IStream {
 require_once 'control/Base.php';
 require_once 'control/FixedLFO.php';
 require_once 'control/ControlledLFO.php';
+require_once 'control/Factory.php';

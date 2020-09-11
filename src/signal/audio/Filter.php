@@ -195,3 +195,4 @@ abstract class Resonant extends Base implements IResonanceControlled {
 
 require_once 'filter/ResonantLowPass.php';
 require_once 'filter/Karlsen.php';
+require_once 'filter/Factory.php';

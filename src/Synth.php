@@ -31,3 +31,4 @@ require_once 'Envelope.php';
 require_once 'Oscillator.php';
 require_once 'Output.php';
 require_once 'Operator.php';
+require_once 'Patch.php';

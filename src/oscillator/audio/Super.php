@@ -153,7 +153,7 @@ class Super extends Simple {
      */
     private function initHarmonicStack(array $aHarmonicStack) {
         if (count($aHarmonicStack) < 2) {
-            throw new InvaliArgumentException();
+            throw new InvalidArgumentException('Harmonic Stack must have at least 2 entries');
         }
 
         foreach ($aHarmonicStack as $iHarmonicID => $aHarmonic) {

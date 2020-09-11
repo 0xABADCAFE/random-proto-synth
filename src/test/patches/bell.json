@@ -1,0 +1,78 @@
+{
+    "name": "bell",
+    "comment": " Simple 2-Operator FM Bell",
+    "operators": {
+        "out": {
+            "comment": "Output Operator: Realtime via soxplay",
+            "type": "output",
+            "destination": {
+                "type": "play"
+            }
+        },
+        "carrier": {
+            "comment": "Simple Oscillator Operator based on sine wave generator",
+            "type": "oscillator",
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "sine"
+                }
+            },
+            "level_control": {
+                "type": "envelope",
+                "config": {
+                    "comment": "Custom envelope shape",
+                    "type": "custom",
+                    "shape": {
+                        "initial": 0.0,
+                        "points": [
+                            [1.0, 0.01],
+                            [0.5, 0.2],
+                            [0.25, 0.2],
+                            [0.125, 0.2],
+                            [0.0625, 0.2],
+                            [0.03125, 0.2]
+                        ]
+                    }
+                }
+            }
+        },
+        "modulator": {
+            "comment": "Simple Oscillator Operator based on sine wave generator",
+            "type": "oscillator",
+            "unmodulated":true,
+            "ratio": 4.51591,
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "sine"
+                }
+            },
+            "level_control": {
+                "type": "envelope",
+                "config": {
+                    "comment": "Custom envelope shape",
+                    "type": "custom",
+                    "shape": {
+                        "initial": 1.0,
+                        "points": [
+                            [0, 2.0]
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "matrix": {
+        "out": {
+            "carrier": {
+                "audio": 1.0
+            }
+        },
+        "carrier": {
+            "modulator": {
+                "phase": 0.5
+            }
+        }
+    }
+}

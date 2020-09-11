@@ -190,4 +190,4 @@ require_once 'operator/UnmodulatedOscillator.php';
 require_once 'operator/ModulatableOscillator.php';
 require_once 'operator/Filter.php';
 require_once 'operator/Output.php';
-
+require_once 'operator/Factory.php';
