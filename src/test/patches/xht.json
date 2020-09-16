@@ -1,0 +1,168 @@
+{
+    "name": "XHT",
+    "comment": "Down and out",
+    "operators": {
+        "out": {
+            "comment": "Resonant Lowpass filter with fixed envelope control for cutoff and resonance",
+            "type": "filter",
+            "model": {
+                "type": "lowpass",
+                "cutoff_control": {
+                    "type": "envelope",
+                    "config": {
+                        "type": "custom",
+                        "shape": {
+                            "initial": 0.1,
+                            "points": [
+                                [1.0,  1.0],
+                                [0.1,  4.0],
+                                [0.01, 4.0]
+                            ]
+                        }
+                    }
+                },
+                "resonance_control": {
+                    "type": "envelope",
+                    "config": {
+                        "type": "custom",
+                        "shape": {
+                            "initial": 0.0,
+                            "points": [
+                                [1.5,  3.0]
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "carrier1": {
+            "comment": "Square wave oscillator with amplitude and pitch envelope",
+            "type": "oscillator",
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "square"
+                }
+            },
+            "ratio": 1.0,
+            "detune": 0.0,
+            "level_control": {
+                "type": "envelope",
+                "config": {
+                    "type": "custom",
+                    "shape": {
+                        "initial": 1.0,
+                        "points": [
+                            [0.5, 0.5]
+                        ]
+                    }
+                }
+            },
+            "pitch_control": {
+                "type": "envelope",
+                "config": {
+                    "type": "custom",
+                    "shape": {
+                        "comment": "3 octave slide down over 4 seconds. Range given in semitones.",
+                        "initial": 0.0,
+                        "points": [
+                            [-36.0, 4.0]
+                        ]
+                    }
+                }
+            }
+        },
+        "carrier2": {
+            "comment": "Saw wave oscillator with amplitude and pitch envelope",
+            "type": "oscillator",
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "sawdown"
+                }
+            },
+            "unmodulated": true,
+            "ratio": 1.0091,
+            "detune": 0.0,
+            "level_control": {
+                "type": "envelope",
+                "config": {
+                    "type": "custom",
+                    "shape": {
+                        "initial": 0.25,
+                        "points": [
+                            [0.75, 4.0]
+                        ]
+                    }
+                }
+            },
+            "pitch_control": {
+                "type": "envelope",
+                "config": {
+                    "type": "custom",
+                    "shape": {
+                        "comment": "3 octave slide down over 4 seconds. Range given in semitones.",
+                        "initial": 0.0,
+                        "points": [
+                            [-36.0, 4.0]
+                        ]
+                    }
+                }
+            }
+        },
+        "modulator": {
+            "comment": "Sine",
+            "type": "oscillator",
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "sine"
+                }
+            },
+            "ratio": 0.5,
+            "detune": 0.0,
+            "level_control": {
+                "type": "envelope",
+                "config": {
+                    "type": "custom",
+                    "shape": {
+                        "initial": 0.0,
+                        "points": [
+                            [1.0, 4.0],
+                            [0.0, 4.0],
+                            [0.5, 6.0]
+                        ]
+                    }
+                }
+            },
+            "pitch_control": {
+                "type": "envelope",
+                "config": {
+                    "type": "custom",
+                    "shape": {
+                        "comment": "3 octave slide down over 4 seconds. Range given in semitones.",
+                        "initial": 0.0,
+                        "points": [
+                            [-36.0, 4.0]
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "matrix": {
+        "carrier1": {
+            "modulator": {
+                "phase": 2.0
+            }
+        },
+        "out": {
+            "carrier1": {
+                "audio": 0.75
+            },
+            "carrier2": {
+                "audio": 0.75
+            }
+        }
+    }
+}
