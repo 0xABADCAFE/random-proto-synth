@@ -130,9 +130,7 @@ class Module implements Map\Note\IMIDINumberAware {
     }
 
     /**
-     * Validates the Operator list. There must be at least one output operator and one
-     * source Operator. The output operator must be declared by the key name defined in
-     * S_KEY_OUTPUT and be an instance of the Operator\Summing or one of it's subclasses.
+     * Validates the Operator list.
      *
      * All entries in the list must be implementations of the Operator\IOperator interface.
      *
@@ -140,14 +138,13 @@ class Module implements Map\Note\IMIDINumberAware {
      * @throws \Exception
      */
     private function checkOperatorList(array $aOperatorList) {
-        if (count($aOperatorList) < 2) {
-            throw new \Exception('At least 2 Operators expected (one output and one source)');
+        if (empty($aOperatorList)) {
+            throw new \Exception('No operators defined!');
         }
         if (!(
-            isset($aOperatorList[self::S_KEY_OUTPUT]) &&
-            $aOperatorList[self::S_KEY_OUTPUT] instanceof Operator\Summing
+            isset($aOperatorList[self::S_KEY_OUTPUT])
         )) {
-            throw new \Exception('Output operator not defined or is not an appropriate type');
+            throw new \Exception('No operator is designated as the output');
         }
         foreach ($aOperatorList as $sKey => $oOperator) {
             if (!($oOperator instanceof Operator\IOperator)) {
@@ -164,9 +161,6 @@ class Module implements Map\Note\IMIDINumberAware {
      * @param float[][][]          $aModulationMatrix
      */
     private function checkModulationMatrix(array $aOperatorList, array $aModulationMatrix) {
-        if (!isset($aModulationMatrix[self::S_KEY_OUTPUT]) || empty($aModulationMatrix[self::S_KEY_OUTPUT])) {
-            throw new \Exception("Nothing is connected to the output Operator");
-        }
         foreach ($aModulationMatrix as $sKey => $aInputs) {
             $this->checkOperatorInputs($aOperatorList, $sKey, $aInputs);
         }
@@ -222,7 +216,6 @@ class Module implements Map\Note\IMIDINumberAware {
 
             foreach ($aInputs as $sModulatorKey => $aInputLevels) {
                 $oModulator = $this->aOperatorList[$sModulatorKey];
-
                 foreach ($aInputLevels as $sInputKind => $fLevel) {
                     $oInputKind = Operator\InputKind::get(self::MODULATION_MAP[$sInputKind]);
                     $oCarrier->attachInput($oModulator, (float)$fLevel, $oInputKind);

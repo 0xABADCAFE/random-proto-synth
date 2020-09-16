@@ -1,0 +1,37 @@
+{
+    "name": "squaredecay",
+    "comment": " Simple 1-Operator Square",
+    "operators": {
+        "out": {
+            "comment": "Simple Oscillator Operator based on square wave generator",
+            "type": "oscillator",
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "square"
+                }
+            },
+            "level_control": {
+                "type": "envelope",
+                "config": {
+                    "comment": "Custom envelope shape",
+                    "type": "custom",
+                    "shape": {
+                        "initial": 1.0,
+                        "points": [
+                            [0.5,  0.5],
+                            [0.25, 0.5]
+                        ]
+                    },
+                    "keyscale_speed": {
+                        "type": "12tone_scaled",
+                        "scale": 1.0,
+                        "invert":true
+                    }
+                }
+            }
+        }
+    },
+    "matrix": {
+    }
+}

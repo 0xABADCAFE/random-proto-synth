@@ -251,6 +251,7 @@ class LinearInterpolated implements Envelope\IGenerator {
      */
     private function recalculate() {
         $this->aProcessPoints  = [];
+        $this->aProcessIndexes = [];
         $iProcessRate = Signal\Context::get()->getProcessRate();
         $fTimeTotal   = 0.0;
         $i = 0;
