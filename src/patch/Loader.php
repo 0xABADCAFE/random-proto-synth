@@ -17,6 +17,7 @@ namespace ABadCafe\Synth\Patch;
 
 use ABadCafe\Synth\Map;
 use ABadCafe\Synth\Operator;
+use ABadCafe\Synth\Envelope;
 
 use function ABadCafe\Synth\Utility\dprintf;
 
@@ -36,10 +37,53 @@ class Loader {
         $this->assertFileReadable($sFile);
         $oData = $this->deserialiseFileContent($sFile);
         $this->assertBasicDataStructure($oData);
+
+        // Now load up the subcomponents that can be shared, such as maps, etc.
+        $oNoteMapSet = $this->buildNoteMaps($oData);
+
+        Envelope\Factory::get()->setPredefinedNoteMaps($oNoteMapSet);
+
+        $oEnvelopeSet = $this->buildEnvelopes($oData);
+
         return new Module(
             $this->buildOperators($oData),
             $this->buildModulationMatrix($oData)
         );
+    }
+
+    /**
+     * Parses the notemaps section of the file and returns a (possibly empty) collection of predefined
+     * note maps.
+     *
+     * @param  object $oData
+     * @return Map\KeyedSet
+     * @throws \Exception
+     */
+    private function buildNoteMaps(object $oData) : Map\KeyedSet {
+        $oSet = new Map\KeyedSet;
+        if (isset($oData->notemaps) && is_object($oData->notemaps)) {
+            $oFactory = Map\Note\Factory::get();
+            foreach ($oData->notemaps as $sIdentity => $oDescription) {
+                $oSet->add($sIdentity, $oFactory->createFrom($oDescription));
+            }
+        }
+        return $oSet;
+    }
+
+    /**
+     * @param  object $oData
+     * @return Envelope\KeyedSet
+     * @throws \Exception
+     */
+    private function buildEnvelopes(object $oData) : Envelope\KeyedSet {
+        $oSet = new Envelope\KeyedSet;
+        if (isset($oData->envelopes) && is_object($oData->envelopes)) {
+            $oFactory = Envelope\Factory::get();
+            foreach ($oData->envelopes as $sIdentity => $oDescription) {
+                $oSet->add($sIdentity, $oFactory->createFrom($oDescription));
+            }
+        }
+        return $oSet;
     }
 
     /**

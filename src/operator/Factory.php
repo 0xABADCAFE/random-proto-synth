@@ -37,6 +37,8 @@ class Factory implements Utility\IFactory {
         'oscillator'  => 'createOscillator'
     ];
 
+
+
     /**
      * @param  object $oDescription
      * @return IGenerator

@@ -32,6 +32,11 @@ class Factory implements Utility\IFactory {
     ];
 
     /**
+     * @var Map\KeyedSet|null $oPredefinedNoteMapSet
+     */
+    private ?Map\KeyedSet $oPredefinedNoteMapSet = null;
+
+    /**
      * @param  object $oDescription
      * @return IGenerator
      * @throws \Exception
@@ -44,6 +49,17 @@ class Factory implements Utility\IFactory {
             return $cCreator($oDescription);
         }
         throw new \Exception('Unknown Envelope Type ' . $sType);
+    }
+
+    /**
+     * Set predefined note maps that can be referred to in the envelope description.
+     *
+     * @param  Map\KeyedSet|null $oSet
+     * @return self
+     */
+    public function setPredefinedNoteMaps(?Map\KeyedSet $oSet) : self {
+        $this->oPredefinedNoteMapSet = $oSet;
+        return $this;
     }
 
     /**
@@ -61,16 +77,10 @@ class Factory implements Utility\IFactory {
         if (!isset($oDescription->shape) || !is_object($oDescription->shape)) {
             throw new \Exception('Missing or malformed Shape definition');
         }
-
-        $oSpeedScale = isset($oDescription->keyscale_speed) && is_object($oDescription->keyscale_speed) ?
-            $this->createMap($oDescription->keyscale_speed) : null;
-        $oLevelScale = isset($oDescription->keyscale_level) && is_object($oDescription->keyscale_level) ?
-            $this->createMap($oDescription->keyscale_level) : null;
-
         return new Generator\LinearInterpolated(
             $this->createShape($oDescription->shape),
-            $oSpeedScale,
-            $oLevelScale
+            isset($oDescription->keyscale_speed) ? $this->getNoteMap($oDescription->keyscale_speed) : null,
+            isset($oDescription->keyscale_level) ? $this->getNoteMap($oDescription->keyscale_level) : null
         );
     }
 
@@ -88,11 +98,22 @@ class Factory implements Utility\IFactory {
         );
     }
 
+
     /**
-     * @param  object $oDescription
-     * @return Map\Note\IMIDINumber
+     * @param  object|string $mDescription
+     * @return Map\Note\IMIDINumber|null
      */
-    private function createMap(object $oDescription) : Map\Note\IMIDINumber {
-        return Map\Note\Factory::get()->createFrom($oDescription);
+    private function getNoteMap($mDescription) : ?Map\Note\IMIDINumber {
+        if (is_object($mDescription)) {
+            return Map\Note\Factory::get()->createFrom($mDescription);
+        }
+        if (
+            $this->oPredefinedNoteMapSet &&
+            is_string($mDescription)
+        ) {
+            return $this->oPredefinedNoteMapSet->get($mDescription);
+        }
+        return null;
     }
+
 }
