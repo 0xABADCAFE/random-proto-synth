@@ -18,6 +18,7 @@ use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Output;
 use ABadCafe\Synth\Map;
 use ABadCafe\Synth\Oscillator;
+use ABadCafe\Synth\Envelope;
 use ABadCafe\Synth\Utility;
 use function ABadCafe\Synth\Utility\dprintf;
 
@@ -28,7 +29,10 @@ use function ABadCafe\Synth\Utility\dprintf;
  */
 class Factory implements Utility\IFactory {
 
-    use Utility\TSingleton;
+    use
+        Utility\TSingleton,
+        Map\Note\TKeyedSetFactoryUser
+    ;
 
     const PRODUCT_TYPES = [
         'output'      => 'createOutput',
@@ -126,8 +130,8 @@ class Factory implements Utility\IFactory {
             Signal\Control\Factory::get()->createFrom($oDescription->pitch_control) : null;
 
         // Basic Key Scale for pitch
-        $oKeyscaleMap  = isset($oDescription->keyscale_pitch) && is_object($oDescription->keyscale_pitch) ?
-            Map\Note\Factory::get()->createFrom($oDescription->keyscale_pitch) : null;
+        $oKeyscaleMap  = isset($oDescription->keyscale_pitch) ?
+            $this->getNoteMap($oDescription->keyscale_pitch) : null;
 
         $fFreqRatio    = (float)($oDescription->ratio  ?? 1.0);
         $fDetune       = (float)($oDescription->detune ?? 0.0);
@@ -154,5 +158,4 @@ class Factory implements Utility\IFactory {
             );
         }
     }
-
 }

@@ -173,10 +173,3 @@ interface IGenerator {
     public function map(IPacket $oInput) : IPacket;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-require_once 'signal/Context.php';
-require_once 'signal/Packet.php';
-require_once 'signal/Control.php';
-require_once 'signal/Audio.php';
-require_once 'signal/Generator.php';

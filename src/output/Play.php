@@ -30,7 +30,7 @@ class Play implements IPCMOutput, Signal\IChannelMode {
     const
         I_MIN_LEVEL = -32767,
         I_MAX_LEVEL = 32767,
-        I_BUFFER    = 256
+        I_BUFFER    = 1024
     ;
 
     /**
