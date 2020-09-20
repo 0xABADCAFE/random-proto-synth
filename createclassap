@@ -1,6 +1,22 @@
 #!/usr/bin/php
 <?php
 
+/**
+ *      _/_/_/  _/_/_/  _/      _/  _/_/_/      _/_/_/
+ *   _/          _/    _/_/  _/_/  _/    _/  _/
+ *  _/  _/_/    _/    _/  _/  _/  _/_/_/      _/_/
+ * _/    _/    _/    _/      _/  _/              _/
+ *  _/_/_/  _/_/_/  _/      _/  _/        _/_/_/
+ *
+ *  - Grossly Impractical Modular PHP Synthesiser -
+ *
+ */
+
+declare(strict_types = 1);
+
+/**
+ * ClassMapBuilder
+ */
 class ClassMapBuilder {
 
     const EXCLUDE_PATTERNS = [
@@ -12,10 +28,15 @@ class ClassMapBuilder {
         'src/test' => 1
     ];
 
+    /** @var string[] $aFiles */
     private array $aFiles = [];
 
+    /** @var string[] $aClassMap */
     private array $aClassMap = [];
 
+    /**
+     * Main entry point
+     */
     public function execute() {
         $this->aFiles = [];
         $this->traverse('src');
@@ -23,16 +44,16 @@ class ClassMapBuilder {
         foreach ($this->aFiles as $sSourcePath) {
             $this->processFile($sSourcePath);
         }
-
         $sCode = "<?php\n\nnamespace ABadCafe\\Synth;\n\nconst CLASS_MAP = " .
             str_replace(['array (', ')'], ['[', ']'], var_export($this->aClassMap, true)) .
             ";";
-
         file_put_contents('src/classmap.php', $sCode);
     }
 
     /**
      * Recurse over the directory structure
+     *
+     * @param string %sDirectory
      */
     private function traverse(string $sDirectory) {
         $oCurrentDir = dir($sDirectory);
@@ -60,6 +81,11 @@ class ClassMapBuilder {
         }
     }
 
+    /**
+     * Extract namespace, interface, class and trait definitions from a source file
+     *
+     * @param string $sFile
+     */
     private function processFile(string $sFile) {
         $sContent = file_get_contents($sFile);
         preg_match('/^namespace\s+([a-z0-9_\\\]+)/im', $sContent, $aMatches);
