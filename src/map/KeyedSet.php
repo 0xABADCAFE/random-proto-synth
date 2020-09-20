@@ -13,33 +13,27 @@
 
 declare(strict_types = 1);
 
-/**
- * Oscillator
- */
-namespace ABadCafe\Synth\Oscillator;
-use ABadCafe\Synth\Signal;
+namespace ABadCafe\Synth\Map;
+use ABadCafe\Synth\Utility;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * IOscillator
+ * KeyedSet
  *
- * Interface for Oscillators
+ * Type safe associative collection for MIDI Byte Maps
  */
-interface IOscillator {
+class KeyedSet implements \Countable {
+    use Utility\TSet;
 
     /**
-     * Get the oscillator frequency in Hz
-     *
-     * @return float
-     */
-    public function getFrequency() : float;
-
-    /**
-     * Set a new frequency for the oscillator, in Hz
-     *
-     * @param  float $fFrequecny
+     * @param  string   $sKey
+     * @param  MIDIByte $oItem
      * @return self
      */
-    public function setFrequency(float $fFrequency) : self;
+    public function add(string $sKey, MIDIByte $oItem) : self {
+        $this->aItems[$sKey] = $oItem;
+        return $this;
+    }
 }
+

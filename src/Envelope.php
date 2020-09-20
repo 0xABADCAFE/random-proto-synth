@@ -104,9 +104,3 @@ interface IGenerator extends Signal\Control\IStream, Map\Note\IMIDINumberAware {
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-require_once 'envelope/Shape.php';
-require_once 'envelope/Generator.php';
-require_once 'envelope/KeyedSet.php';
-require_once 'envelope/Factory.php';

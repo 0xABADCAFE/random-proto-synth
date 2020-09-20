@@ -74,9 +74,3 @@ interface IOscillator extends Oscillator\IOscillator, Signal\Audio\IStream {
 
 }
 
-require_once 'audio/Base.php';
-require_once 'audio/Simple.php';
-require_once 'audio/Super.php';
-require_once 'audio/Morphing.php';
-require_once 'audio/Factory.php';
-

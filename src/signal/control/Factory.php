@@ -26,7 +26,10 @@ use function ABadCafe\Synth\Utility\dprintf;
  */
 class Factory implements Utility\IFactory {
 
-    use Utility\TSingleton;
+    use
+        Utility\TSingleton,
+        Envelope\Generator\TKeyedSetFactoryUser
+    ;
 
     const PRODUCT_TYPES = [
         'oscillator' => 'createOscillator',

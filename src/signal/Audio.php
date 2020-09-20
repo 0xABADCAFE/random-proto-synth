@@ -109,5 +109,3 @@ interface IFilter {
      */
     public function filter(Packet $oInput) : Packet;
 }
-
-require_once 'audio/Filter.php';

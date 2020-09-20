@@ -323,3 +323,41 @@ class TwelveToneEqualTemperament extends TwelveTone {
         }
     }
 }
+
+/**
+ * TKeyedSetUser user trait - for entities that rely on KeyedSet of Map\Note\IMIDINumber
+ */
+trait TKeyedSetFactoryUser {
+    /**
+     * @var Map\KeyedSet|null $oPredefinedNoteMapSet
+     */
+    private ?Map\KeyedSet $oPredefinedNoteMapSet = null;
+
+    /**
+     * Set predefined note maps that can be referred to in the envelope description.
+     *
+     * @param  Map\KeyedSet|null $oSet
+     * @return self
+     */
+    public function setPredefinedNoteMaps(?Map\KeyedSet $oSet) : self {
+        $this->oPredefinedNoteMapSet = $oSet;
+        return $this;
+    }
+
+    /**
+     * @param  object|string $mDescription
+     * @return IMIDINumber|null
+     */
+    private function getNoteMap($mDescription) : ?IMIDINumber {
+        if (is_object($mDescription)) {
+            return Envelope\Factory::get()->createFrom($mDescription);
+        }
+        if (
+            $this->oPredefinedNoteMapSet &&
+            is_string($mDescription)
+        ) {
+            return $this->oPredefinedNoteMapSet->get($mDescription);
+        }
+        return null;
+    }
+}

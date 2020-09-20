@@ -25,16 +25,14 @@ use function ABadCafe\Synth\Utility\dprintf;
  */
 class Factory implements Utility\IFactory {
 
-    use Utility\TSingleton;
+    use
+        Utility\TSingleton,
+        Map\Note\TKeyedSetFactoryUser
+    ;
 
     const PRODUCT_TYPES = [
         'custom' => 'createLinearInterpolated',
     ];
-
-    /**
-     * @var Map\KeyedSet|null $oPredefinedNoteMapSet
-     */
-    private ?Map\KeyedSet $oPredefinedNoteMapSet = null;
 
     /**
      * @param  object $oDescription
@@ -49,17 +47,6 @@ class Factory implements Utility\IFactory {
             return $cCreator($oDescription);
         }
         throw new \Exception('Unknown Envelope Type ' . $sType);
-    }
-
-    /**
-     * Set predefined note maps that can be referred to in the envelope description.
-     *
-     * @param  Map\KeyedSet|null $oSet
-     * @return self
-     */
-    public function setPredefinedNoteMaps(?Map\KeyedSet $oSet) : self {
-        $this->oPredefinedNoteMapSet = $oSet;
-        return $this;
     }
 
     /**
@@ -97,23 +84,4 @@ class Factory implements Utility\IFactory {
             $oDescription->points
         );
     }
-
-
-    /**
-     * @param  object|string $mDescription
-     * @return Map\Note\IMIDINumber|null
-     */
-    private function getNoteMap($mDescription) : ?Map\Note\IMIDINumber {
-        if (is_object($mDescription)) {
-            return Map\Note\Factory::get()->createFrom($mDescription);
-        }
-        if (
-            $this->oPredefinedNoteMapSet &&
-            is_string($mDescription)
-        ) {
-            return $this->oPredefinedNoteMapSet->get($mDescription);
-        }
-        return null;
-    }
-
 }

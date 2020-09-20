@@ -21,14 +21,14 @@
 namespace ABadCafe\Synth;
 
 if (PHP_VERSION_ID < 70400) {
-    throw new \RuntimeExceptiom("Requires at least PHP 7.4");
+    throw new \RuntimeException("Requires at least PHP 7.4");
 }
 
-require_once 'Utility.php';
-require_once 'Map.php';
-require_once 'Signal.php';
-require_once 'Envelope.php';
-require_once 'Oscillator.php';
-require_once 'Output.php';
-require_once 'Operator.php';
-require_once 'Patch.php';
+require_once 'classmap.php';
+spl_autoload_register(function(string $str_class) {
+    if (isset(CLASS_MAP[$str_class])) {
+        require_once __DIR__ . CLASS_MAP[$str_class];
+    }
+});
+
+require_once 'utility/functions.php';
