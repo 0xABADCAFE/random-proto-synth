@@ -13,7 +13,8 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Envelope;
+namespace ABadCafe\Synth\Envelope\Generator;
+use ABadCafe\Synth\Envelope;
 use ABadCafe\Synth\Utility;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,11 +28,11 @@ class KeyedSet implements \Countable {
     use Utility\TSet;
 
     /**
-     * @param  string   $sKey
-     * @param  MIDIByte $oItem
+     * @param  string              $sKey
+     * @param  Envelope\IGenerator $oItem
      * @return self
      */
-    public function add(string $sKey, IGenerator $oItem) : self {
+    public function add(string $sKey, Envelope\IGenerator $oItem) : self {
         $this->aItems[$sKey] = $oItem;
         return $this;
     }

@@ -18,6 +18,7 @@ namespace ABadCafe\Synth\Patch;
 use ABadCafe\Synth\Map;
 use ABadCafe\Synth\Operator;
 use ABadCafe\Synth\Envelope;
+use ABadCafe\Synth\Signal\Control;
 
 use function ABadCafe\Synth\Utility\dprintf;
 
@@ -44,6 +45,8 @@ class Loader {
         Envelope\Factory::get()->setPredefinedNoteMaps($oNoteMapSet);
 
         $oEnvelopeSet = $this->buildEnvelopes($oData);
+
+        Control\Factory::get()->setPredefinedEnvelopes($oEnvelopeSet);
 
         return new Module(
             $this->buildOperators($oData),
@@ -75,8 +78,8 @@ class Loader {
      * @return Envelope\KeyedSet
      * @throws \Exception
      */
-    private function buildEnvelopes(object $oData) : Envelope\KeyedSet {
-        $oSet = new Envelope\KeyedSet;
+    private function buildEnvelopes(object $oData) : Envelope\Generator\KeyedSet {
+        $oSet = new Envelope\Generator\KeyedSet;
         if (isset($oData->envelopes) && is_object($oData->envelopes)) {
             $oFactory = Envelope\Factory::get();
             foreach ($oData->envelopes as $sIdentity => $oDescription) {

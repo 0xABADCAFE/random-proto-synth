@@ -53,7 +53,7 @@ class ClassMapBuilder {
     /**
      * Recurse over the directory structure
      *
-     * @param string %sDirectory
+     * @param string $sDirectory
      */
     private function traverse(string $sDirectory) {
         $oCurrentDir = dir($sDirectory);
