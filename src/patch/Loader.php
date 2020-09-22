@@ -39,13 +39,13 @@ class Loader {
         $oData = $this->deserialiseFileContent($sFile);
         $this->assertBasicDataStructure($oData);
 
-        // Now load up the subcomponents that can be shared, such as maps, etc.
+        // Shared note maps
         $oNoteMapSet = $this->buildNoteMaps($oData);
-
         Envelope\Factory::get()->setPredefinedNoteMaps($oNoteMapSet);
+        Operator\Factory::get()->setPredefinedNoteMaps($oNoteMapSet);
 
+        // Shared envelopes
         $oEnvelopeSet = $this->buildEnvelopes($oData);
-
         Control\Factory::get()->setPredefinedEnvelopes($oEnvelopeSet);
 
         return new Module(
