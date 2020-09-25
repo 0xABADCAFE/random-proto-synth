@@ -61,6 +61,9 @@ class Simple extends Base {
         }
 
         $this->oLastOutput = $this->oGenerator->map($this->oGeneratorInput);
+
+        //$this->postProcess();
+
         return $this->oLastOutput;
     }
 

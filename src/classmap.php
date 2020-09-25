@@ -47,6 +47,7 @@ const CLASS_MAP = [
   'ABadCafe\\Synth\\Signal\\Generator\\Factory' => '/signal/generator/Factory.php',
   'ABadCafe\\Synth\\Signal\\Generator\\Noise' => '/signal/generator/Noise.php',
   'ABadCafe\\Synth\\Signal\\Generator\\Base' => '/signal/generator/Base.php',
+  'ABadCafe\\Synth\\Signal\\Generator\\IWaveShaper' => '/signal/generator/WaveShaper.php',
   'ABadCafe\\Synth\\Signal\\Generator\\SawUp' => '/signal/generator/Saw.php',
   'ABadCafe\\Synth\\Signal\\Generator\\SawDown' => '/signal/generator/Saw.php',
   'ABadCafe\\Synth\\Signal\\Generator\\WaveTable' => '/signal/generator/WaveTable.php',

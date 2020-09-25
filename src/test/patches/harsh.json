@@ -1,0 +1,50 @@
+{
+    "name": "harsh",
+    "envelopes": {
+        "decay": {
+            "comment": "Custom envelope shape",
+            "type": "custom",
+            "shape": {
+                "initial": 0.0,
+                "points": [
+                    [1.0, 1.0]
+                ]
+            }
+        }
+    },
+    "operators": {
+        "out": {
+            "comment": "Simple Oscillator Operator based on sine wave generator",
+            "type": "oscillator",
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "sine"
+                }
+            }
+        },
+        "modulator": {
+            "comment": "Simple Oscillator Operator based on saw wave generator",
+            "type": "oscillator",
+            "unmodulated":true,
+            "ratio": 0.5,
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "sawdown"
+                }
+            },
+            "level_control": {
+                "type": "envelope",
+                "config": "decay"
+            }
+        }
+    },
+    "matrix": {
+        "out": {
+            "modulator": {
+                "phase": 0.25
+            }
+        }
+    }
+}
