@@ -41,10 +41,16 @@ class Square extends Base {
     public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
-        foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = floor($fValue) & 1 ? $this->fMinLevel : $this->fMaxLevel;
+         if ($this->oShaper) {
+            foreach ($oValues as $i => $fValue) {
+                $fValue = $this->oShaper->modifyInput($fValue);
+                $oValues[$i] = $this->oShaper->modifyOutput(floor($fValue) & 1 ? $this->fMinLevel : $this->fMaxLevel);
+            }
+        } else {
+            foreach ($oValues as $i => $fValue) {
+                $oValues[$i] = floor($fValue) & 1 ? $this->fMinLevel : $this->fMaxLevel;
+            }
         }
         return $oOutput;
     }
 }
-

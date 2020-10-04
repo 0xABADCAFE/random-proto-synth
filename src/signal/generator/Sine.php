@@ -46,8 +46,15 @@ class Sine extends Base {
     public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
-        foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = ($this->fScaleLevel * sin($fValue)) + $this->fBiasLevel;
+        if ($this->oShaper) {
+            foreach ($oValues as $i => $fTime) {
+                $fTime = $this->oShaper->modifyInput($fTime);
+                $oValues[$i] = $this->oShaper->modifyOutput(($this->fScaleLevel * sin($fTime)) + $this->fBiasLevel);
+            }
+        } else {
+            foreach ($oValues as $i => $fTime) {
+                $oValues[$i] = ($this->fScaleLevel * sin($fTime)) + $this->fBiasLevel;
+            }
         }
         return $oOutput;
     }
