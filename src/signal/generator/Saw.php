@@ -45,8 +45,15 @@ class SawUp extends Base {
     public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
-        foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = $this->fScaleLevel * ($fValue - floor($fValue)) + $this->fMinLevel;
+        if ($this->oShaper) {
+            foreach ($oValues as $i => $fTime) {
+                $fTime = $this->oShaper->modifyInput($fTime);
+                $oValues[$i] = $this->oShaper->modifyOutput($this->fScaleLevel * ($fTime - floor($fTime)) + $this->fMinLevel);
+            }
+        } else {
+            foreach ($oValues as $i => $fTime) {
+                $oValues[$i] = $this->fScaleLevel * ($fTime - floor($fTime)) + $this->fMinLevel;
+            }
         }
         return $oOutput;
     }
@@ -74,11 +81,17 @@ class SawDown extends SawUp {
     public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
-        foreach ($oValues as $i => $fValue) {
-            $oValues[$i] = $this->fScaleLevel * (ceil($fValue) - $fValue) + $this->fMinLevel;
+        if ($this->oShaper) {
+            foreach ($oValues as $i => $fTime) {
+                $fTime = $this->oShaper->modifyInput($fTime);
+                $oValues[$i] = $this->oShaper->modifyOutput($this->fScaleLevel * (ceil($fTime) - $fTime) + $this->fMinLevel);
+            }
+        } else {
+            foreach ($oValues as $i => $fTime) {
+                $oValues[$i] = $this->fScaleLevel * (ceil($fTime) - $fTime) + $this->fMinLevel;
+            }
         }
         return $oOutput;
     }
-
 }
 

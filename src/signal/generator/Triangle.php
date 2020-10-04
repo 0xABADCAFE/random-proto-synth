@@ -44,11 +44,21 @@ class Triangle extends Base {
     public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
-        foreach ($oValues as $i => $fValue) {
-            $fValue -= 0.5;
-            $fFloor = floor($fValue);
-            $fScale  = (int)$fFloor & 1 ? $this->fScaleLevel : -$this->fScaleLevel;
-            $oValues[$i] = $this->fBiasLevel + $fScale*($fValue - $fFloor - 0.5);
+        if ($this->oShaper) {
+            foreach ($oValues as $i => $fValue) {
+                $fValue      = $this->oShaper->modifyInput($fValue);
+                $fValue     -= 0.5;
+                $fFloor      = floor($fValue);
+                $fScale      = (int)$fFloor & 1 ? $this->fScaleLevel : -$this->fScaleLevel;
+                $oValues[$i] = $this->oShaper->modifyOutput($this->fBiasLevel + $fScale*($fValue - $fFloor - 0.5));
+            }
+        } else {
+            foreach ($oValues as $i => $fValue) {
+                $fValue     -= 0.5;
+                $fFloor      = floor($fValue);
+                $fScale      = (int)$fFloor & 1 ? $this->fScaleLevel : -$this->fScaleLevel;
+                $oValues[$i] = $this->fBiasLevel + $fScale*($fValue - $fFloor - 0.5);
+            }
         }
         return $oOutput;
     }

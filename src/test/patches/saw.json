@@ -1,0 +1,69 @@
+{
+    "name": "saw",
+    "comment": " Simple 1-Operator Square",
+    "notemaps" : {
+        "halving" : {
+            "comment": "Halves value every octave",
+            "type": "12tone_scaled",
+            "scale": 1.0,
+            "invert":true
+        }
+    },
+    "operators": {
+        "out": {
+            "comment": "Simple Oscillator Operator based on saw wave generator",
+            "type": "oscillator",
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "sawdown"
+                }
+            },
+            "level_control": {
+                "type": "envelope",
+                "config": {
+                    "comment": "Custom envelope shape",
+                    "type": "custom",
+                    "shape": {
+                        "initial": 1.0,
+                        "points": [
+                            [0.5,  0.5],
+                            [0.25, 0.5]
+                        ]
+                    },
+                    "keyscale_speed": "halving"
+                }
+            }
+        },
+        "modulator": {
+            "type": "oscillator",
+            "model": {
+                "type": "simple",
+                "generator": {
+                    "type": "sine"
+                }
+            },
+            "level_control": {
+                "type": "envelope",
+                "config": {
+                    "comment": "Custom envelope shape",
+                    "type": "custom",
+                    "shape": {
+                        "initial": 1.0,
+                        "points": [
+                            [2.0,  1.0]
+                        ]
+                    },
+                    "keyscale_speed": "halving"
+                }
+            }
+        }
+    },
+    "matrix": {
+        "out": {
+            "modulator": {
+                "phase": 1.0
+            }
+        }
+    }
+}
