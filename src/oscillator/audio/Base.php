@@ -37,11 +37,7 @@ abstract class Base implements IOscillator {
         $fFrequency        = ILimits::F_DEF_FREQ, // The base frequency
         $fCurrentFrequency = ILimits::F_DEF_FREQ, // The present instantaneous frequency considering any pitch control
         $fPhaseCorrection  = 0.0,                 // The accumulated phase difference as a result of pitch control */
-        $fScaleVal         = 0.0,
-
-        $fSoftening        = 0.1,
-        $fLastOne          = 0.0,
-        $fLastTwo          = 0.0
+        $fScaleVal         = 0.0
     ;
 
     protected ?\SPLFixedArray
@@ -162,18 +158,4 @@ abstract class Base implements IOscillator {
         return $this;
     }
 
-    protected function postProcess() {
-        if ($this->fSoftening > 0.0) {
-            $oSampleValues = $this->oLastOutput->getValues();
-            $fScaleIn  = 0.5 * $this->fSoftening;
-            $fScaleOut = 1.0 / (1.0 + $this->fSoftening);
-            foreach ($oSampleValues as $i => $fCurrentSample) {
-                $fLastAverage      = $fScaleIn * ($this->fLastOne + $this->fLastTwo);
-                $fCurrentSample    = $fScaleOut * ($fCurrentSample + $fLastAverage);
-                $oSampleValues[$i] = $fCurrentSample;
-                $this->fLastTwo = $this->fLastOne;
-                $this->fLastOne = $fCurrentSample;
-            }
-        }
-    }
 }
