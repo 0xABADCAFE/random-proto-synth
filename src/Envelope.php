@@ -39,6 +39,23 @@ interface ILimits {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * IGenerator
+ *
+ * Basic tag interface for Envelope Generators
+ */
+interface IGenerator extends Signal\Control\IStream, Map\Note\IMIDINumberAware {
+
+    const
+        // Use cases for Map\Note\IMIDINumberAware
+        S_NOTE_MAP_SPEED = 'speed',
+        S_NOTE_MAP_LEVEL = 'level'
+    ;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
  * IShape
  *
  * Basic interface for entities that define an Envelope Shape
@@ -75,17 +92,11 @@ interface IShape extends Countable {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * IGenerator
+ * IShaped
  *
- * Basic tag interface for Envelope Generators
+ * Basic tag interface generators that use shape sets
  */
-interface IGenerator extends Signal\Control\IStream, Map\Note\IMIDINumberAware {
-
-    const
-        // Use cases for Map\Note\IMIDINumberAware
-        S_NOTE_MAP_SPEED = 'speed',
-        S_NOTE_MAP_LEVEL = 'level'
-    ;
+interface IShaped {
 
     /**
      * Set the envelope shape. Will trigger a reset.
@@ -101,6 +112,4 @@ interface IGenerator extends Signal\Control\IStream, Map\Note\IMIDINumberAware {
      * @return IShape
      */
     public function getShape() : IShape;
-
 }
-
