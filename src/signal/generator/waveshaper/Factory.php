@@ -28,8 +28,9 @@ class Factory implements Utility\IFactory {
     use Utility\TSingleton;
 
     const PRODUCT_TYPES = [
-        'capacitance'   => 'createCapacitance',
-        'phasefeedback' => 'createPhaseFeedback'
+        'capacitance'      => 'createCapacitance',
+        'phasefeedback'    => 'createPhaseFeedback',
+        'phasefeedbackcap' => 'createPhaseFeedbackWithCapacitance',
     ];
 
     /**
@@ -60,7 +61,7 @@ class Factory implements Utility\IFactory {
      */
     private function createCapacitance(object $oDescription) : FixedCapacitance {
         return new FixedCapacitance(
-            $oDescription->amount ?? (float)$oDescription->amount : FixedCapacitance::F_DEFAULT_AMOUNT
+            (float)($oDescription->capacitance ?? FixedCapacitance::F_DEFAULT_AMOUNT)
         );
     }
 
@@ -70,7 +71,18 @@ class Factory implements Utility\IFactory {
      */
     private function createPhaseFeedback(object $oDescription) : FixedPhaseFeedback {
         return new FixedPhaseFeedback(
-            $oDescription->level ?? (float)$oDescription->level : FixedPhaseFeedback::F_DEFAULT_LEVEL;
+            (float)($oDescription->feedback ?? FixedPhaseFeedback::F_DEFAULT_LEVEL)
+        );
+    }
+
+    /**
+     * @param  object $oDescription
+     * @return FixedPhaseFeedback
+     */
+    private function createPhaseFeedbackWithCapacitance(object $oDescription) : FixedPhaseFeedbackWithCapacitance {
+        return new FixedPhaseFeedbackWithCapacitance(
+            (float)($oDescription->feedback    ?? FixedPhaseFeedback::F_DEFAULT_LEVEL),
+            (float)($oDescription->capacitance ?? FixedCapacitance::F_DEFAULT_AMOUNT)
         );
     }
 }

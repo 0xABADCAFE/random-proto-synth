@@ -54,6 +54,7 @@ const CLASS_MAP = [
   'ABadCafe\\Synth\\Signal\\Generator\\WaveTable' => '/signal/generator/WaveTable.php',
   'ABadCafe\\Synth\\Signal\\Generator\\WaveShaper\\FixedPhaseFeedback' => '/signal/generator/waveshaper/FixedPhaseFeedback.php',
   'ABadCafe\\Synth\\Signal\\Generator\\WaveShaper\\Factory' => '/signal/generator/waveshaper/Factory.php',
+  'ABadCafe\\Synth\\Signal\\Generator\\WaveShaper\\FixedPhaseFeedbackWithCapacitance' => '/signal/generator/waveshaper/FixedPhaseFeedbackWithCapacitance.php',
   'ABadCafe\\Synth\\Signal\\Generator\\WaveShaper\\FixedCapacitance' => '/signal/generator/waveshaper/FixedCapacitance.php',
   'ABadCafe\\Synth\\Operator\\ControlledFilter' => '/operator/Filter.php',
   'ABadCafe\\Synth\\Operator\\PCMOutput' => '/operator/Output.php',
