@@ -32,6 +32,7 @@ class Factory implements Utility\IFactory {
 
     const PRODUCT_TYPES = [
         'custom' => 'createLinearInterpolated',
+        'decay'  => 'createDecayPulse',
     ];
 
     /**
@@ -66,6 +67,19 @@ class Factory implements Utility\IFactory {
         }
         return new Generator\LinearInterpolated(
             $this->createShape($oDescription->shape),
+            isset($oDescription->keyscale_speed) ? $this->getNoteMap($oDescription->keyscale_speed) : null,
+            isset($oDescription->keyscale_level) ? $this->getNoteMap($oDescription->keyscale_level) : null
+        );
+    }
+
+    /**
+     * @param  object $oDescription
+     * @return Generator\DecayPulse
+     */
+    private function createDecayPulse(object $oDescription) : Generator\DecayPulse {
+        return new Generator\DecayPulse(
+            (float)($oDescription->initial ?? 1.0),
+            (float)($oDescription->halflife ?? 1.0),
             isset($oDescription->keyscale_speed) ? $this->getNoteMap($oDescription->keyscale_speed) : null,
             isset($oDescription->keyscale_level) ? $this->getNoteMap($oDescription->keyscale_level) : null
         );

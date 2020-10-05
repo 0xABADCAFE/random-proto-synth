@@ -17,22 +17,24 @@ namespace ABadCafe\Synth\Signal\Generator\WaveShaper;
 use ABadCafe\Synth\Signal\Generator;
 
 /**
- * PhaseFeedback
+ * FixedPhaseFeedbackWithCapacitance
  *
- * Allows a self-modulating oscillator to be impmlemented
+ * Combines Phase Feedback with Capacitance
  */
-class FixedPhaseFeedback implements Generator\IWaveShaper {
-
-    const F_DEFAULT_LEVEL = 1.0;
+class FixedPhaseFeedbackWithCapacitance implements Generator\IWaveShaper {
 
     protected float
         $fFeedback         = 0.1,
         $fLastOne          = 0.0,
-        $fLastTwo          = 0.0
+        $fLastTwo          = 0.0,
+        $fLastScale,
+        $fNextScale
     ;
 
-    public function __construct(float $fFeedback = self::F_DEFAULT_LEVEL) {
-        $this->fFeedback = $fFeedback * 0.5;
+    public function __construct(float $fFeedback, float $fCapacitance) {
+        $this->fFeedback  = $fFeedback * 0.5;
+        $this->fLastScale = $fCapacitance;
+        $this->fNextScale = 1.0 - $this->fLastScale;
     }
 
     /**
@@ -46,6 +48,7 @@ class FixedPhaseFeedback implements Generator\IWaveShaper {
      * @inheritDoc
      */
     public function modifyOutput(float $fOutput) : float {
+        $fOutput = ($this->fNextScale * $fOutput) + ($this->fLastScale * $this->fLastOne);
         $this->fLastTwo = $this->fLastOne;
         $this->fLastOne = $fOutput;
         return $fOutput;

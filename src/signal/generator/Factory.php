@@ -51,7 +51,10 @@ class Factory implements Utility\IFactory {
         if ($sSimpleProduct) {
             return new $sSimpleProduct(
                 (float)($oDescription->min ?? Signal\ILimits::F_MIN_LEVEL_NO_CLIP),
-                (float)($oDescription->max ?? Signal\ILimits::F_MAX_LEVEL_NO_CLIP)
+                (float)($oDescription->max ?? Signal\ILimits::F_MAX_LEVEL_NO_CLIP),
+                isset($oDescription->shaper) && is_object($oDescription->shaper) ?
+                    WaveShaper\Factory::get()->createFrom($oDescription->shaper) :
+                    null
             );
         }
         $sComplexProduct = self::COMPLEX_TYPES[$sType] ?? null;

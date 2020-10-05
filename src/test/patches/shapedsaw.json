@@ -16,9 +16,10 @@
             "model": {
                 "type": "simple",
                 "generator": {
-                    "type": "square",
+                    "type": "sawdown",
                     "shaper": {
-                        "type": "capacitance",
+                        "type": "phasefeedbackcap",
+                        "feedback": 0.5,
                         "capacitance": 0.1
                     }
                 }

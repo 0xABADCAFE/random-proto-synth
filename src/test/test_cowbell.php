@@ -12,8 +12,8 @@ $oCarrier = new Operator\UnmodulatedOscillator(
     new Oscillator\Audio\Super(
         new Signal\Generator\Square(),
         [
-            [1.0,  0.5, 0.0],
-            [845/587, 0.25, 0.0],
+            [1.0,  0.5, 0.2],
+            [840/587, 0.25, 0.0],
         ]
     ),
 
@@ -24,28 +24,14 @@ $oCarrier = new Operator\UnmodulatedOscillator(
     0.0,
 
     // Amplitude Control
-    new Envelope\Generator\LinearInterpolated(
-        new Envelope\Shape(
-            1,                // Initial Level
-            [
-                [ 1/2, 0.125],
-                [ 1/4, 0.125],
-                [ 1/8, 0.125],
-                [ 1/16, 0.125],
-                [ 1/32, 0.125],
-                [ 1/64, 0.125],
-                [ 1/128, 0.125],
-                [ 0, 1]
-            ]
-        )
-    )
+    new Envelope\Generator\DecayPulse(1.1, 0.06)
 );
 
 $oFilter = new Operator\ControlledFilter(
 
     // TODO - bandbass here
     // Filter type
-    new Signal\Audio\Filter\KarlsenBandPass(0.12, 0.35)
+    new Signal\Audio\Filter\KarlsenBandPass(0.08, 0.25)
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
