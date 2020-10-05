@@ -23,13 +23,15 @@ use ABadCafe\Synth\Signal\Generator;
  */
 class FixedCapacitance implements Generator\IWaveShaper {
 
+    const F_DEFAULT_AMOUNT = 0.5;
+
     private float
-        $fLast   = 0.0,
+        $fLast = 0.0,
         $fLastScale,
         $fNextScale
     ;
 
-    public function __construct(float $fAmount) {
+    public function __construct(float $fAmount = self::F_DEFAULT_AMOUNT) {
         $this->fLastScale  = $fAmount;
         $this->fNextScale = 1.0 - $this->fLastScale;
     }

@@ -76,12 +76,10 @@ class Factory implements Utility\IFactory {
      * @param  object $oDescription
      * @return Generator\DecayPulse
      */
-    private function createLinearInterpolated(object $oDescription) : Generator\DecayPulse {
-        if (!isset($oDescription->halflife) || !is_numeric($oDescription->halflife)) {
-            throw new \Exception('Missing or malformed halflife definition');
-        }
+    private function createDecayPulse(object $oDescription) : Generator\DecayPulse {
         return new Generator\DecayPulse(
-            (float)$oDescription->halflife,
+            (float)($oDescription->initial ?? 1.0),
+            (float)($oDescription->halflife ?? 1.0),
             isset($oDescription->keyscale_speed) ? $this->getNoteMap($oDescription->keyscale_speed) : null,
             isset($oDescription->keyscale_level) ? $this->getNoteMap($oDescription->keyscale_level) : null
         );
