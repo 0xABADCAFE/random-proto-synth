@@ -14,20 +14,9 @@
 declare(strict_types = 1);
 
 namespace ABadCafe\Synth\Map;
+use ABadCafe\Synth\Controller;
 use \SPLFixedArray;
 use \OutOfRangeException;
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Limits for MIDI Maps
- */
-interface IMIDIByteLimits {
-    const
-        I_MIN_SINGLE_BYTE_VALUE = 0,
-        I_MAX_SINGLE_BYTE_VALUE = 127
-    ;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +25,7 @@ interface IMIDIByteLimits {
  *
  * Base class for MIDI based byte maps, in which a byte number maps to some controlling value.
  */
-abstract class MIDIByte implements IMIDIByteLimits {
+abstract class MIDIByte implements Controller\IMIDIByteLimits {
 
     protected SPLFixedArray $oMap;
 
