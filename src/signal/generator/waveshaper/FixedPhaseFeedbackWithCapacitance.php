@@ -31,6 +31,10 @@ class FixedPhaseFeedbackWithCapacitance implements Generator\IWaveShaper {
         $fNextScale
     ;
 
+    /**
+     * @param float $fFeedback
+     * @param float $fCapacitance
+     */
     public function __construct(float $fFeedback, float $fCapacitance) {
         $this->fFeedback  = $fFeedback * 0.5;
         $this->fLastScale = $fCapacitance;

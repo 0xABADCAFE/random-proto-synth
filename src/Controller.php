@@ -44,7 +44,7 @@ interface IMIDINote {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Limits for MIDI Byte data
+ * Standard MIDI note numbers
  */
 interface IMIDINoteStandard {
     /** @const int I_SEMIS_PER_OCTAVE */
@@ -103,9 +103,17 @@ interface IMIDINoteStandard {
 interface IMIDINoteEventListener {
 
     /**
+     * Invoked on a note on event
      *
+     * @param int $iNumber   - MIDI note number (0-127)
+     * @param int $iVelocity - MIDI note velocity (0-127)
      */
     public function noteOn(int $iNumber, int $iVelocity);
 
+    /**
+     * Invoked on a note off event
+     *
+     * @param int $iNumber   - MIDI note number (0-127)
+     */
     public function noteOff(int $iNunber);
 }
