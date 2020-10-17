@@ -31,8 +31,11 @@ class FixedCapacitance implements Generator\IWaveShaper {
         $fNextScale
     ;
 
-    public function __construct(float $fAmount = self::F_DEFAULT_AMOUNT) {
-        $this->fLastScale  = $fAmount;
+    /**
+     * @param float $fAmount
+     */
+    public function __construct(float $fCapacitance = self::F_DEFAULT_AMOUNT) {
+        $this->fLastScale  = $fCapacitance;
         $this->fNextScale = 1.0 - $this->fLastScale;
     }
 

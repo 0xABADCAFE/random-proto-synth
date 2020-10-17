@@ -31,6 +31,9 @@ class FixedPhaseFeedback implements Generator\IWaveShaper {
         $fLastTwo          = 0.0
     ;
 
+    /**
+     * @param float $fFeedback
+     */
     public function __construct(float $fFeedback = self::F_DEFAULT_LEVEL) {
         $this->fFeedback = $fFeedback * 0.5;
     }

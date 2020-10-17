@@ -215,13 +215,13 @@ class DecayPulse implements Envelope\IGenerator {
         // Now calculate the required decay per sample required to reach half intensity after that many samples.
         $this->fDecayPerSample = 0.5 * 2 ** (($iHalfLifeInSamples - 1) / $iHalfLifeInSamples);
 
-            dprintf(
-                "%s() Initial Level: %f, Half Life (samples): %d, Decay Per Sample: %f\n",
-                __METHOD__,
-                $this->fCurrent,
-                $iHalfLifeInSamples,
-                $this->fDecayPerSample
-            );
+        dprintf(
+            "%s() Initial Level: %f, Half Life (samples): %d, Decay Per Sample: %f\n",
+            __METHOD__,
+            $this->fCurrent,
+            $iHalfLifeInSamples,
+            $this->fDecayPerSample
+        );
     }
 
 }
