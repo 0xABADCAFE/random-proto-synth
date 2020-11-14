@@ -14,7 +14,7 @@
 declare(strict_types = 1);
 
 namespace ABadCafe\Synth\Patch;
-
+use ABadCafe\Synth\Controller;
 use ABadCafe\Synth\Map;
 use ABadCafe\Synth\Operator;
 
@@ -25,7 +25,9 @@ use function ABadCafe\Synth\Utility\dprintf;
 /**
  * Module
  */
-class Module implements Map\Note\IMIDINumberAware {
+class Module implements Controller\IMIDINoteStandardEventListener {
+
+    use Controller\TMIDINoteStandardLookup;
 
     const S_KEY_OUTPUT = 'out';
 
@@ -68,46 +70,10 @@ class Module implements Map\Note\IMIDINumberAware {
     }
 
     /**
-     * Obtain a list of use cases that IMIDINumber maps can be set for.
-     *
-     * @return string[]
+     * @inheritDoc
+     * @implements IMIDINoteEventListener::noteOn()
      */
-    public function getNoteNumberMapUseCases() : array {
-        return [];
-    }
-
-    /**
-     * Set a new Note Map. An implementor may use multiple Note Maps for multiple things, for exanple, the effect of
-     * note number on envelope speeds, amplitudes, filter cutoff etc. The use cases are specific to the implementor.
-     *
-     * @param  Map\Note\IMIDINumber $oNoteMap
-     * @param  string               $sUseCase
-     * @return self
-     */
-    public function setNoteNumberMap(Map\Note\IMIDINumber $oNoteMap, string $sUseCase) : self {
-        return $this;
-    }
-
-    /**
-     * Get the current Note Map.
-     *
-     * @param string $sUseCase
-     *
-     * @return Map\Note\IMIDINumber
-     */
-    public function getNoteNumberMap(string $sUseCase) : Map\Note\IMIDINumber {
-        return Map\Note\Invariant::get();
-    }
-
-    /**
-     * Set the note number to use. The expectation is that the consuming class will use the Note Map to derive some
-     * control paramter base on the note.
-     *
-     * @param  int $iNote
-     * @return self
-     * @throws OutOfRangeException
-     */
-    public function setNoteNumber(int $iNote) : self {
+    public function noteOn(int $iNote, $iVelocity) : self {
         foreach ($this->aOperatorList as $oOperator) {
             $oOperator->setNoteNumber($iNote);
         }
@@ -115,18 +81,25 @@ class Module implements Map\Note\IMIDINumberAware {
     }
 
     /**
-     * Set the note to use, by name. The expectation is that the consuming class will use the Note Map to derive some
-     * control paramter base on the note.
-     *
-     * @param  string $sNote
-     * @return self
-     * @throws OutOfBoundsException
+     * @inheritDoc
+     * @implements IMIDINoteEventListener::noteOff()
      */
-    public function setNoteName(string $sNote) : self {
-        foreach ($this->aOperatorList as $oOperator) {
-            $oOperator->setNoteName($sNote);
-        }
+    public function noteOff(int $iNumber) : self {
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function noteNameOn(string $sNoteName, int $iVelocity) : self {
+        return $this->noteOn($this->getNoteNumber($sNoteName), $iVelocity);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function noteNameOff(string $sNoteName) : self {
+        return $this->noteOff($this->getNoteNumber($sNoteName));
     }
 
     /**
