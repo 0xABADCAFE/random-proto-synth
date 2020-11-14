@@ -33,7 +33,7 @@ $fVolume = (float)($aOptions['v'] ?? 1.0);
 $sOutput = $aOptions['o'] ?? '';
 
 $oPatch = (new Patch\Loader())->load($sPatch);
-$oPatch->setNoteName($sNote);
+$oPatch->noteNameOn($sNote, 127);
 
 $oOutputOperator = new Operator\PCMOutput(
     !empty($sOutput) ? new Output\Wav() : new Output\Play()

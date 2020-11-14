@@ -26,16 +26,7 @@ use function ABadCafe\Synth\Utility\dprintf;
  *
  * Enumerates MIDI note numbers
  */
-interface IMIDINumber extends Controller\IMIDINote {
-
-    /**
-     * Maps a note name to a number
-     *
-     * @param  string $sNote
-     * @return int
-     * @throws OutOfBoundsException
-     */
-    public function getNoteNumber(string $sNote) : int;
+interface IMIDINumber extends Controller\IMIDINoteStandard {
 
     /**
      * Invokes mapByte() for a named note
@@ -161,15 +152,7 @@ class Invariant extends Map\MIDIByte implements IMIDINumber {
  */
 abstract class TwelveTone extends Map\MIDIByte implements IMIDINumber, Controller\IMIDINoteStandard {
 
-    /**
-     * @inheritdoc
-     */
-    public function getNoteNumber(string $sNote) : int {
-        if (isset(self::A_NOTE_NAMES[$sNote])) {
-            return self::A_NOTE_NAMES[$sNote];
-        }
-        throw new OutOfBoundsException();
-    }
+    use Controller\TMIDINoteStandardLookup;
 
     /**
      * @inheritdoc
@@ -269,6 +252,8 @@ class TwelveToneEqualTemperament extends TwelveTone {
         }
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * TKeyedSetUser user trait - for entities that rely on KeyedSet of Map\Note\IMIDINumber

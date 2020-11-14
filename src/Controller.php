@@ -46,7 +46,7 @@ interface IMIDINote {
 /**
  * Standard MIDI note numbers
  */
-interface IMIDINoteStandard {
+interface IMIDINoteStandard extends IMIDINote {
     /** @const int I_SEMIS_PER_OCTAVE */
     const I_SEMIS_PER_OCTAVE = 12;
 
@@ -95,10 +95,38 @@ interface IMIDINoteStandard {
         'C9'   =>  120, 'C#9'  => 121, 'Db9'  => 121, 'D9'   => 122, 'D#9'  => 123, 'Eb9'  => 123, 'E9'   => 124,
         'F9'   =>  125, 'F#9'  => 126, 'Gb9'  => 126, 'G9'   => 127
     ];
+
+    /**
+     * Maps a note name to a number
+     *
+     * @param  string $sNote
+     * @return int
+     * @throws \OutOfBoundsException
+     */
+    public function getNoteNumber(string $sNote) : int;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * Interface for entities that need to react to midi note events
+ * Standard trait implementation to provide IMIDINoteStandard::getNoteNumber()
+ */
+trait TMIDINoteStandardLookup {
+    /**
+     * @inheritdoc
+     */
+    public function getNoteNumber(string $sNote) : int {
+        if (isset(self::A_NOTE_NAMES[$sNote])) {
+            return self::A_NOTE_NAMES[$sNote];
+        }
+        throw new \OutOfBoundsException();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Mimimal interface for entities that need to react to MIDI note events
  */
 interface IMIDINoteEventListener {
 
@@ -108,12 +136,35 @@ interface IMIDINoteEventListener {
      * @param int $iNumber   - MIDI note number (0-127)
      * @param int $iVelocity - MIDI note velocity (0-127)
      */
-    public function noteOn(int $iNumber, int $iVelocity);
+    public function noteOn(int $iNumber, int $iVelocity) : self;
 
     /**
      * Invoked on a note off event
      *
      * @param int $iNumber   - MIDI note number (0-127)
      */
-    public function noteOff(int $iNunber);
+    public function noteOff(int $iNumber) : self;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Extension interface that allows notenames to be set instead.
+ */
+interface IMIDINoteStandardEventListener extends IMIDINoteEventListener, IMIDINoteStandard {
+
+    /**
+     * Invoked on a note on event
+     *
+     * @param int $iNumber   - MIDI note number (0-127)
+     * @param int $iVelocity - MIDI note velocity (0-127)
+     */
+    public function noteNameOn(string $sNoteName, int $iVelocity) : self;
+
+    /**
+     * Invoked on a note off event
+     *
+     * @param int $iNumber   - MIDI note number (0-127)
+     */
+    public function noteNameOff(string $sNoteName) : self;
 }
