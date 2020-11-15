@@ -21,7 +21,7 @@ use ABadCafe\Synth\Signal;
 /**
  * Base class for non-flat generator functions
  */
-abstract class Base implements Signal\IGenerator {
+abstract class Shape implements Signal\IGenerator {
 
     protected float
         $fMinLevel,
