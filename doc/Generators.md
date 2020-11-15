@@ -1,5 +1,7 @@
 # Generators
 
+![class layout](./images/Generators.png)
+
 ## Background
 
 _Generators_ represent basic periodic waveform shapes in a time/frequency independent manner. Generators are used to build _Oscillators_ which produce a time-varying output _Signal_ following the waveform shape.
