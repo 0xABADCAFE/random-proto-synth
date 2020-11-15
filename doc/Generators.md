@@ -1,16 +1,16 @@
 # Generators
 
-## Basics
+## Background
 
-_Generators_ represent basic periodic waveform shapes in a time/frequency independent manner. Generators at
+_Generators_ represent basic periodic waveform shapes in a time/frequency independent manner. Generators are used to build _Oscillators_ which produce a time-varying output _Signal_ following the waveform shape.
 
 ### Shape
 
-The _Shape_ is the basic curve that the generator follows for increasing values of _x_ and repeats once every _Period_. The _Shape_ is ultimately defined by some numerical function, for example _sine_.
+The _Shape_ is the basic curve that the generator follows for increasing values of _x_ and repeats once every _Period_. The _Shape_ is ultimately defined by some numerical function, for example _sine()_.
 
 ### Period
 
-The _Period_ is distance _p_ along the _x_-axis after which the _Shape_ repeats. For a simple _sine_ generator, the _Period_ is 2_PI_. The _Period_ is constant for a given _Generator_.
+The _Period_ is distance _p_ along the _x_-axis after which the _Shape_ repeats. For a simple sinewave generator, the _Period_ is 2_PI_. The _Period_ is constant for a given _Generator_.
 
 ### Minimum and Maximum Level
 
