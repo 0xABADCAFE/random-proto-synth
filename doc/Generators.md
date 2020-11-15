@@ -16,6 +16,10 @@ The _Period_ is distance _p_ along the _x_-axis after which the _Shape_ repeats.
 
 The lower and upper limits for the _y_-axis values of the _Shape_. Generators allow these to to be specifed. For all _Generators_ the default is -1.0 for _Minimum Level_and 1.0 for _Maximum Level_. These can be set differently for a given _Shape_. For example, setting the _Minimum Level_ to 0.0 and _Maximum Level_ to 2.0 has the effect of shifting the _Shape_ up the _y_-axis such that it is never negative,
 
+### Wave Shaper (optional)
+
+In order to make things more interesting, an optional _Wave Shaper_ can be set on a _Generator_ that subtly modifies the _Shape_ of the generator in various ways.
+
 ## Included Generators
 
 The following predifined _Generators_ are included:
@@ -44,3 +48,9 @@ Hard edge sware wave. Alternates between _Minimum Level_ and _Maximum Level_ eac
 
 Pseudoramdom output (White noise). The _Period_ of this _Generator_ is 1.
 
+### WaveTable
+
+Custom defines shape that uses an array of values and linearly interpolates between them. This _Generator_ differs slightly from all of the above in the following ways:
+- _Minimum Level_ and _Maximum Level_ can not be set.
+- _Period_ is the size of the array.
+- The size of the array is defined on construction as a given power of 2. For example, an input of 8 creates an internal table of 256 entries.
