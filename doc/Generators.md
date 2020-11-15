@@ -20,7 +20,7 @@ The lower and upper limits for the _y_-axis values of the _Shape_. Generators al
 
 ### WaveShaper (optional)
 
-In order to make things more interesting, an optional _WaveShaper_ can be set on a _Generator_ that subtly modifies the _Shape_ of the generator in various ways. Since a WaveShaper can modify the mapped output value of a _Generator_ it can result in values that are outside the normal limits for that _Generator_
+In order to make things more interesting, an optional [_WaveShaper_](./WaveShapers.md) can be set on a _Generator_ that subtly modifies the _Shape_ of the generator in various ways. Since a WaveShaper can modify the mapped output value of a _Generator_ it can result in values that are outside the normal limits for that _Generator_
 
 ## Included Generators
 
