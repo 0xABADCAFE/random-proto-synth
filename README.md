@@ -30,6 +30,9 @@ Generators represent basic periodic waveform shapes in a time/frequency independ
 - Square: Hard square wave
 - Noise: White noise
 
+Read more [here](./docs/Generators.md)
+
+
 ### Oscillators
 Oscillators are responsible for basic audio signal generation. They accept a Generator and have a settable frequency and phase offset. They will produce Packets sequentially that represent the given Generator waveform at the specified frequency. Oscillator implementations exist that can accept input Packets that perform phase or amplitude modulation of their Generator output. The following oscillators are provided:
 - Simple : Basic pitch / phase modulatable oscillator
