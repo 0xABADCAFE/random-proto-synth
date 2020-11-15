@@ -4,7 +4,9 @@
 
 ## Background
 
-_Generators_ represent basic periodic waveform shapes in a time/frequency independent manner. Generators are used to build _Oscillators_ which produce a time-varying output _Signal_ following the waveform shape.
+_Generators_ represent basic periodic waveform shapes in a time/frequency independent manner. Generators are used to build _Oscillators_ which produce a time-varying output _Signal_ following the waveform shape. Generators _map_ an input _Packet_ of _x_-axis values to an output map of _y_-axis values.
+
+_Generators_ have the following properties:
 
 ### Shape
 

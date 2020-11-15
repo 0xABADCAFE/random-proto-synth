@@ -22,13 +22,7 @@ Signal data are generated and processed in discrete Packets that contain a globa
 - Modulation: Multiplying each value in one Packet with the corresponding value in another Packet, e.g. amplitude modulation of signals.
 
 ### Generators
-Generators represent basic periodic waveform shapes in a time/frequency independent manner. Generators define the numerical period after they repeat. Generators typically accept a Packet of input values for which a Packet of the corresponding output values will be returned. Generators can have their minimum and maximum output levels specified. Generators are provided for:
-- Flat : (DC) fixed level output.
-- Sine : Basic sine wave
-- Triangle: Triangle wave
-- Sawtooth: Sawtooth wave, in both rising and falling edge variants
-- Square: Hard square wave
-- Noise: White noise
+Generators represent basic periodic waveform shapes in a time/frequency independent manner. Generators define the numerical period after they repeat. Generators typically accept a Packet of input values for which a Packet of the corresponding output values will be returned. Generators can have their minimum and maximum output levels specified.
 
 Read more [here](./docs/Generators.md)
 
