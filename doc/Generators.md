@@ -20,7 +20,7 @@ The lower and upper limits for the _y_-axis values of the _Shape_. Generators al
 
 ### WaveShaper (optional)
 
-In order to make things more interesting, an optional [_WaveShaper_](./WaveShapers.md) can be set on a _Generator_ that subtly modifies the _Shape_ of the generator in various ways. Since a WaveShaper can modify the mapped output value of a _Generator_ it can result in values that are outside the normal limits for that _Generator_
+In order to make things more interesting, an optional [_WaveShaper_](./WaveShapers.md) can be set on a _Generator_ that subtly modifies the _Shape_ of the generator in various ways. Since a WaveShaper can modify the mapped output value of a _Generator_ it can result in values that are outside the normal limits for that _Generator_.
 
 ## Included Generators
 
@@ -30,21 +30,30 @@ The following predifined _Generators_ are included:
 
 Basic _sine_ wave. Harmonically the simplest _Generator_. The _Period_ of this _Generator_ is 2*_PI_.
 
+![sine](./images/generator/sine.png)
+
 ### Triangle
 
 Simple Triangular wave. Linearly increases from the _Minimum Level_ to the _Maximum Level_ and then linearly decreases back to the _Minimum Level_. Richer in harmonics than _Sine_ but still relatively soft. The _Period_ this _Generator_ is 2.
 
-### Saw Up
-
-Saw tooth wave. Linearly increases from the _Minimum Level_ to the _Maximum Level_ then abruptly resets and repeats. Rich in harmonics. The _Period_ of this _Generator_ is 1.
+![triangle](./images/generator/triangle.png)
 
 ### Saw Down
 
-Saw tooth wave. Mirror image of the _Saw Up_. Linearly decreases from the _Maximum Level_ to the _Minimum Level_ then abruptly resets and repeats. Rich in harmonics. The _Period_ of this _Generator_ is 1.
+Saw tooth wave. Linearly decreases from the _Maximum Level_ to the _Minimum Level_ then abruptly resets and repeats. Rich in harmonics. The _Period_ of this _Generator_ is 1.
+
+![saw](./images/generator/sawdown.png)
+
+### Saw Up
+
+Saw tooth wave. Vertically flipped mirror image of _Saw Down_.
 
 ### Square
 
 Hard edge sware wave. Alternates between _Minimum Level_ and _Maximum Level_ each half period. Rich in harmonics. The _Period_ of this _Generator_ is 2.
+
+![saw](./images/generator/square.png)
+
 
 ### Noise
 
@@ -59,4 +68,4 @@ Custom defined waveform shape that uses a supplied array of values and linearly 
 
 ## Entity Diagram
 
-![class layout](./images/Generators.png)
+![class layout](./images/generator/classes.png)
