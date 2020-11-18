@@ -2,19 +2,23 @@
 
 ## Background
 
-_Generators_ represent basic periodic waveform shapes in a time/frequency independent manner. Generators are used to build _Oscillators_ which produce a time-varying output _Signal_ following the waveform shape. Generators _map_ an input _Packet_ of _x_-axis values to an output map of _y_-axis values.
+_Generators_ represent basic periodic waveform shapes in a time/frequency independent manner. Generators are used to build _Oscillators_ which produce a time-varying output _Signal_ following the waveform shape. Generators _map_ an input _Packet_ of _x_-axis values to an output map of _y_-axis values. The basic behaviour is depicted below.
+
+![behaviour](./images/generator/behaviour.png)
+
+## Properties
 
 _Generators_ have the following properties:
 
-### Shape
+### 1. Shape
 
 The _Shape_ is the basic curve that the generator follows for increasing values of _x_ and repeats once every _Period_. The _Shape_ is ultimately defined by some numerical function, for example _sine()_.
 
-### Period
+### 2. Period
 
 The _Period_ is distance _p_ along the _x_-axis after which the _Shape_ repeats. For a simple sinewave generator, the _Period_ is 2*_PI_. The _Period_ is constant for a given _Generator_.
 
-### Limits
+### 3. Limits
 
 The lower and upper limits for the _y_-axis values of the _Shape_. Generators allow these to to be specifed. For all _Generators_ the default is -1.0 for _Minimum Level_ and 1.0 for _Maximum Level_. These can be set differently for a given _Shape_. For example, setting the _Minimum Level_ to 0.0 and _Maximum Level_ to 2.0 has the effect of shifting the _Shape_ up the _y_-axis such that it is never usually negative.
 
