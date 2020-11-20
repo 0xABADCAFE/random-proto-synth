@@ -1,4 +1,4 @@
-# WaveShapers
+# Fundamentals > WaveShapers
 
 ## Background
 
@@ -7,7 +7,7 @@ _WaveShapers_ are modifiers that can be used in conjunction with _Generators_ to
 1. Phase adjustment. The input values in the _Packet_ are modified before being passed to the fundamental function of the _Generator_.
 2. Amplitude adjustment. The output value of the function is modified.
 
-The key functionality that the _WaveShaper_ provides is the ability to make successive values in the output _Packet_ of the _Generator_ depend on each other in ways that are otherwise not practical when dealing with processing entire _Packets_. An example of a phase adjustment is depicted below.
+The key functionality that the _WaveShaper_ provides is the ability to make successive values in the output _Packet_ of the _Generator_ depend on each other in ways that are otherwise not practical when dealing with processing entire _Packets_. An example of a _WaveShaper_ performing a phase adjustment is depicted below.
 
 ![behaviour](./images/waveshaper/behaviour.png)
 
