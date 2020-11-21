@@ -11,12 +11,12 @@ const
 
 $iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
 
-$aGenerators = [
-    'sine'     => new Signal\Generator\Sine(),
-    'square'   => new Signal\Generator\Square(),
-    'saw_up'   => new Signal\Generator\SawUp(),
-    'saw_down' => new Signal\Generator\SawDown(),
-    'triangle' => new Signal\Generator\Triangle(),
+$aWaveforms = [
+    'sine'     => new Signal\Waveform\Sine(),
+    'square'   => new Signal\Waveform\Square(),
+    'saw_up'   => new Signal\Waveform\SawUp(),
+    'saw_down' => new Signal\Waveform\SawDown(),
+    'triangle' => new Signal\Waveform\Triangle(),
 ];
 
 $oModulatorEnvelope = new Envelope\Generator\LinearInterpolated(
@@ -42,22 +42,22 @@ $aRatios = [
 
 $oOutput = new Output\Play;
 
-foreach ($aGenerators as $sCarrierName => $oCarrierGenerator) {
+foreach ($aWaveforms as $sCarrierName => $oCarrierWaveform) {
     echo "Testing Carrier : ", $sCarrierName, "\n";
 
-    foreach ($aGenerators as $sModulatorName => $oModulatorGenerator) {
+    foreach ($aWaveforms as $sModulatorName => $oModulatorWaveform) {
         foreach ($aRatios as $sRatioName => $fRatio) {
 
             echo "\tModulator : ", $sModulatorName, " @ ", $fRatio, " x Carrier\n";
 
             $oModulator = new Oscillator\Audio\Simple(
-                $oModulatorGenerator,
+                $oModulatorWaveform,
                 F_CARRIER * $fRatio
             );
             $oModulatorEnvelope->reset();
 
             $oCarrier = new Oscillator\Audio\Simple(
-                $oCarrierGenerator,
+                $oCarrierWaveform,
                 F_CARRIER
             );
 

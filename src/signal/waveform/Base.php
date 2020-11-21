@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator;
+namespace ABadCafe\Synth\Signal\Waveform;
 use ABadCafe\Synth\Signal;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,24 +21,24 @@ use ABadCafe\Synth\Signal;
 /**
  * Base class for non-flat generator functions
  */
-abstract class Shape implements Signal\IGenerator {
+abstract class Base implements Signal\IWaveform {
 
     protected float
         $fMinLevel,
         $fMaxLevel
     ;
 
-    protected ?IWaveShaper $oShaper = null;
+    protected ?IShaper $oShaper = null;
 
     /**
-     * @param float $fMinLevel
-     * @param float $fMaxLevel
-     * @param IWaveShaper|null $oShaper
+     * @param float        $fMinLevel
+     * @param float        $fMaxLevel
+     * @param IShaper|null $oShaper
      */
     public function __construct(
         float $fMinLevel      = Signal\ILimits::F_MIN_LEVEL_NO_CLIP,
         float $fMaxLevel      = Signal\ILimits::F_MAX_LEVEL_NO_CLIP,
-        ?IWaveShaper $oShaper = null
+        ?IShaper $oShaper = null
     ) {
         $this->fMinLevel = min($fMinLevel, $fMaxLevel);
         $this->fMaxLevel = max($fMinLevel, $fMaxLevel);
@@ -47,10 +47,10 @@ abstract class Shape implements Signal\IGenerator {
     }
 
     /**
-     * @param  IWaveShaper|null
+     * @param  IShaper|null
      * @return self
      */
-    public function setWaveShaper(?IWaveShaper $oShaper) : self {
+    public function setShaper(?IShaper $oShaper) : self {
         $this->oShaper = $oShaper;
         return $this;
     }

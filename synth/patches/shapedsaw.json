@@ -1,6 +1,6 @@
 {
     "name": "squaredecay",
-    "comment": " Simple 1-Operator Square",
+    "comment": " Simple 1-Operator Example",
     "notemaps" : {
         "halving" : {
             "comment": "Halves value every octave",
@@ -11,11 +11,11 @@
     },
     "operators": {
         "out": {
-            "comment": "Simple Oscillator Operator based on square wave generator",
+            "comment": "Simple Oscillator Operator based on saw wave",
             "type": "oscillator",
             "model": {
                 "type": "simple",
-                "generator": {
+                "waveform": {
                     "type": "sawdown",
                     "shaper": {
                         "type": "phasefeedbackcap",

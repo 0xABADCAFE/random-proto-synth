@@ -8,15 +8,15 @@ const I_TIME = 8;
 
 $iMaxSamples = I_TIME * Signal\Context::get()->getProcessRate();
 
-$oGenerator = new Signal\Generator\Sine();
+$oWaveform = new Signal\Waveform\Sine();
 
 $oLFO = new Oscillator\Audio\Simple(
-    $oGenerator,
+    $oWaveform,
     0.1
 );
 
 $oModulator = new Oscillator\Audio\Simple(
-    $oGenerator,
+    $oWaveform,
     55
 );
 
@@ -31,7 +31,7 @@ $oModulatorShape
 $oModulatorEnvelope = new Envelope\Generator\LinearInterpolated($oModulatorShape);
 
 $oCarrier = new Oscillator\Audio\Simple(
-    new Signal\Generator\Square(),
+    new Signal\Waveform\Square(),
     220
 );
 

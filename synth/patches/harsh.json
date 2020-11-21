@@ -14,23 +14,23 @@
     },
     "operators": {
         "out": {
-            "comment": "Simple Oscillator Operator based on sine wave generator",
+            "comment": "Simple Oscillator Operator based on sine wave",
             "type": "oscillator",
             "model": {
                 "type": "simple",
-                "generator": {
+                "waveform": {
                     "type": "sine"
                 }
             }
         },
         "modulator": {
-            "comment": "Simple Oscillator Operator based on saw wave generator",
+            "comment": "Simple Oscillator Operator based on saw wave",
             "type": "oscillator",
             "unmodulated":true,
             "ratio": 0.5,
             "model": {
                 "type": "simple",
-                "generator": {
+                "waveform": {
                     "type": "sawdown"
                 }
             },

@@ -11,15 +11,15 @@
     },
     "operators": {
         "out": {
-            "comment": "Simple Oscillator Operator based on square wave generator",
+            "comment": "Simple Oscillator Operator based on square wave",
             "type": "oscillator",
             "model": {
                 "type": "simple",
-                "generator": {
+                "waveform": {
                     "type": "square",
                     "shaper": {
                         "type": "capacitance",
-                        "capacitance": 0.1
+                        "capacitance": 0.5
                     }
                 }
             },

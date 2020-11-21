@@ -13,25 +13,20 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator;
+namespace ABadCafe\Synth\Signal\Waveform;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Sine - single frequency
+ * Square - series of frequencies
  *
- * Maps input values to a sine wave output.
+ * Maps input values to a square output.
  */
-class Sine extends Shape {
+class Square extends Shape {
 
-    const F_PERIOD = 2.0 * M_PI;
-
-    private float
-        $fBiasLevel,
-        $fScaleLevel
-    ;
+    const F_PERIOD = 2.0;
 
     /**
      * @inheritdoc
@@ -46,24 +41,16 @@ class Sine extends Shape {
     public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
-        if ($this->oShaper) {
-            foreach ($oValues as $i => $fTime) {
-                $fTime = $this->oShaper->modifyInput($fTime);
-                $oValues[$i] = $this->oShaper->modifyOutput(($this->fScaleLevel * sin($fTime)) + $this->fBiasLevel);
+         if ($this->oShaper) {
+            foreach ($oValues as $i => $fValue) {
+                $fValue = $this->oShaper->modifyInput($fValue);
+                $oValues[$i] = $this->oShaper->modifyOutput(floor($fValue) & 1 ? $this->fMinLevel : $this->fMaxLevel);
             }
         } else {
-            foreach ($oValues as $i => $fTime) {
-                $oValues[$i] = ($this->fScaleLevel * sin($fTime)) + $this->fBiasLevel;
+            foreach ($oValues as $i => $fValue) {
+                $oValues[$i] = floor($fValue) & 1 ? $this->fMinLevel : $this->fMaxLevel;
             }
         }
         return $oOutput;
-    }
-
-    /**
-     * @overridden
-     */
-    protected function init() {
-        $this->fBiasLevel  = 0.5*($this->fMaxLevel + $this->fMinLevel);
-        $this->fScaleLevel = 0.5*($this->fMaxLevel - $this->fMinLevel);
     }
 }

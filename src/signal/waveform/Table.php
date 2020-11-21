@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator;
+namespace ABadCafe\Synth\Signal\Waveform;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 use function ABadCafe\Synth\Utility\clamp;
@@ -26,7 +26,7 @@ use function ABadCafe\Synth\Utility\clamp;
  * Use a short lookup table as a wave period. The table must be a power of two in length. To enforce this,
  * construction takes the exponent size, which must be an integer between 2 and 8.
  */
-class WaveTable implements Signal\IGenerator {
+class WaveTable implements Signal\IWaveform {
 
     const
         I_MIN_SIZE_EXP = 2,
@@ -50,7 +50,7 @@ class WaveTable implements Signal\IGenerator {
     /**
      * @return SPLFixedArray
      */
-    public function getTable() : SPLFixedArray {
+    public function getData() : SPLFixedArray {
         return $this->oTable;
     }
 

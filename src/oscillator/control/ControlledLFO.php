@@ -27,7 +27,7 @@ class ControlledLFO extends Base {
 
     use Signal\TContextIndexAware;
 
-    protected Signal\IGenerator $oGenerator;
+    protected Signal\IWaveform $oWaveform;
 
     protected Signal\Control\IStream
         $oRateControl,
@@ -35,7 +35,7 @@ class ControlledLFO extends Base {
     ;
 
     protected Signal\Control\Packet
-        $oGeneratorInput,
+        $oWaveformInput,
         $oLastOutput
     ;
     protected int $iSamplePosition = 0;
@@ -49,19 +49,19 @@ class ControlledLFO extends Base {
     /**
      * Constructor.
      *
-     * @param Signal\IGenerator $oGenerator
-     * @param float             $fFrequency
-     * @param float             $fDepth;
+     * @param Signal\IWaveform $oWaveform
+     * @param float            $fFrequency
+     * @param float            $fDepth;
      */
     public function __construct(
-        Signal\IGenerator      $oGenerator,
+        Signal\IWaveform       $oWaveform,
         Signal\Control\IStream $oRateControl,
         Signal\Control\IStream $oDepthControl
     ) {
-        $this->oGenerator       = $oGenerator;
+        $this->oWaveform        = $oWaveform;
         $this->oRateControl     = $oRateControl;
         $this->oDepthControl    = $oDepthControl;
-        $this->oGeneratorInput  = new Signal\Control\Packet();
+        $this->oWaveformInput   = new Signal\Control\Packet();
         $this->oLastOutput      = new Signal\Control\Packet();
         $this->fPhaseCorrection = 0;
     }
@@ -112,10 +112,10 @@ class ControlledLFO extends Base {
             return $this->oLastOutput;
         }
 
-        $oValues = $this->oGeneratorInput->getValues();
+        $oValues = $this->oWaveformInput->getValues();
         $oShifts = $this->oRateControl->emit($iIndex);
 
-        $fTimeStep     = Signal\Context::get()->getSamplePeriod() * $this->oGenerator->getPeriod();
+        $fTimeStep     = Signal\Context::get()->getSamplePeriod() * $this->oWaveform->getPeriod();
         foreach ($oShifts->getValues() as $i => $fNextFrequency) {
             $fTime                   = $fTimeStep * $this->iSamplePosition++;
             $oValues[$i]             = ($this->fCurrentFrequency * $fTime) + $this->fPhaseCorrection;
@@ -123,7 +123,7 @@ class ControlledLFO extends Base {
             $this->fCurrentFrequency = $fNextFrequency;
         }
 
-        $oOutput = $this->oGenerator->map($this->oGeneratorInput);
+        $oOutput = $this->oWaveform->map($this->oWaveformInput);
         $oOutput->modulateWith($this->oDepthControl->emit($iIndex));
         $this->oLastOutput = $oOutput;
         return $oOutput;

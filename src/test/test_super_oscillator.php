@@ -7,7 +7,7 @@ require_once '../Synth.php';
 $iSamples = 5 * Signal\Context::get()->getProcessRate();
 
 $oOscillator = new Oscillator\Audio\Super(
-    new Signal\Generator\SawUp(),
+    new Signal\Waveform\SawUp(),
     [
         [1.0,   0.5, 0], // Fundamental harmonic
         [0.995, 0.2, 0], // Detuned fundamental (flat)

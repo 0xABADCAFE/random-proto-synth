@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator\WaveShaper;
+namespace ABadCafe\Synth\Signal\Waveform\Shaper;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Utility;
 use function Utility\dprintf;
@@ -35,10 +35,10 @@ class Factory implements Utility\IFactory {
 
     /**
      * @param  object $oDescription
-     * @return Signal\Generator\IWaveShaper
+     * @return Signal\Waveform\IShaper
      * @throws \Exception
      */
-    public function createFrom(object $oDescription) : Signal\Generator\IWaveShaper {
+    public function createFrom(object $oDescription) : Signal\Waveform\IShaper {
         $sType    = strtolower($oDescription->type ?? '<none>');
         $sProduct = self::PRODUCT_TYPES[$sType] ?? null;
         if ($sProduct) {

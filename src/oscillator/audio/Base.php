@@ -26,9 +26,9 @@ abstract class Base implements IOscillator {
 
     const F_INV_TWELVE = 1.0/12.0;
 
-    protected Signal\IGenerator $oGenerator;
+    protected Signal\IWaveform $oWaveform;
     protected Signal\Audio\Packet
-        $oGeneratorInput,
+        $oWaveformInput,
         $oLastOutput
     ;
     protected int $iSamplePosition = 0;
@@ -49,20 +49,20 @@ abstract class Base implements IOscillator {
     /**
      * Constructor.
      *
-     * @param Signal\IGenerator $oGenerator
-     * @param float             $fFrequency
-     * @param float             $fPhase;
+     * @param Signal\IWaveform $oWaveform
+     * @param float            $fFrequency
+     * @param float            $fPhase;
      */
     public function __construct(
-        Signal\IGenerator $oGenerator,
+        Signal\IWaveform $oWaveform,
         float             $fFrequency  = ILimits::F_DEF_FREQ,
         float             $fPhase      = 0.0
     ) {
-        $this->oGenerator       = $oGenerator;
-        $this->oGeneratorInput  = new Signal\Audio\Packet();
+        $this->oWaveform        = $oWaveform;
+        $this->oWaveformInput   = new Signal\Audio\Packet();
         $this->oLastOutput      = new Signal\Audio\Packet();
         $this->setFrequency($fFrequency);
-        $this->fPhaseCorrection = $oGenerator->getPeriod() * $fPhase;
+        $this->fPhaseCorrection = $oWaveform->getPeriod() * $fPhase;
     }
 
     /**
@@ -72,7 +72,7 @@ abstract class Base implements IOscillator {
         return sprintf(
             "%s [%s freq:%.3fHz rate:%dHz, pos:%d]",
             static::class,
-            get_class($this->oGenerator),
+            get_class($this->oWaveform),
             $this->fFrequency,
             Signal\Context::get()->getProcessRate(),
             $this->iSamplePosition
@@ -120,7 +120,7 @@ abstract class Base implements IOscillator {
      */
     public function setFrequency(float $fFrequency) : self {
         $this->fFrequency = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
-        $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency * Signal\Context::get()->getSamplePeriod();
+        $this->fScaleVal  = $this->oWaveform->getPeriod() * $this->fFrequency * Signal\Context::get()->getSamplePeriod();
         $this->fCurrentFreqency = $this->fFrequency;
         return $this;
     }
@@ -147,7 +147,7 @@ abstract class Base implements IOscillator {
      */
     public function setPhaseModulation(Signal\Audio\Packet $oPhase = null) : self {
         if ($oPhase) {
-            $fPhaseSize = $this->oGenerator->getPeriod();
+            $fPhaseSize = $this->oWaveform->getPeriod();
             $this->oPhaseShift = clone $oPhase->getValues();
             foreach ($this->oPhaseShift as $i => $fValue) {
                 $this->oPhaseShift[$i] = $fValue * $fPhaseSize;
