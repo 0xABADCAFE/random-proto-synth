@@ -24,7 +24,7 @@ use \SPLFixedArray;
  *
  * Maps input values to a upwards sawtooth output.
  */
-class SawUp extends Shape {
+class SawUp extends Base {
 
     const F_PERIOD  = 1.0;
 

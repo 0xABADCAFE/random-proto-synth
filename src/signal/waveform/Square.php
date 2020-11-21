@@ -24,7 +24,7 @@ use \SPLFixedArray;
  *
  * Maps input values to a square output.
  */
-class Square extends Shape {
+class Square extends Base {
 
     const F_PERIOD = 2.0;
 
