@@ -9,9 +9,9 @@ $iMaxSamples = 5 * Signal\Context::get()->getProcessRate();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $oOscillator = new Oscillator\Audio\Morphing(
-    new Signal\Generator\Square(),
-    new Signal\Generator\SawDown(),
-    new Signal\Generator\Sine(-0.5, 0.5),
+    new Signal\Waveform\Square(),
+    new Signal\Waveform\SawDown(),
+    new Signal\Waveform\Sine(-0.5, 0.5),
     55,
     2.001,
     1

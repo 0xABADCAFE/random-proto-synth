@@ -13,15 +13,15 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator\WaveShaper;
-use ABadCafe\Synth\Signal\Generator;
+namespace ABadCafe\Synth\Signal\Waveform\Shaper;
+use ABadCafe\Synth\Signal\Waveform;
 
 /**
  * PhaseFeedback
  *
  * Allows a self-modulating oscillator to be impmlemented
  */
-class FixedPhaseFeedback implements Generator\IWaveShaper {
+class FixedPhaseFeedback implements Waveform\IShaper {
 
     const F_DEFAULT_LEVEL = 1.0;
 

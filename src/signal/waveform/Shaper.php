@@ -13,12 +13,12 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator;
+namespace ABadCafe\Synth\Signal\Waveform;
 
 /**
- * Interface for per-sample manipulation of shape and amplitude within an IGenerator implementation.
+ * Interface for per-sample manipulation of shape and amplitude within an IWaveform implementation.
  */
-interface IWaveShaper {
+interface IShaper {
     /**
      * Called for time domain input value in the mapping, applies some modification (eg phase, etc)
      *

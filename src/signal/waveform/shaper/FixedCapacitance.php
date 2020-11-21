@@ -13,15 +13,15 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator\WaveShaper;
-use ABadCafe\Synth\Signal\Generator;
+namespace ABadCafe\Synth\Signal\Waveform\Shaper;
+use ABadCafe\Synth\Signal\Waveform;
 
 /**
  * FixedCapacitance
  *
  * Adds a charge/discharge like slew to the sample stream based on blending with previous values.
  */
-class FixedCapacitance implements Generator\IWaveShaper {
+class FixedCapacitance implements Waveform\IShaper {
 
     const F_DEFAULT_AMOUNT = 0.5;
 

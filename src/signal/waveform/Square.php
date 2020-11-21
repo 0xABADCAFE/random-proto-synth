@@ -13,24 +13,20 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator;
+namespace ABadCafe\Synth\Signal\Waveform;
 use ABadCafe\Synth\Signal;
 use \SPLFixedArray;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Noise - all frequencies
+ * Square - series of frequencies
  *
- * Maps to a randomised value, irrespective of input
+ * Maps input values to a square output.
  */
-class Noise extends Base {
+class Square extends Base {
 
-    const F_PERIOD = 1.0;
-
-    protected float
-        $fScaleLevel
-    ;
+    const F_PERIOD = 2.0;
 
     /**
      * @inheritdoc
@@ -45,16 +41,16 @@ class Noise extends Base {
     public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
-        foreach($oValues as $i => $fValue) {
-            $oValues[$i] = $this->fMinLevel + mt_rand() * $this->fScaleLevel;
+         if ($this->oShaper) {
+            foreach ($oValues as $i => $fValue) {
+                $fValue = $this->oShaper->modifyInput($fValue);
+                $oValues[$i] = $this->oShaper->modifyOutput(floor($fValue) & 1 ? $this->fMinLevel : $this->fMaxLevel);
+            }
+        } else {
+            foreach ($oValues as $i => $fValue) {
+                $oValues[$i] = floor($fValue) & 1 ? $this->fMinLevel : $this->fMaxLevel;
+            }
         }
         return $oOutput;
-    }
-
-    /**
-     * @overriden
-     */
-    protected function init() {
-        $this->fScaleLevel = ($this->fMaxLevel - $this->fMinLevel) / mt_getrandmax();
     }
 }

@@ -10,7 +10,7 @@ $oCarrier = new Operator\UnmodulatedOscillator(
 
     // Wave function
     new Oscillator\Audio\Super(
-        new Signal\Generator\Square(),
+        new Signal\Waveform\Square(),
         [
             [1.0,  0.5, 0.2],
             [840/587, 0.25, 0.0],

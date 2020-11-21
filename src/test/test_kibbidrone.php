@@ -8,13 +8,13 @@ const I_SECONDS    = 6;
 const I_NUM_OSC    = 1024;
 const F_MAX_OUTPUT = 16.0/I_NUM_OSC;
 
-$oGenerator = new Signal\Generator\SawDown(-F_MAX_OUTPUT, F_MAX_OUTPUT);
+$oWaveform = new Signal\Waveform\SawDown(-F_MAX_OUTPUT, F_MAX_OUTPUT);
 
 $aOscillators    = [];
 $aPitchEnvelopes = [];
 for ($i = 0; $i < I_NUM_OSC; ++$i) {
     $aOscillators[$i] = new Oscillator\Audio\Simple(
-        $oGenerator,
+        $oWaveform,
         440.0
     );
 
@@ -22,7 +22,7 @@ for ($i = 0; $i < I_NUM_OSC; ++$i) {
     $fStartRatio = 0.1 * mt_rand(-600, -360);
     $fEndRatio   = 12*mt_rand(-2, 2);
 
-    $aEnvelopes[$i] = new Envelope\Generator\LinearInterpolated(
+    $aEnvelopes[$i] = new Envelope\Waveform\LinearInterpolated(
         new Envelope\Shape(
             $fStartRatio + $fDetune, [
                 [$fEndRatio + $fDetune, 4.0],

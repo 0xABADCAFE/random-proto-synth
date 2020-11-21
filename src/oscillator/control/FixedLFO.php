@@ -38,16 +38,16 @@ class FixedLFO extends Base {
     /**
      * Constructor.
      *
-     * @param Signal\IGenerator $oGenerator
+     * @param Signal\IWaveform $oWaveform
      * @param float             $fFrequency
      * @param float             $fDepth;
      */
     public function __construct(
-        Signal\IGenerator $oGenerator,
+        Signal\IWaveform $oWaveform,
         float             $fFrequency  = ILimits::F_DEF_FREQ,
         float             $fDepth      = 0.5
     ) {
-        parent::__construct($oGenerator);
+        parent::__construct($oWaveform);
         $this->setFrequency($fFrequency);
         $this->fPhaseCorrection = 0;
         $this->fDepth       = $fDepth;
@@ -85,7 +85,7 @@ class FixedLFO extends Base {
      */
     public function setFrequency(float $fFrequency) : self {
         $this->fFrequency = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
-        $this->fScaleVal  = $this->oGenerator->getPeriod() * $this->fFrequency * Signal\Context::get()->getSamplePeriod();
+        $this->fScaleVal  = $this->oWaveform->getPeriod() * $this->fFrequency * Signal\Context::get()->getSamplePeriod();
         $this->fCurrentFreqency = $this->fFrequency;
         return $this;
     }
@@ -109,14 +109,14 @@ class FixedLFO extends Base {
             return $this->oLastOutput;
         }
 
-        $oValues = $this->oGeneratorInput->getValues();
+        $oValues = $this->oWaveformInput->getValues();
 
         // Basic linear intervals, there is no phase adjustment
         foreach ($oValues as $i => $fValue) {
             $oValues[$i] = $this->fScaleVal * $this->iSamplePosition++;
         }
 
-        $oOutput = $this->oGenerator->map($this->oGeneratorInput);
+        $oOutput = $this->oWaveform->map($this->oWaveformInput);
         $oOutput->scaleBy($this->fDepth);
         $this->oLastOutput = $oOutput;
         return $oOutput;

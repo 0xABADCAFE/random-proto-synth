@@ -10,7 +10,7 @@ $oModulator1 = new Operator\UnmodulatedOscillator(
 
     // Wave function
     new Oscillator\Audio\Simple(
-        new Signal\Generator\Sine()
+        new Signal\Waveform\Sine()
     ),
 
     // Frequency ratio
@@ -40,7 +40,7 @@ $oModulator2 = new Operator\UnmodulatedOscillator(
 
     // Wave function
     new Oscillator\Audio\Simple(
-        new Signal\Generator\Sine(),
+        new Signal\Waveform\Sine(),
         3
     )
 );
@@ -52,7 +52,7 @@ $oCarrier = new Operator\ModulatableOscillator(
 
     // Wave function
     new Oscillator\Audio\Simple(
-        new Signal\Generator\Sine()
+        new Signal\Waveform\Sine()
     ),
 
     // Frequency ratio

@@ -11,11 +11,11 @@
     },
     "operators": {
         "out": {
-            "comment": "Simple Oscillator Operator based on sine wave generator",
+            "comment": "Simple Oscillator Operator based on sine wave",
             "type": "oscillator",
             "model": {
                 "type": "simple",
-                "generator": {
+                "waveform": {
                     "type": "sine"
                 }
             },
@@ -25,13 +25,13 @@
             }
         },
         "modulator": {
-            "comment": "Simple Oscillator Operator based on sine wave generator",
+            "comment": "Simple Oscillator Operator based on sine wave",
             "type": "oscillator",
             "unmodulated":true,
             "ratio": 4.51591,
             "model": {
                 "type": "simple",
-                "generator": {
+                "waveform": {
                     "type": "sine"
                 }
             },

@@ -26,9 +26,9 @@ use function ABadCafe\Synth\Utility\clamp;
 
 abstract class Base implements IOscillator {
 
-    protected Signal\IGenerator $oGenerator;
+    protected Signal\IWaveform $oWaveform;
     protected Signal\Control\Packet
-        $oGeneratorInput,
+        $oWaveformInput,
         $oLastOutput
     ;
     protected int   $iSamplePosition = 0;
@@ -37,11 +37,11 @@ abstract class Base implements IOscillator {
     /**
      * Constructor.
      *
-     * @param Signal\IGenerator $oGenerator
+     * @param Signal\IWaveform $oWaveform
      */
-    public function __construct(Signal\IGenerator $oGenerator) {
-        $this->oGenerator       = $oGenerator;
-        $this->oGeneratorInput  = new Signal\Control\Packet();
+    public function __construct(Signal\IWaveform $oWaveform) {
+        $this->oWaveform       = $oWaveform;
+        $this->oWaveformInput  = new Signal\Control\Packet();
         $this->oLastOutput      = new Signal\Control\Packet();
     }
 
@@ -59,7 +59,7 @@ abstract class Base implements IOscillator {
         return sprintf(
             "%s [%s]",
             static::class,
-            get_class($this->oGenerator),
+            get_class($this->oWaveform),
         );
     }
 }

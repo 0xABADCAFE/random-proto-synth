@@ -42,9 +42,9 @@ class Factory implements Utility\IFactory {
         $sType    = strtolower($oDescription->type ?? '<none>');
         $sProduct = self::PRODUCT_TYPES[$sType] ?? null;
         if ($sProduct) {
-            $oGenerator = $this->getGenerator($oDescription);
+            $oWaveform = $this->getWaveform($oDescription);
             $cCreator = [$this, $sProduct];
-            return $cCreator($oDescription, $oGenerator);
+            return $cCreator($oDescription, $oWaveform);
         }
         throw new \Exception('Unknown Audio Oscillator Type ' . $sType);
     }
@@ -57,27 +57,27 @@ class Factory implements Utility\IFactory {
     }
 
     /**
-     * Get the generator dependency
+     * Get the waveform dependency
      *
      * @param object $oDescription
-     * @return Signal\IGenerator
+     * @return Signal\IWaveform
      * @throws \Exception
      */
-    private function getGenerator(object $oDescription) : Signal\IGenerator {
-        if (!isset($oDescription->generator) || !is_object($oDescription->generator)) {
-            throw new \Exception('Audio Oscillator missing generator');
+    private function getWaveform(object $oDescription) : Signal\IWaveform {
+        if (!isset($oDescription->waveform) || !is_object($oDescription->waveform)) {
+            throw new \Exception('Audio Oscillator missing waveform');
         }
-        return Signal\Generator\Factory::get()->createFrom($oDescription->generator);
+        return Signal\Waveform\Factory::get()->createFrom($oDescription->waveform);
     }
 
     /**
      * @param  object $oDescription
-     * @param  Signal\IGenerator $oGenerator
+     * @param  Signal\IWaveform $oWaveform
      * @return Simple
      */
-    private function createSimple(object $oDescription, Signal\IGenerator $oGenerator) : Simple {
+    private function createSimple(object $oDescription, Signal\IWaveform $oWaveform) : Simple {
         return new Simple(
-            $oGenerator,
+            $oWaveform,
             (float)($oDescription->freq ??  ILimits::F_DEF_FREQ),
             (float)($oDescription->phase ?? 0)
         );
@@ -85,15 +85,15 @@ class Factory implements Utility\IFactory {
 
     /**
      * @param  object $oDescription
-     * @param  Signal\IGenerator $oGenerator
+     * @param  Signal\IWaveform $oWaveform
      * @return Super
      */
-    private function createSuper(object $oDescription, Signal\IGenerator $oGenerator) : Super {
+    private function createSuper(object $oDescription, Signal\IWaveform $oWaveform) : Super {
         if (!isset($oDescription->stack) || !is_array($oDescription->stack)) {
             throw new \Exception('Missing or empty harmonic stack for Super Oscillator');
         }
         return new Super(
-            $oGenerator,
+            $oWaveform,
             $oDescription->stack,
             (float)($oDescription->freq ??  ILimits::F_DEF_FREQ)
         );
