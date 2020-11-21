@@ -19,7 +19,7 @@ use ABadCafe\Synth\Signal;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Simple Oscillator. Single Generator, continuous output.
+ * Simple Oscillator. Single Waveform, continuous output.
  */
 class Simple extends Base {
 
@@ -34,12 +34,12 @@ class Simple extends Base {
             return $this->oLastOutput;
         }
 
-        $oValues = $this->oGeneratorInput->getValues();
+        $oValues = $this->oWaveformInput->getValues();
 
         if ($this->oPitchShift) {
             // Every sample point has a new frequency, we must also correct the phase for every sample point.
             // The phase correction is accumulated, which is equivalent to integrating over the time step.
-            $fTimeStep     = Signal\Context::get()->getSamplePeriod() * $this->oGenerator->getPeriod();
+            $fTimeStep     = Signal\Context::get()->getSamplePeriod() * $this->oWaveform->getPeriod();
             foreach ($this->oPitchShift as $i => $fNextFrequency) {
                 $fTime                   = $fTimeStep * $this->iSamplePosition++;
                 $oValues[$i]             = ($this->fCurrentFrequency * $fTime) + $this->fPhaseCorrection;
@@ -60,7 +60,7 @@ class Simple extends Base {
             }
         }
 
-        $this->oLastOutput = $this->oGenerator->map($this->oGeneratorInput);
+        $this->oLastOutput = $this->oWaveform->map($this->oWaveformInput);
 
         //$this->postProcess();
 

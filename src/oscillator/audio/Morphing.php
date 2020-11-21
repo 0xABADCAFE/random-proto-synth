@@ -20,7 +20,7 @@ use function ABadCafe\Synth\Utility\clamp;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Morphing Oscillator. Two Generators, second at a fixed frequency ratio to the first, mixed using a third Generator as an LFO.
+ * Morphing Oscillator. Two Waveforms, second at a fixed frequency ratio to the first, mixed using a third Waveform as an LFO.
  */
  class Morphing extends Simple {
 
@@ -31,9 +31,9 @@ use function ABadCafe\Synth\Utility\clamp;
         F_MAX_RATIO = 8.0
     ;
 
-    protected Signal\IGenerator
-        $oSecondaryGenerator,
-        $oMixingGenerator
+    protected Signal\IWaveform
+        $oSecondaryWaveform,
+        $oMixingWaveform
     ;
 
     protected Signal\Audio\Packet
@@ -49,28 +49,28 @@ use function ABadCafe\Synth\Utility\clamp;
     ;
 
     public function __construct(
-        Signal\IGenerator $oPrimaryGenerator,
-        Signal\IGenerator $oSecondaryGenerator,
-        Signal\IGenerator $oMixingGenerator,
-        float             $fPrimaryFrequency,
-        float             $fSecondaryRatio,
-        float             $fMixingFrequency
+        Signal\IWaveform $oPrimaryWaveform,
+        Signal\IWaveform $oSecondaryWaveform,
+        Signal\IWaveform $oMixingWaveform,
+        float            $fPrimaryFrequency,
+        float            $fSecondaryRatio,
+        float            $fMixingFrequency
     ) {
-        $this->fMixingFrequency    = clamp($fMixingFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
-        $this->fSecondaryRatio     = clamp($fSecondaryRatio, self::F_MIN_RATIO, self::F_MAX_RATIO);
-        $this->oSecondaryGenerator = $oSecondaryGenerator;
-        $this->oMixingGenerator    = $oMixingGenerator;
-        $this->oSecondaryInput     = new Signal\Audio\Packet();
-        $this->oMixingInput        = new Signal\Audio\Packet();
-        $this->oLastOutput         = new Signal\Audio\Packet();
-        parent::__construct($oPrimaryGenerator, $fPrimaryFrequency);
+        $this->fMixingFrequency   = clamp($fMixingFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
+        $this->fSecondaryRatio    = clamp($fSecondaryRatio, self::F_MIN_RATIO, self::F_MAX_RATIO);
+        $this->oSecondaryWaveform = $oSecondaryWaveform;
+        $this->oMixingWaveform    = $oMixingWaveform;
+        $this->oSecondaryInput    = new Signal\Audio\Packet();
+        $this->oMixingInput       = new Signal\Audio\Packet();
+        $this->oLastOutput        = new Signal\Audio\Packet();
+        parent::__construct($oPrimaryWaveform, $fPrimaryFrequency);
     }
 
     public function setFrequency(float $fFrequency) : self {
         parent::setFrequency($fFrequency);
         $fRate = 1.0 / (float)Signal\Context::get()->getProcessRate();
-        $this->fSecondaryScaleVal = $this->oSecondaryGenerator->getPeriod() * $this->fFrequency * $this->fSecondaryRatio * $fRate;
-        $this->fMixingScaleVal    = $this->oMixingGenerator->getPeriod()    * $this->fMixingFrequency * $fRate;
+        $this->fSecondaryScaleVal = $this->oSecondaryWaveform->getPeriod() * $this->fFrequency * $this->fSecondaryRatio * $fRate;
+        $this->fMixingScaleVal    = $this->oMixingWaveform->getPeriod()    * $this->fMixingFrequency * $fRate;
         return $this;
     }
 
@@ -85,7 +85,7 @@ use function ABadCafe\Synth\Utility\clamp;
             return $this->oLastOutput;
         }
 
-        $oValues          = $this->oGeneratorInput->getValues();
+        $oValues          = $this->oWaveformInput->getValues();
         $oSecondaryValues = $this->oSecondaryInput->getValues();
         $oMixingValues    = $this->oMixingInput->getValues();
         foreach ($oValues as $i => $fValue) {
@@ -93,9 +93,9 @@ use function ABadCafe\Synth\Utility\clamp;
             $oSecondaryValues[$i] = $this->fSecondaryScaleVal * $this->iSamplePosition;
             $oMixingValues[$i]    = $this->fMixingScaleVal    * $this->iSamplePosition++;
         }
-        $oOutputPacket    = $this->oGenerator->map($this->oGeneratorInput);
-        $oSecondaryValues = $this->oSecondaryGenerator->map($this->oSecondaryInput)->getValues();
-        $oMixingValues    = $this->oMixingGenerator->map($this->oMixingInput)->getValues();
+        $oOutputPacket    = $this->oWaveform->map($this->oWaveformInput);
+        $oSecondaryValues = $this->oSecondaryWaveform->map($this->oSecondaryInput)->getValues();
+        $oMixingValues    = $this->oMixingWaveform->map($this->oMixingInput)->getValues();
         $oOutputValues    = $oOutputPacket->getValues();
         foreach ($oOutputValues as $i => $fPrimary) {
             $fMixValue = 0.5 * ($oMixingValues[$i] + Signal\ILimits::F_MAX_LEVEL_NO_CLIP);
@@ -111,20 +111,20 @@ use function ABadCafe\Synth\Utility\clamp;
      * @todo - remove. See emit()
      */
 //     public function emitPhaseModulated(Signal\Packet $oPhase) : Signal\Packet {
-//         $oValues             = $this->oGeneratorInput->getValues();
+//         $oValues             = $this->oWaveformInput->getValues();
 //         $oSecondaryValues    = $this->oSecondaryInput->getValues();
 //         $oMixingValues       = $this->oMixingInput->getValues();
-//         $fPhaseSize          = $this->oGenerator->getPeriod();
-//         $fSecondaryPhaseSize = $this->oSecondaryGenerator->getPeriod();
+//         $fPhaseSize          = $this->oWaveform->getPeriod();
+//         $fSecondaryPhaseSize = $this->oSecondaryWaveform->getPeriod();
 //         $oModulator          = $oPhase->getValues();
 //         foreach ($oValues as $i => $fValue) {
 //             $oValues[$i]          = ($this->fScaleVal          * $this->iSamplePosition) + ($fPhaseSize * $oModulator[$i]);
 //             $oSecondaryValues[$i] = ($this->fSecondaryScaleVal * $this->iSamplePosition) + ($fSecondaryPhaseSize * $oModulator[$i]);
 //             $oMixingValues[$i]    = $this->fMixingScaleVal     * $this->iSamplePosition++;
 //         }
-//         $oOutputPacket    = $this->oGenerator->map($this->oGeneratorInput);
-//         $oSecondaryValues = $this->oSecondaryGenerator->map($this->oSecondaryInput)->getValues();
-//         $oMixingValues    = $this->oMixingGenerator->map($this->oMixingInput)->getValues();
+//         $oOutputPacket    = $this->oWaveform->map($this->oWaveformInput);
+//         $oSecondaryValues = $this->oSecondaryWaveform->map($this->oSecondaryInput)->getValues();
+//         $oMixingValues    = $this->oMixingWaveform->map($this->oMixingInput)->getValues();
 //         $oOutputValues    = $oOutputPacket->getValues();
 //         foreach ($oOutputValues as $i => $fPrimary) {
 //             $fMixValue = 0.5 * ($oMixingValues[$i] + SignalLimits::F_MAX_LEVEL_NO_CLIP);

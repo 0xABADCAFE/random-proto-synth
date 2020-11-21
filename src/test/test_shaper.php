@@ -6,14 +6,14 @@ require_once '../Synth.php';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$oGenerator = new Signal\Generator\Sine();
-$oGenerator->setWaveShaper(new Signal\Generator\WaveShaper\FixedPhaseFeedback(1.0));
+$oWaveform = new Signal\Waveform\Sine();
+$oWaveform->setShaper(new Signal\Waveform\Shaper\FixedPhaseFeedback(1.0));
 
 $iOneSecond = Signal\Context::get()->getProcessRate();
 $oOutput    = new Output\Wav;
 
 $oOscillator = new Oscillator\Audio\Simple(
-    $oGenerator,
+    $oWaveform,
     440
 );
 

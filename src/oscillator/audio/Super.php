@@ -21,7 +21,7 @@ use \RangeException;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Super Oscillator. Single Generator with any number of tunable harmonics
+ * Super Oscillator. Single Waveform with any number of tunable harmonics
  */
 class Super extends Simple {
 
@@ -53,19 +53,19 @@ class Super extends Simple {
      * For this Oscillator to be useful, at least two harmonics need to be present. For this reason an exception is
      * thrown if the harmonic array has fewer than two entries.
      *
-     * @param Signal\IGenerator $oGenerator
+     * @param Signal\IWaveform $oWaveform
      * @param float[3][]        $aHarmonicStack
      * @param float             $fFrequency
      *
      * @throws InvalidArgumentException
      */
     public function __construct(
-        Signal\IGenerator $oGenerator,
+        Signal\IWaveform $oWaveform,
         array             $aHarmonicStack,
         float             $fFrequency  = ILimits::F_DEF_FREQ
     ) {
-        $this->oGenerator      = $oGenerator;
-        $this->oGeneratorInput = new Signal\Audio\Packet();
+        $this->oWaveform      = $oWaveform;
+        $this->oWaveformInput = new Signal\Audio\Packet();
         $this->setFrequency($fFrequency);
         $this->initHarmonicStack($aHarmonicStack);
     }
@@ -80,12 +80,12 @@ class Super extends Simple {
         }
 
         $oOutput = new Signal\Audio\Packet();
-        $oValues = $this->oGeneratorInput->getValues();
+        $oValues = $this->oWaveformInput->getValues();
         $iSamplePosition = 0;
 
         // Handle pitch control
         if ($this->oPitchShift) {
-            $fCyclePeriod      = $this->oGenerator->getPeriod();
+            $fCyclePeriod      = $this->oWaveform->getPeriod();
             $fSamplePeriod     = Signal\Context::get()->getSamplePeriod();
             $fCurrentFrequency = $this->fCurrentFrequency;
             // Process each harmonic term
@@ -108,7 +108,7 @@ class Super extends Simple {
                     }
                 }
                 $oOutput->accumulate(
-                    $this->oGenerator->map($this->oGeneratorInput),
+                    $this->oWaveform->map($this->oWaveformInput),
                     $this->aIntensities[$iHarmonicID]
                 );
             }
@@ -129,7 +129,7 @@ class Super extends Simple {
                     }
                 }
                 $oOutput->accumulate(
-                    $this->oGenerator->map($this->oGeneratorInput),
+                    $this->oWaveform->map($this->oWaveformInput),
                     $this->aIntensities[$iHarmonicID]
                 );
             }
@@ -168,7 +168,7 @@ class Super extends Simple {
         $this->aHarmonics        = array_column($aHarmonicStack, 0);
         $this->aIntensities      = array_column($aHarmonicStack, 1);
         $this->aInitPhases       = array_column($aHarmonicStack, 2);
-        $fPeriod = $this->oGenerator->getPeriod();
+        $fPeriod = $this->oWaveform->getPeriod();
         foreach ($this->aInitPhases as $i => $fPhaseNormalised) {
             $this->aInitPhases[$i] = $fPeriod * $fPhaseNormalised;
         }

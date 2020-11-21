@@ -7,7 +7,7 @@ require_once '../Synth.php';
 $iMaxSamples = 3 * Signal\Context::get()->getProcessRate();
 
 $oOscillator = new Oscillator\Audio\Simple(
-    new Signal\Generator\Sine(),
+    new Signal\Waveform\Sine(),
     220
 );
 
@@ -32,7 +32,7 @@ $oLFODepthControl = new Envelope\Generator\LinearInterpolated(
 );
 
 $oControlledLFO = new Oscillator\Control\ControlledLFO(
-    new Signal\Generator\Sine(),
+    new Signal\Waveform\Sine(),
     $oLFORateControl,
     $oLFODepthControl
 );

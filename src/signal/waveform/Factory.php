@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator;
+namespace ABadCafe\Synth\Signal\Waveform;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Utility;
 use function Utility\dprintf;
@@ -37,15 +37,15 @@ class Factory implements Utility\IFactory {
     ];
 
     const COMPLEX_TYPES = [
-        'table' => 'createWaveTable',
+        'table' => 'createTable',
     ];
 
     /**
      * @param  object $oDescription
-     * @return Signal\IGenerator
+     * @return Signal\IWaveform
      * @throws \Exception
      */
-    public function createFrom(object $oDescription) : Signal\IGenerator {
+    public function createFrom(object $oDescription) : Signal\IWaveform {
         $sType          = strtolower($oDescription->type ?? '<none>');
         $sSimpleProduct = self::SIMPLE_TYPES[$sType] ?? null;
         if ($sSimpleProduct) {
@@ -53,7 +53,7 @@ class Factory implements Utility\IFactory {
                 (float)($oDescription->min ?? Signal\ILimits::F_MIN_LEVEL_NO_CLIP),
                 (float)($oDescription->max ?? Signal\ILimits::F_MAX_LEVEL_NO_CLIP),
                 isset($oDescription->shaper) && is_object($oDescription->shaper) ?
-                    WaveShaper\Factory::get()->createFrom($oDescription->shaper) :
+                    Shaper\Factory::get()->createFrom($oDescription->shaper) :
                     null
             );
         }
@@ -62,7 +62,7 @@ class Factory implements Utility\IFactory {
             $cCreator = [$this, $sComplexProduct];
             return $cCreator($oDescription);
         }
-        throw new \Exception('Unknown Generator Type ' . $sType);
+        throw new \Exception('Unknown Waveform Type ' . $sType);
     }
 
     /**
@@ -74,10 +74,10 @@ class Factory implements Utility\IFactory {
 
     /**
      * @param  object $oDescription
-     * @return Signal\IGenerator
+     * @return Signal\IWaveform
      * @throws \Exception
      */
-    private function createWaveTable(object $oDesciption) : Signal\IGenerator {
+    private function createTable(object $oDesciption) : Signal\IWaveform {
         if (
             !isset($oDesciption->data) ||
             !is_array($oDesciption->data) ||
@@ -90,11 +90,11 @@ class Factory implements Utility\IFactory {
         if ($iSizeExp < WaveTable::I_MIN_SIZE_EXP || (1<<$iSizeExp) !== $iSize) {
             throw new \Exception("Invalid WaveTable length");
         }
-        $oGenerator = new WaveTable($iSizeExp);
-        $oTableData = $oGenerator->getTable();
+        $oWaveform =  new Table($iSizeExp);
+        $oTableData = $oWaveform->getData();
         foreach ($oDesciption->data as $i => $fValue) {
             $oTableData[$i] = (float)$fValue;
         }
-        return $oGenerator;
+        return $oWaveform;
     }
 }

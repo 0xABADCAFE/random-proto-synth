@@ -41,9 +41,9 @@ class Factory implements Utility\IFactory {
         $sType    = strtolower($oDescription->type ?? '<none>');
         $sProduct = self::PRODUCT_TYPES[$sType] ?? null;
         if ($sProduct) {
-            $oGenerator = $this->getGenerator($oDescription);
+            $oWaveform = $this->getWaveform($oDescription);
             $cCreator = [$this, $sProduct];
-            return $cCreator($oDescription, $oGenerator);
+            return $cCreator($oDescription, $oWaveform);
         }
         throw new \Exception('Unknown Control Oscillator Type ' . $sType);
     }
@@ -56,27 +56,27 @@ class Factory implements Utility\IFactory {
     }
 
     /**
-     * Get the generator dependency
+     * Get the waveform dependency
      *
      * @param object $oDescription
-     * @return Signal\IGenerator
+     * @return Signal\IWaveform
      * @throws \Exception
      */
-    private function getGenerator(object $oDescription) : Signal\IGenerator {
-        if (!isset($oDescription->generator) || !is_object($oDescription->generator)) {
-            throw new \Exception('Control Oscillator missing generator');
+    private function getWaveform(object $oDescription) : Signal\IWaveform {
+        if (!isset($oDescription->waveform) || !is_object($oDescription->waveform)) {
+            throw new \Exception('Control Oscillator missing waveform');
         }
-        return Signal\Generator\Factory::get()->createFrom($oDescription->generator);
+        return Signal\Waveform\Factory::get()->createFrom($oDescription->waveform);
     }
 
     /**
      * @param  object $oDescription
-     * @param  Signal\IGenerator $oGenerator
+     * @param  Signal\IWaveform $oWaveform
      * @return FixedLFO
      */
-    private function createFixedLFO(object $oDescription, Signal\IGenerator $oGenerator) : FixedLFO {
+    private function createFixedLFO(object $oDescription, Signal\IWaveform $oWaveform) : FixedLFO {
         return new FixedLFO(
-            $oGenerator,
+            $oWaveform,
             (float)($oDescription->rate ??  ILimits::F_DEF_FREQ),
             (float)($oDescription->depth ?? 0.5)
         );

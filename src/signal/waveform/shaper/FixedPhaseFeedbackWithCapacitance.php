@@ -13,15 +13,15 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Generator\WaveShaper;
-use ABadCafe\Synth\Signal\Generator;
+namespace ABadCafe\Synth\Signal\Waveform\Shaper;
+use ABadCafe\Synth\Signal\Waveform;
 
 /**
  * FixedPhaseFeedbackWithCapacitance
  *
  * Combines Phase Feedback with Capacitance
  */
-class FixedPhaseFeedbackWithCapacitance implements Generator\IWaveShaper {
+class FixedPhaseFeedbackWithCapacitance implements Waveform\IShaper {
 
     protected float
         $fFeedback         = 0.1,

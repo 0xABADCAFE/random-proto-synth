@@ -149,12 +149,12 @@ interface IStream {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * IGenerator
+ * IWaveform
  *
- * Main signal generator interface. Function generators generate a basic waveform, with a time-independent duty
- * cycle of 0.0 - 1.0. Values outside this range will have their integer part ignored.
+ * Main waveform interface. Waveforms define a basic repeating shape that has a time-independent period. These are used
+ * by Oscillators to produce a time varying Signal.
  */
-interface IGenerator {
+interface IWaveform {
 
     /**
      * Returns the period of this function, i.e. the numeric interval after which it's output cycles.
