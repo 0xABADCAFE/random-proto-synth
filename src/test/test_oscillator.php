@@ -27,7 +27,7 @@ $aWaveforms = [
     'table'         => new Signal\Waveform\Wavetable(8)
 ];
 
-$oTable = $aWaveforms['table']->getData();
+$oTable = $aWaveforms['table']->getValues();
 $fScale = 1.0 / count($oTable);
 foreach($oTable as $i => $fValue) {
     $oTable[$i] = (2 ** ($i * $fScale)) - 1.5;

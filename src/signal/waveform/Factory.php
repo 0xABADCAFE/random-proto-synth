@@ -91,7 +91,7 @@ class Factory implements Utility\IFactory {
             throw new \Exception("Invalid WaveTable length");
         }
         $oWaveform =  new Table($iSizeExp);
-        $oTableData = $oWaveform->getData();
+        $oTableData = $oWaveform->getValues();
         foreach ($oDesciption->data as $i => $fValue) {
             $oTableData[$i] = (float)$fValue;
         }

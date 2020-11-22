@@ -50,7 +50,7 @@ class WaveTable implements Signal\IWaveform {
     /**
      * @return SPLFixedArray
      */
-    public function getData() : SPLFixedArray {
+    public function getValues() : SPLFixedArray {
         return $this->oTable;
     }
 

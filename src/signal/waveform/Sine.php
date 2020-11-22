@@ -24,7 +24,7 @@ use \SPLFixedArray;
  *
  * Maps input values to a sine wave output.
  */
-class Sine extends Base {
+class Sine extends Primitive {
 
     const F_PERIOD = 2.0 * M_PI;
 

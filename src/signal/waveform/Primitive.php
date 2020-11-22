@@ -21,7 +21,7 @@ use ABadCafe\Synth\Signal;
 /**
  * Base class for non-flat generator functions
  */
-abstract class Base implements Signal\IWaveform {
+abstract class Primitive implements Signal\IWaveform {
 
     protected float
         $fMinLevel,
