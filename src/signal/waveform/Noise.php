@@ -45,8 +45,15 @@ class Noise extends Base {
     public function map(Signal\IPacket $oInput) : Signal\IPacket {
         $oOutput = clone $oInput;
         $oValues = $oOutput->getValues();
-        foreach($oValues as $i => $fValue) {
-            $oValues[$i] = $this->fMinLevel + mt_rand() * $this->fScaleLevel;
+
+        if ($this->oShaper) {
+            foreach ($oValues as $i => $fTime) {
+                $oValues[$i] = $this->oShaper->modifyOutput($this->fMinLevel + mt_rand() * $this->fScaleLevel);
+            }
+        } else {
+            foreach($oValues as $i => $fValue) {
+                $oValues[$i] = $this->fMinLevel + mt_rand() * $this->fScaleLevel;
+            }
         }
         return $oOutput;
     }
