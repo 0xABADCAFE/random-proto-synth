@@ -55,8 +55,8 @@ abstract class Base implements IOscillator {
      */
     public function __construct(
         Signal\IWaveform $oWaveform,
-        float             $fFrequency  = ILimits::F_DEF_FREQ,
-        float             $fPhase      = 0.0
+        float            $fFrequency  = ILimits::F_DEF_FREQ,
+        float            $fPhase      = 0.0
     ) {
         $this->oWaveform        = $oWaveform;
         $this->oWaveformInput   = new Signal\Audio\Packet();
