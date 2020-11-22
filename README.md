@@ -25,7 +25,7 @@ Signal data are generated and processed in discrete _Packets_ that contain a glo
 ### Waveforms
 Waveforms represent basic periodic waveform shapes in a time/frequency independent manner and define the numerical period after they repeat. Waveforms typically accept a Packet of input values for which a Packet of the corresponding output values will be returned. Waveforms can have their minimum and maximum output levels specified and can have specialised _Shapers_ applied that modify their behaviour.
 
-Read more [here](./docs/Waveform.md)
+Read more [here](./doc/Waveform.md)
 
 
 ### Oscillators
