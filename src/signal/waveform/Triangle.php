@@ -22,7 +22,7 @@ use \SPLFixedArray;
 /**
  * Basic triangle generator
  */
-class Triangle extends Base {
+class Triangle extends Primitive {
 
     const F_PERIOD = 2.0;
 
