@@ -74,5 +74,6 @@ As the intensity of the shaper is increased, the crossover points become increas
 This _Shaper_ is a union of the _FixedPhaseFeedback_ and _FixedCapacitance_ performing both operations simultaneously.
 
 ## Entity Diagram
+The following interfaces and classes make up the wave shaper components of the system.
 
 ![class layout](./images/waveform/shaper/classes.png)

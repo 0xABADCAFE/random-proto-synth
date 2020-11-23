@@ -30,13 +30,13 @@ The most primitive audio _Oscillator_, providing the basic services described ab
 
 ### 2. Super
 
-An extension of the _Simple_ _Oscillator_ that adds a user defined stack of harmonics. Each harmonic has it's own frequency multiplier relative to the main frequency, intensity and phase offset, equivalent to using an entire set of _Simple_ _Oscillators_ mixed together.
+This _Oscillator_ adds a user defined stack of harmonics. Each harmonic has it's own frequency multiplier relative to the main frequency, intensity and phase offset, equivalent to using an entire set of _Simple_ _Oscillators_ mixed together.
 
 This _Oscillator_ can be used to produce chords, detunes and other interesting effects. Particularly useful for creating thicker sounds from basic the saw _Waveforms_.
 
 ### 3. Morphing
 
-An extension of the _Simple_ _Oscillator_ that accepts two additional _Waveform_ parameters, a secondary and a mixer. The _Oscillator_ blends between the primary and secondary _Waveform_ shapes using the mixer _Waveform_ output value to control the mixing:
+This _Oscillator_ accepts two additional _Waveform_ parameters, a secondary and a mixer. The _Oscillator_ blends between the primary and secondary _Waveform_ shapes using the mixer _Waveform_ output value to control the mixing:
 
 - When the mixer _Waveform_ output is 1.0, only the primary _Waveform_ is used.
 - When the mixer _Waveform_ output us -1.0, only the secondary _Waveform_ is used.
@@ -45,4 +45,6 @@ An extension of the _Simple_ _Oscillator_ that accepts two additional _Waveform_
 The secondary _Waveform_ frequency is set as a user-defined multiple of the fundamental, while the mixing _Waveform_ frequency is set independently.
 
 ## Entity Diagram
+The following interfaces and classes make up the audio _Oscillator_ components of the system. Note the top level _Signal\IStream_, _Signal\IPacket_ and _Oscillator\IOscillator_ interfaces are first specialised into an _Audio_ subnamespace and then implemented.
 
+![class layout](./images/oscillator/audio/classes.png)

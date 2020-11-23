@@ -82,5 +82,6 @@ Custom defined lookup table that uses a supplied array of values and linearly in
 - The size of the array is defined on construction as a given power of 2. For example, an input of 8 creates an internal table of 256 entries.
 
 ## Entity Diagram
+The following interfaces and classes make up the _Waveform_ components of the system. Note that the _Waveform_ map() behaviour is completely indifferent to the type of _Signal\IPacket_ given as input and in response always returns the same specific implementation type as the input. This allows the same _Waveform_ to be used in the production of audio and control signals.
 
 ![class layout](./images/waveform/classes.png)
