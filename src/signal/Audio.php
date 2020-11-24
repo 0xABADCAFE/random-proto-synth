@@ -65,6 +65,87 @@ interface IStream extends Signal\IStream {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * FixedMixer
+ *
+ * Implements a fixed level mixer for a set IStreams, each with their own level.
+ */
+class FixedMixer implements IStream {
+
+    use Signal\TContextIndexAware;
+
+    private int    $iPosition = 0;
+    private array  $aStreams  = [];
+    private array  $aLevels   = [];
+    private Packet $oLastPacket;
+
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        $this->oLastPacket = new Packet();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPosition() : int {
+        return $this->iPosition;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function reset() : self {
+        $this->iPosition  = 0;
+        $this->iLastIndex = 0;
+        $this->oLastPacket->fillWith(0);
+        foreach ($this->aStreams as $oStream) {
+            $oStream->reset();
+        }
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function emit(?int $iIndex = null) : Packet {
+        if (empty($this->aLevels) || $this->useLast($iIndex)) {
+            return $this->oLastPacket;
+        }
+        return $this->emitNew();
+    }
+
+    /**
+     * @param  IStream $oStream
+     * @param  float   $fLevel
+     * @return self
+     */
+    public function add(IStream $oStream, float $fLevel) : self {
+        if (abs($fLevel) > 0.0) {
+            $this->aStreams[] = $oStream;
+            $this->aLevels[]  = $fLevel;
+        }
+        return $this;
+    }
+
+    /**
+     * @return Packet
+     */
+    private function emitNew() : Packet {
+        $this->oLastPacket->fillWith(0.0);
+        foreach ($this->aStreams as $i => $oStream) {
+            $this->oLastPacket->accumulate(
+                $oStream->emit($this->iLastIndex),
+                $this->aLevels[$i]
+            );
+        }
+        return $this->oLastPacket;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
  * IFilter
  *
  * Main audio signal filter interface. The filter cutoff is normalised such that the range 0.0 - 1.0 covers the full

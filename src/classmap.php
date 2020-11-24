@@ -35,6 +35,7 @@ const CLASS_MAP = [
   'ABadCafe\\Synth\\Signal\\TContextIndexAware' => '/signal/Context.php',
   'ABadCafe\\Synth\\Signal\\Audio\\Packet' => '/signal/Audio.php',
   'ABadCafe\\Synth\\Signal\\Audio\\IStream' => '/signal/Audio.php',
+  'ABadCafe\\Synth\\Signal\\Audio\\FixedMixer' => '/signal/Audio.php',
   'ABadCafe\\Synth\\Signal\\Audio\\IFilter' => '/signal/Audio.php',
   'ABadCafe\\Synth\\Signal\\Control\\Factory' => '/signal/control/Factory.php',
   'ABadCafe\\Synth\\Signal\\Waveform\\Triangle' => '/signal/waveform/Triangle.php',
