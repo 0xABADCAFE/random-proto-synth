@@ -83,6 +83,16 @@ trait TPacketImplementation {
     }
 
     /**
+     * Copy the internal data from another Packet
+     *
+     * @param self $oPacket
+     */
+    public function copyFrom(self $oPacket) : self {
+        $this->oValues = clone $oPacket->oValues;
+        return $this;
+    }
+
+    /**
      * Multiply the values in this packet with those in the provided packet
      *
      * @param  Packet $oPacket
