@@ -14,6 +14,7 @@
 declare(strict_types = 1);
 
 namespace ABadCafe\Synth\Operator;
+use ABadCafe\Synth\Oscillator\Audio;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Oscillator;
 
@@ -26,16 +27,31 @@ use ABadCafe\Synth\Oscillator;
  */
 class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeModulated, IPhaseModulated {
 
-    protected array
-        /** @var IOperator[] $aModulators - keyed by instance ID */
-        $aModulators = [],
+    protected Signal\Audio\Stream\FixedMixer $oPhaseMixer;
+    protected Signal\Audio\Stream\FixedMixer $oAmplitudeMixer;
 
-        /** @var float[] $aPhaseModulationIndex - keyed by instance ID */
-        $aPhaseModulationIndex = [],
-
-        /** @var float[] $aAmplidudeModulationIndex - keyed by instance ID */
-        $aAmplitudeModulationIndex = []
-    ;
+    /**
+     * @overridden
+     */
+    public function __construct(
+        Audio\IOscillator       $oOscillator,
+        float                   $fFrequencyRatio   = 1.0,
+        float                   $fDetune           = 0.0,
+        Signal\Control\IStream  $oAmplitudeControl = null,
+        Signal\Control\IStream  $oPitchControl     = null,
+        Map\Note\IMIDINumber    $oRootNoteMap      = null
+    ) {
+        parent::__construct(
+            $oOscillator,
+            $fFrequencyRatio,
+            $fDetune,
+            $oAmplitudeControl,
+            $oPitchControl,
+            $oRootNoteMap
+        );
+        $this->oPhaseMixer     = new Signal\Audio\Stream\FixedMixer();
+        $this->oAmplitudeMixer = new Signal\Audio\Stream\FixedMixer();
+    }
 
     /**
      * @inheritdoc
@@ -70,8 +86,11 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
      * @see IAmplitudeModulated
      */
     public function attachAmplitudeModulatorInput(IOperator $oOperator, float $fLevel) : self {
-        $this->aModulators[$oOperator->iInstanceID]               = $oOperator;
-        $this->aAmplitudeModulationIndex[$oOperator->iInstanceID] = $fLevel;
+        $this->oAmplitudeMixer->addStream(
+            (string)$oOperator->iInstanceID,
+            $oOperator,
+            $fLevel
+        );
         return $this;
     }
 
@@ -80,8 +99,11 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
      * @see IPhaseModulated
      */
     public function attachPhaseModulatorInput(IOperator $oOperator, float $fLevel) : self {
-        $this->aModulators[$oOperator->iInstanceID]           = $oOperator;
-        $this->aPhaseModulationIndex[$oOperator->iInstanceID] = $fLevel;
+        $this->oPhaseMixer->addStream(
+            (string)$oOperator->iInstanceID,
+            $oOperator,
+            $fLevel
+        );
         return $this;
     }
 
@@ -93,17 +115,7 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
      */
     protected function emitNew() : Signal\Audio\Packet {
 
-        $oPhaseAccumulator     = empty($this->aPhaseModulationIndex)     ? null : new Signal\Audio\Packet();
-        $oAmplitudeAccumulator = empty($this->aAmplitudeModulationIndex) ? null : new Signal\Audio\Packet();
-        foreach ($this->aModulators as $iInstanceID => $oOperator) {
-            $oPacket = $oOperator->emit($this->iLastIndex);
-            if (isset($this->aPhaseModulationIndex[$iInstanceID])) {
-                $oPhaseAccumulator->accumulate($oPacket, $this->aPhaseModulationIndex[$iInstanceID]);
-            }
-            if (isset($this->aAmplitudeModulationIndex[$iInstanceID])) {
-                $oAmplitudeAccumulator->accumulate($oPacket, $this->aAmplitudeModulationIndex[$iInstanceID]);
-            }
-        }
+        $oPhaseAccumulator = $this->oPhaseMixer->isSilent() ? null : $this->oPhaseMixer->emit($this->iLastIndex);
 
         // Apply any phase modulation
         if ($oPhaseAccumulator) {
@@ -121,6 +133,8 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
         } else {
             $this->oLastPacket = $this->oOscillator->emit($this->iLastIndex);
         }
+
+        $oAmplitudeAccumulator = $this->oAmplitudeMixer->isSilent() ? null : $this->oAmplitudeMixer->emit($this->iLastIndex);
 
         // Apply any amplitude modulation
         if ($oAmplitudeAccumulator) {
