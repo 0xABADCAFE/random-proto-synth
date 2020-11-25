@@ -5,16 +5,15 @@ namespace ABadCafe\Synth;
 require_once '../Synth.php';
 
 
-$oOscillator1 = new Oscillator\Audio\Simple(new Signal\Waveform\Sine(), 440);
-$oOscillator2 = new Oscillator\Audio\Simple(new Signal\Waveform\Triangle(), 880);
-$oOscillator3 = new Oscillator\Audio\Simple(new Signal\Waveform\SawDown(), 440);
+$oOscillator1 = new Oscillator\Audio\Simple(new Signal\Waveform\SawDown(), 220);
+$oOscillator2 = new Oscillator\Audio\Simple(new Signal\Waveform\SawDown(), 440);
+$oOscillator3 = new Oscillator\Audio\Simple(new Signal\Waveform\SawDown(), 880);
 
 $oMixer = new Signal\Audio\Stream\FixedMixer();
 $oMixer
-    ->addStream($oOscillator2, -0.25)
-    ->addStream($oOscillator1, 0.75)
-    ->addStream($oOscillator2, 0.25)
-    ->addStream($oOscillator3, 0.25);
+    ->addStream('osc1', $oOscillator1, 0.5)
+    ->addStream('osc2', $oOscillator2, 0.25)
+    ->addStream('osc3', $oOscillator3, 0.125);
 
 
 $iOneSecond = Signal\Context::get()->getProcessRate();

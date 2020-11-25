@@ -47,6 +47,13 @@ class FixedMixer implements Signal\Audio\IStream {
     }
 
     /**
+     * Returns true if the mixer has no inputs to mix.
+     */
+    public function isSilent() : bool {
+        return empty($this->aStreams);
+    }
+
+    /**
      * @inheritDoc
      */
     public function reset() : self {
@@ -71,34 +78,27 @@ class FixedMixer implements Signal\Audio\IStream {
     }
 
     /**
-     * Adds an input IStream to the internal set, with the following extras:
+     * Adds a named stream, overwriting any existing stream of the same name,
      *
-     * If the level is zero, does not add
-     * If the IStream is already known, sums the existing and new level
-     *    If the new level is zero, the IStream is removed from the internal set, otherwise
-     *    Updates the level of the existing IStream
-     *
+     * @param  string  $sName
      * @param  IStream $oStream
      * @param  float   $fLevel
      * @return self
      */
-    public function addStream(Signal\Audio\IStream $oStream, float $fLevel) : self {
-        if (abs($fLevel) > 0.0) {
-            // OK, this is a search but strict comparison on a small set of object instances should be quick.
-            $iKnown = array_search($oStream, $this->aStreams, true);
-            if (false === $iKnown) {
-                $this->aStreams[] = $oStream;
-                $this->aLevels[]  = $fLevel;
-            } else {
-                $fNewLevel = $this->aLevels[$iKnown] + $fLevel;
-                if (abs($fNewLevel) > 0) {
-                    $this->aLevels[$iKnown] = $fNewLevel;
-                } else {
-                    unset($this->aStreams[$iKnown]);
-                    unset($this->aLevels[$iKnown]);
-                }
-            }
-        }
+    public function addStream(string $sName, Signal\Audio\IStream $oStream, float $fLevel) : self {
+        $this->aStreams[$sName] = $oStream;
+        $this->aLevels[$sName]  = $fLevel;
+        return $this;
+    }
+
+    /**
+     * Remove a named stream
+     *
+     * @return self
+     */
+    public function removeStream(string $sName) : self {
+        unset($this->aStreams[$sName]);
+        unset($this->aLevels[$sName]);
         return $this;
     }
 
