@@ -46,21 +46,6 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
 
     /**
      * @inheritdoc
-     */
-    public function reset() : Signal\Audio\IStream {
-        $this->oOscillator->reset();
-        if ($this->oAmplitudeControl) {
-            $this->oAmplitudeControl->reset();
-        }
-        if ($this->oPitchControl) {
-            $this->oPitchControl->reset();
-        }
-        $this->iPacketIndex = 0;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
      *
      * This Operator only accepts modulating inputs. An E_SIGNAL input will be interpreted E_AMPLITUDE.
      */
@@ -130,20 +115,18 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
             $this->oOscillator->setPitchModulation($this->oPitchControl->emit($this->iLastIndex));
         }
 
-        // Get the raw oscillator output
-        $oOscillatorPacket = $this->oOscillator->emit($this->iLastIndex);
-
-        // Apply any amplitude control
-        if ($this->oAmplitudeControl) {
-            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit($this->iLastIndex));
+        // If we have a volume control, get the amplifier output. Otherwise, the raw oscillator
+        if ($this->oAmplifier) {
+            $this->oLastPacket = $this->oAmplifier->emit($this->iLastIndex);
+        } else {
+            $this->oLastPacket = $this->oOscillator->emit($this->iLastIndex);
         }
 
         // Apply any amplitude modulation
         if ($oAmplitudeAccumulator) {
-            $oOscillatorPacket->modulateWith($oAmplitudeAccumulator);
+            $this->oLastPacket->modulateWith($oAmplitudeAccumulator);
         }
 
-        $this->oLastPacket = $oOscillatorPacket;
         return $this->oLastPacket;
     }
 
