@@ -38,6 +38,7 @@ const CLASS_MAP = [
   'ABadCafe\\Synth\\Signal\\Audio\\IFilter' => '/signal/Audio.php',
   'ABadCafe\\Synth\\Signal\\Control\\Factory' => '/signal/control/Factory.php',
   'ABadCafe\\Synth\\Signal\\Control\\Stream\\FixedMixer' => '/signal/control/Stream.php',
+  'ABadCafe\\Synth\\Signal\\Control\\Stream\\SemitonesToMultiplier' => '/signal/control/Stream.php',
   'ABadCafe\\Synth\\Signal\\Waveform\\Triangle' => '/signal/waveform/Triangle.php',
   'ABadCafe\\Synth\\Signal\\Waveform\\Square' => '/signal/waveform/Square.php',
   'ABadCafe\\Synth\\Signal\\Waveform\\Sine' => '/signal/waveform/Sine.php',

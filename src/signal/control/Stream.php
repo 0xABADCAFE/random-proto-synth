@@ -124,7 +124,7 @@ class FixedMixer implements Signal\Control\IStream {
  *
  * Converts a Control Stream expressed as pitch control in semitones to a frequency multiplier.
  */
-class SemitonesToScale implements Signal\Control\IStream {
+class SemitonesToMultiplier implements Signal\Control\IStream {
 
     const F_INV_TWELVE = 1.0/12.0;
 
