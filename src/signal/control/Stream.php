@@ -116,3 +116,68 @@ class FixedMixer implements Signal\Control\IStream {
         return $this->oLastPacket;
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * SemitonesToScale
+ *
+ * Converts a Control Stream expressed as pitch control in semitones to a frequency multiplier.
+ */
+class SemitonesToScale implements Signal\Control\IStream {
+
+    const F_INV_TWELVE = 1.0/12.0;
+
+    use Signal\TContextIndexAware;
+
+    private Signal\Control\IStream $oInput;
+    private Signal\Control\Packet  $oLastPacket;
+
+    /**
+     * @param Signal\Control\IStream $oInput
+     */
+    public function __construct(Signal\Control\IStream $oInput) {
+        $this->oInput      = $oInput;
+        $this->oLastPacket = new Signal\Control\Packet();
+        $this->oLastPacket->fillWith(1.0);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPosition() : int {
+        return $this->oInput->getPosition();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function reset() : self {
+        $this->iLastIndex = 0;
+        $this->oLastPacket->fillWith(1.0);
+        $this->oInput->reset();
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function emit(?int $iIndex = null) : Signal\Control\Packet {
+        if ($this->useLast($iIndex)) {
+            return $this->oLastPacket;
+        }
+        return $this->emitNew();
+    }
+
+    /**
+     * @return Signal\Control\Packet
+     */
+    private function emitNew() : Signal\Control\Packet {
+        $oSemitoneValues   = $this->oInput->emit($this->iLastIndex)->getValues();
+        $oMultiplierValues = $this->oLastPacket->getValues();
+        foreach ($oSemitoneValues as $i => $fSemitone) {
+            $oMultiplierValues[$i] = 2.0 ** ($fSemitone * self::F_INV_TWELVE);
+        }
+        return $this->oLastPacket;
+    }
+}

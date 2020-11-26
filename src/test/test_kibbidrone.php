@@ -22,7 +22,7 @@ for ($i = 0; $i < I_NUM_OSC; ++$i) {
     $fStartRatio = 0.1 * mt_rand(-600, -360);
     $fEndRatio   = 12*mt_rand(-2, 2);
 
-    $aEnvelopes[$i] = new Envelope\Waveform\LinearInterpolated(
+    $aEnvelopes[$i] = new Envelope\Generator\LinearInterpolated(
         new Envelope\Shape(
             $fStartRatio + $fDetune, [
                 [$fEndRatio + $fDetune, 4.0],
