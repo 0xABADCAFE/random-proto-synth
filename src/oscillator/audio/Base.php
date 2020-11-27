@@ -24,27 +24,24 @@ use function ABadCafe\Synth\Utility\clamp;
  */
 abstract class Base implements IOscillator {
 
-    const F_INV_TWELVE = 1.0/12.0;
-
     protected Signal\IWaveform $oWaveform;
     protected Signal\Audio\Packet
         $oWaveformInput,
         $oLastOutput
     ;
+
+    protected ?Signal\Control\IStream $oPitchModulator = null;
+    protected ?Signal\Audio\IStream   $oPhaseModulator = null;
+
     protected int $iSamplePosition = 0;
 
     protected float
         $fFrequency        = ILimits::F_DEF_FREQ, // The base frequency
         $fCurrentFrequency = ILimits::F_DEF_FREQ, // The present instantaneous frequency considering any pitch control
         $fPhaseCorrection  = 0.0,                 // The accumulated phase difference as a result of pitch control */
+        $fWaveformPeriod   = 1.0,                 // The period of the Waveform
         $fScaleVal         = 0.0
     ;
-
-    protected ?\SPLFixedArray
-        $oPhaseShift = null,
-        $oPitchShift = null
-    ;
-
 
     /**
      * Constructor.
@@ -62,7 +59,24 @@ abstract class Base implements IOscillator {
         $this->oWaveformInput   = new Signal\Audio\Packet();
         $this->oLastOutput      = new Signal\Audio\Packet();
         $this->setFrequency($fFrequency);
-        $this->fPhaseCorrection = $oWaveform->getPeriod() * $fPhase;
+        $this->fWaveformPeriod  = $oWaveform->getPeriod();
+        $this->fPhaseCorrection = $this->fWaveformPeriod * $fPhase;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setPitchModulator(?Signal\Control\IStream $oPitchModulator) : self {
+        $this->oPitchModulator = $oPitchModulator;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setPhaseModulator(?Signal\Audio\IStream $oPhaseModulator) : self {
+        $this->oPhaseModulator = $oPhaseModulator;
+        return $this;
     }
 
     /**
@@ -90,12 +104,17 @@ abstract class Base implements IOscillator {
     }
 
     /**
-     * Get the oscillator signal frequency
-     *
-     * @return int
+     * @inheritDoc
      */
     public function getFrequency() : float {
         return $this->fFrequency;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentFrequency() : float {
+        return $this->fCurrentFrequency;
     }
 
     /**
@@ -122,39 +141,6 @@ abstract class Base implements IOscillator {
         $this->fFrequency = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
         $this->fScaleVal  = $this->oWaveform->getPeriod() * $this->fFrequency * Signal\Context::get()->getSamplePeriod();
         $this->fCurrentFreqency = $this->fFrequency;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPitchModulation(Signal\Control\Packet $oPitch = null) : self {
-        if ($oPitch) {
-            // Convert the linear semitone based shifts into absolute multiples of the base frequency
-            $this->oPitchShift = clone $oPitch->getValues();
-            foreach ($this->oPitchShift as $i => $fValue) {
-                $this->oPitchShift[$i] = $this->fFrequency * (2 ** ($fValue * self::F_INV_TWELVE));
-            }
-        } else {
-            $this->oPitchShift = null;
-        }
-        return $this;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function setPhaseModulation(Signal\Audio\Packet $oPhase = null) : self {
-        if ($oPhase) {
-            $fPhaseSize = $this->oWaveform->getPeriod();
-            $this->oPhaseShift = clone $oPhase->getValues();
-            foreach ($this->oPhaseShift as $i => $fValue) {
-                $this->oPhaseShift[$i] = $fValue * $fPhaseSize;
-            }
-        } else {
-            $this->oPhaseShift = null;
-        }
         return $this;
     }
 

@@ -32,7 +32,8 @@ class Prototype implements IOscillator {
         $oLastOutput
     ;
 
-    protected ?Signal\Control\IStream $oPitchControl = null;
+    protected ?Signal\Control\IStream $oPitchModulator   = null;
+    protected ?Signal\Audio\IStream   $oPhaseModulator = null;
 
     protected int $iSamplePosition = 0;
 
@@ -43,26 +44,25 @@ class Prototype implements IOscillator {
         $fScaleVal         = 0.0
     ;
 
-    protected ?\SPLFixedArray
-        $oPhaseShift = null
-    ;
-
     /**
      * Constructor.
      *
      * @param Signal\IWaveform            $oWaveform
-     * @param Signal\Control\IStream|null $oPitchControl = null,
+     * @param Signal\Control\IStream|null $oPitchModulator,
+     * @param Signal\Audio\IStream|null   $oPhaseModulator,
      * @param float                       $fFrequency
      * @param float                       $fPhase;
      */
     public function __construct(
         Signal\IWaveform        $oWaveform,
-        ?Signal\Control\IStream $oPitchControl = null,
-        float                   $fFrequency    = ILimits::F_DEF_FREQ,
-        float                   $fPhase        = 0.0
+        ?Signal\Control\IStream $oPitchModulator = null,
+        ?Signal\Audio\IStream   $oPhaseModulator = null,
+        float                   $fFrequency      = ILimits::F_DEF_FREQ,
+        float                   $fPhase          = 0.0
     ) {
         $this->oWaveform        = $oWaveform;
-        $this->oPitchControl    = $oPitchControl;
+        $this->oPitchModulator  = $oPitchModulator;
+        $this->oPhaseModulator  = $oPhaseModulator;
         $this->oWaveformInput   = new Signal\Audio\Packet();
         $this->oLastOutput      = new Signal\Audio\Packet();
         $this->setFrequency($fFrequency);
@@ -70,17 +70,18 @@ class Prototype implements IOscillator {
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function setPitchModulation(Signal\Control\Packet $oPitch = null) : self {
+    public function setPitchModulator(?Signal\Control\IStream $oPitchModulator) : self {
+        $this->oPitchModulator = $oPitchModulator;
         return $this;
     }
 
-
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function setPhaseModulation(Signal\Audio\Packet $oPhase = null) : self {
+    public function setPhaseModulator(?Signal\Audio\IStream $oPhaseModulator) : self {
+        $this->oPhaseModulator = $oPhaseModulator;
         return $this;
     }
 
@@ -109,12 +110,17 @@ class Prototype implements IOscillator {
     }
 
     /**
-     * Get the oscillator signal frequency
-     *
-     * @return int
+     * @inheritDoc
      */
     public function getFrequency() : float {
         return $this->fFrequency;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentFrequencty() : float {
+        return $this->fCurrentFrequency;
     }
 
     /**
@@ -157,8 +163,8 @@ class Prototype implements IOscillator {
 
         $oValues = $this->oWaveformInput->getValues();
 
-        if ($this->oPitchControl) {
-            $oPitchShift = clone $this->oPitchControl->emit($this->iLastIndex)->getValues();
+        if ($this->oPitchModulator) {
+            $oPitchShift = clone $this->oPitchModulator->emit($this->iLastIndex)->getValues();
 
             // Every sample point has a new frequency, we must also correct the phase for every sample point.
             // The phase correction is accumulated, which is equivalent to integrating over the time step.
@@ -175,6 +181,14 @@ class Prototype implements IOscillator {
             // Basic linear intervals, there is no phase adjustment
             foreach ($oValues as $i => $fValue) {
                 $oValues[$i] = $this->fScaleVal * $this->iSamplePosition++;
+            }
+        }
+
+        if ($this->oPhaseModulator) {
+            $fPhaseSize  = $this->oWaveform->getPeriod();
+            $oPhaseShift = clone $this->oPhaseModulator->emit($this->iLastIndex)->getValues();
+            foreach ($oPhaseShift as $i => $fValue) {
+                $oValues[$i] += $fPhaseSize * $fValue;
             }
         }
 

@@ -24,7 +24,7 @@ $aWaveforms = [
     'noise_full'    => new Signal\Waveform\Noise(),
     'noise_pos'     => new Signal\Waveform\Noise(0.01, 1.0),
     'noise_neg'     => new Signal\Waveform\Noise(-1.0, -0.01),
-    'table'         => new Signal\Waveform\Wavetable(8)
+    'table'         => new Signal\Waveform\Table(8)
 ];
 
 $oTable = $aWaveforms['table']->getValues();
@@ -53,22 +53,4 @@ foreach ($aWaveforms as $sName => $oWaveform) {
     $oOutput->close();
 }
 
-// Quick test of a morphing oscillator
-// $oOscillator = new Oscillator\Morphing(
-//     $aWaveforms['sine'],
-//     $aWaveforms['sine'],
-//     $aWaveforms['sine'],
-//     440,
-//     1.5,
-//     4
-// );
-//
-// echo "Testing : ", $oOscillator, "\n";
-// $oOutput->open('output/test_morph.wav');
-//
-// do {
-//     $oOutput->write($oOscillator->emit());
-// } while ($oOscillator->getPosition() < $iOneSecond);
-// echo "End: ", $oOscillator, "\n\n";
-//
-// $oOutput->close();
+

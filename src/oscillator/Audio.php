@@ -49,28 +49,31 @@ interface ILimits {
 interface IOscillator extends Oscillator\IOscillator, Signal\Audio\IStream {
 
     /**
-     * Set a pitch shift, per sample to be applied to the basic frequency. This is applied in subsequent calls to emit().
-     * The intent here is to support pitch envelope generators. However, as this is applied per sample point, we can use
-     * it to do some extreme FM effects too.
+     * Sets a Control stream input for pitch modulation. This is intended for things like LFO, Pitch Envelopes etc.
+     * The values in the control stream are interpreted as multiples of the base frequency of the oscillator. Use
+     * Signal\Control\Stream\SemitonesToMultiplier to convert output of any signal source defined in semitones for
+     * use here.
      *
-     * The Packet data points are interpreted as octaves to shift by, for example, -1 is an octave down, +1 is an octave up.
+     * Passing null clears any existing modulator.
      *
-     * @param  Signal\Control\Packet $oPitch
+     * @param  Signal\Control\IStream|null $oPitchModulator
      * @return self
      */
-    public function setPitchModulation(Signal\Control\Packet $oPitch = null) : self;
+    public function setPitchModulator(?Signal\Control\IStream $oPitchModulator) : self;
 
     /**
-     * Set a phase moulation, per sample, to be applied to the basic waveform. This is applied in subseuent calls to emit().
-     * The intent here is to allow Phase Modulation based FM synthesis.
+     * Sets an audio stream input for phase modulation. This is intended for FM synthesis purposes where output(s)
+     * from some other audio oscillator(s) modulate the phase of the oscillator but not it's fundamental frequency.
      *
-     * The packet data points are interpreted as duty cycle values to shift by. For example, -1 is one full period behind, +1 is
-     * one full period ahead.
-     *
-     * @param Signal\Audio\Packet $oPitch
+     * @param  Signal\Audio\IStream|null $oPhaseModulator
      * @return self
      */
-    public function setPhaseModulation(Signal\Audio\Packet $oPhase = null) : self;
+    public function setPhaseModulator(?Signal\Audio\IStream $oPhaseModulator) : self;
 
+    /**
+     * Gets the current instantaneous frequency of the oscillator, which may be very different than what is
+     * returned by getFrequency() due to the impact of any pitch modulation.
+     */
+    public function getCurrentFrequency() : float;
 }
 

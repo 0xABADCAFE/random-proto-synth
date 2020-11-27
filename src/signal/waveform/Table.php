@@ -26,7 +26,7 @@ use function ABadCafe\Synth\Utility\clamp;
  * Use a short lookup table as a wave period. The table must be a power of two in length. To enforce this,
  * construction takes the exponent size, which must be an integer between 2 and 8.
  */
-class WaveTable implements Signal\IWaveform {
+class Table implements Signal\IWaveform {
 
     const
         I_MIN_SIZE_EXP = 2,

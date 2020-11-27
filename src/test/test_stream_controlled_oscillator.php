@@ -12,9 +12,11 @@ $oEnvelope = new Envelope\Generator\LinearInterpolated(
         ]
     )
 );
+
 $oOscillator = new Oscillator\Audio\Prototype(
     new Signal\Waveform\Sine(),
     new Signal\Control\Stream\SemitonesToMultiplier($oEnvelope),
+    new Oscillator\Audio\Simple(new Signal\Waveform\Sine(), 220),
     440
 );
 

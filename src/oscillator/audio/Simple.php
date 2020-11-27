@@ -36,35 +36,35 @@ class Simple extends Base {
 
         $oValues = $this->oWaveformInput->getValues();
 
-        if ($this->oPitchShift) {
+        if ($this->oPitchModulator) {
+            $oPitchShift = $this->oPitchModulator->emit($this->iLastIndex)->getValues();
+
             // Every sample point has a new frequency, we must also correct the phase for every sample point.
             // The phase correction is accumulated, which is equivalent to integrating over the time step.
-            $fTimeStep     = Signal\Context::get()->getSamplePeriod() * $this->oWaveform->getPeriod();
-            foreach ($this->oPitchShift as $i => $fNextFrequency) {
+            $fTimeStep = Signal\Context::get()->getSamplePeriod() * $this->fWaveformPeriod;
+            foreach ($oPitchShift as $i => $fNextFrequencyMultiplier) {
+                $fNextFrequency          = $this->fFrequency * $fNextFrequencyMultiplier;
                 $fTime                   = $fTimeStep * $this->iSamplePosition++;
                 $oValues[$i]             = ($this->fCurrentFrequency * $fTime) + $this->fPhaseCorrection;
                 $this->fPhaseCorrection += $fTime * ($this->fCurrentFrequency - $fNextFrequency);
                 $this->fCurrentFrequency = $fNextFrequency;
             }
+
         } else {
-            // Basic linear intervals, there is no phase adjustment
+            // Basic linear intervals, there is no phase adjustment.
             foreach ($oValues as $i => $fValue) {
                 $oValues[$i] = $this->fScaleVal * $this->iSamplePosition++;
             }
         }
 
-        // Apply phase modulation
-        if ($this->oPhaseShift) {
-            foreach ($this->oPhaseShift as $i => $fPhase) {
-                $oValues[$i] += $fPhase;
+        if ($this->oPhaseModulator) {
+            $oPhaseShift = $this->oPhaseModulator->emit($this->iLastIndex)->getValues();
+            foreach ($oPhaseShift as $i => $fValue) {
+                $oValues[$i] += $this->fWaveformPeriod * $fValue;
             }
         }
 
         $this->oLastOutput = $this->oWaveform->map($this->oWaveformInput);
-
-        //$this->postProcess();
-
         return $this->oLastOutput;
     }
-
 }
