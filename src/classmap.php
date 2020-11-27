@@ -89,6 +89,7 @@ const CLASS_MAP = [
   'ABadCafe\\Synth\\Oscillator\\Control\\ControlledLFO' => '/oscillator/control/ControlledLFO.php',
   'ABadCafe\\Synth\\Oscillator\\Audio\\Factory' => '/oscillator/audio/Factory.php',
   'ABadCafe\\Synth\\Oscillator\\Audio\\Base' => '/oscillator/audio/Base.php',
+  'ABadCafe\\Synth\\Oscillator\\Audio\\Prototype' => '/oscillator/audio/Prototye.php',
   'ABadCafe\\Synth\\Oscillator\\Audio\\Super' => '/oscillator/audio/Super.php',
   'ABadCafe\\Synth\\Oscillator\\Audio\\Simple' => '/oscillator/audio/Simple.php',
   'ABadCafe\\Synth\\Map\\MIDIByte' => '/map/MIDIByte.php',
