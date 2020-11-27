@@ -24,6 +24,8 @@ use function ABadCafe\Synth\Utility\clamp;
  */
 abstract class Base implements IOscillator {
 
+    use Signal\TContextIndexAware;
+
     protected Signal\IWaveform $oWaveform;
     protected Signal\Audio\Packet
         $oWaveformInput,
@@ -39,7 +41,8 @@ abstract class Base implements IOscillator {
         $fFrequency        = ILimits::F_DEF_FREQ, // The base frequency
         $fCurrentFrequency = ILimits::F_DEF_FREQ, // The present instantaneous frequency considering any pitch control
         $fPhaseCorrection  = 0.0,                 // The accumulated phase difference as a result of pitch control */
-        $fWaveformPeriod   = 1.0,                 // The period of the Waveform
+        $fWaveformPeriod   = 1.0,                 // The period of the Waveform, to avoid repeatedly asking for it.
+        $fTimeStep         = 0.0,
         $fScaleVal         = 0.0
     ;
 
@@ -58,9 +61,10 @@ abstract class Base implements IOscillator {
         $this->oWaveform        = $oWaveform;
         $this->oWaveformInput   = new Signal\Audio\Packet();
         $this->oLastOutput      = new Signal\Audio\Packet();
-        $this->setFrequency($fFrequency);
         $this->fWaveformPeriod  = $oWaveform->getPeriod();
+        $this->fTimeStep        = Signal\Context::get()->getSamplePeriod() * $this->fWaveformPeriod;
         $this->fPhaseCorrection = $this->fWaveformPeriod * $fPhase;
+        $this->setFrequency($fFrequency);
     }
 
     /**
@@ -138,10 +142,26 @@ abstract class Base implements IOscillator {
      * @return self
      */
     public function setFrequency(float $fFrequency) : self {
-        $this->fFrequency = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
-        $this->fScaleVal  = $this->oWaveform->getPeriod() * $this->fFrequency * Signal\Context::get()->getSamplePeriod();
-        $this->fCurrentFreqency = $this->fFrequency;
+        $this->fFrequency        = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
+        $this->fScaleVal         = $this->fTimeStep * $this->fFrequency;
+        $this->fCurrentFrequency = $this->fFrequency;
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
+        if ($this->useLast($iIndex)) {
+            return $this->oLastOutput;
+        }
+        return $this->emitNew();
+    }
+
+    /**
+     * Calculates a new audio packet
+     *
+     * @return Signal\Audio\Packet;
+     */
+    protected abstract function emitNew() : Signal\Audio\Packet;
 }

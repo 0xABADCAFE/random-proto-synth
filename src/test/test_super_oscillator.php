@@ -6,6 +6,14 @@ require_once '../Synth.php';
 
 $iSamples = 5 * Signal\Context::get()->getProcessRate();
 
+$oEnvelope = new Envelope\Generator\LinearInterpolated(
+    new Envelope\Shape(
+        1.0, [
+            [1.5, 5],
+        ]
+    )
+);
+
 $oOscillator = new Oscillator\Audio\Super(
     new Signal\Waveform\SawUp(),
     [
@@ -19,6 +27,9 @@ $oOscillator = new Oscillator\Audio\Super(
     ],
     110 // Base frequency (Hz)
 );
+
+$oOscillator->setPitchModulator($oEnvelope);
+//$oOscillator->setPhaseModulator(new Oscillator\Audio\Simple(new Signal\Waveform\Sine(-0.01, 0.01), 110));
 
 // Render straight to wav output
 

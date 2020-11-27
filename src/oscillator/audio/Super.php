@@ -61,82 +61,92 @@ class Super extends Simple {
      */
     public function __construct(
         Signal\IWaveform $oWaveform,
-        array             $aHarmonicStack,
-        float             $fFrequency  = ILimits::F_DEF_FREQ
+        array            $aHarmonicStack,
+        float            $fFrequency  = ILimits::F_DEF_FREQ
     ) {
-        $this->oWaveform      = $oWaveform;
-        $this->oWaveformInput = new Signal\Audio\Packet();
-        $this->setFrequency($fFrequency);
+        parent::__construct(
+            $oWaveform,
+            $fFrequency,
+            0.0
+        );
         $this->initHarmonicStack($aHarmonicStack);
     }
 
     /**
      * @inheritDoc
      */
-    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
-
-        if ($this->useLast($iIndex)) {
-            return $this->oLastOutput;
-        }
-
-        $oOutput = new Signal\Audio\Packet();
-        $oValues = $this->oWaveformInput->getValues();
+    protected function emitNew() : Signal\Audio\Packet {
         $iSamplePosition = 0;
+        $oInputValues    = $this->oWaveformInput->getValues();
+        $oOutputValues   = $this->oLastOutput->fillWith(0);
+        $oPhaseShift     = $this->oPhaseModulator ?
+            $this->oPhaseModulator
+                ->emit($this->iLastIndex)
+                ->getValues()
+            : null;
 
-        // Handle pitch control
-        if ($this->oPitchShift) {
-            $fCyclePeriod      = $this->oWaveform->getPeriod();
-            $fSamplePeriod     = Signal\Context::get()->getSamplePeriod();
-            $fCurrentFrequency = $this->fCurrentFrequency;
+        if ($this->oPitchModulator) {
+            // We have something modulating our basic pitch. This gets complicated...
+            $oPitchShift = $this->oPitchModulator
+                ->emit($this->iLastIndex)
+                ->getValues();
+
             // Process each harmonic term
             foreach ($this->aHarmonics as $iHarmonicID => $fHarmonic) {
-                // Every sample point has a new frequency, we must also correct the phase for every sample point.
-                // The phase correction is accumulated, which is equivalent to integrating over the time step.
+
+                // Every sample point has a new frequency, but we can't just use the instantaneous Waveform value for
+                // that as it would be the value that the function has if it was always at that frequency.
+                // Therefore we must also correct the phase for every sample point too. The phase correction is
+                // accumulated, which is equivalent to integrating over the time step.
+
                 $iSamplePosition   = $this->iSamplePosition;
                 $fCurrentFrequency = $this->fCurrentFrequency;
-                foreach ($this->oPitchShift as $i => $fNextFrequency) {
-                    $fTime                                  = $fCyclePeriod * $fSamplePeriod * $iSamplePosition++;
-                    $oValues[$i]                            = ($fHarmonic * $fCurrentFrequency * $fTime) + $this->aPhaseCorrections[$iHarmonicID];
-                    $this->aPhaseCorrections[$iHarmonicID] += $fTime * $fHarmonic * ($fCurrentFrequency - $fNextFrequency);
-                    $fCurrentFrequency                      = $fNextFrequency;
+
+                $fPhaseCorrection  = &$this->aPhaseCorrections[$iHarmonicID];
+                foreach ($oPitchShift as $i => $fNextFrequencyMultiplier) {
+                    $fNextFrequency    = $this->fFrequency * $fNextFrequencyMultiplier;
+                    $fTime             = $this->fTimeStep * $iSamplePosition++;
+                    $oInputValues[$i]  = ($fHarmonic * $fCurrentFrequency * $fTime) + $fPhaseCorrection;
+                    $fPhaseCorrection += $fTime * $fHarmonic * ($fCurrentFrequency - $fNextFrequency);
+                    $fCurrentFrequency = $fNextFrequency;
                 }
 
                 // Apply any phase shift
-                if ($this->oPhaseShift) {
-                    foreach ($this->oPhaseShift as $i => $fPhase) {
-                        $oValues[$i] += $fPhase;
+                if ($oPhaseShift) {
+                    foreach ($oPhaseShift as $i => $fPhase) {
+                        $oInputValues[$i] += $this->fWaveformPeriod * $fPhase;
                     }
                 }
-                $oOutput->accumulate(
+                $oOutputValues->accumulate(
                     $this->oWaveform->map($this->oWaveformInput),
                     $this->aIntensities[$iHarmonicID]
                 );
             }
             $this->fCurrentFrequency = $fCurrentFrequency;
+
         } else {
-            // Process each harmonic term
             foreach ($this->aHarmonics as $iHarmonicID => $fHarmonic) {
                 $iSamplePosition = $this->iSamplePosition;
                 $fScaleVal       = $this->fScaleVal * $fHarmonic;
-                foreach ($oValues as $i => $fValue) {
-                    $oValues[$i] = ($fScaleVal * $iSamplePosition++) + $this->aPhaseCorrections[$iHarmonicID];
+                foreach ($oInputValues as $i => $fValue) {
+                    $oInputValues[$i] = ($fScaleVal * $iSamplePosition++) + $this->aPhaseCorrections[$iHarmonicID];
                 }
 
                 // Apply any phase shift
-                if ($this->oPhaseShift) {
-                    foreach ($this->oPhaseShift as $i => $fPhase) {
-                        $oValues[$i] += $fPhase;
+                if ($oPhaseShift) {
+                    foreach ($oPhaseShift as $i => $fPhase) {
+                        $oInputValues[$i] += $this->fWaveformPeriod * $fPhase;
                     }
                 }
-                $oOutput->accumulate(
+                $oOutputValues->accumulate(
                     $this->oWaveform->map($this->oWaveformInput),
                     $this->aIntensities[$iHarmonicID]
                 );
             }
         }
+
         $this->iSamplePosition = $iSamplePosition;
-        $this->oLastOutput = $oOutput;
-        return $oOutput;
+        return $this->oLastOutput;
     }
 
     /**
@@ -165,13 +175,13 @@ class Super extends Simple {
             }
         }
 
-        $this->aHarmonics        = array_column($aHarmonicStack, 0);
-        $this->aIntensities      = array_column($aHarmonicStack, 1);
-        $this->aInitPhases       = array_column($aHarmonicStack, 2);
+        $this->aHarmonics   = array_column($aHarmonicStack, 0);
+        $this->aIntensities = array_column($aHarmonicStack, 1);
+        $this->aInitPhases  = array_column($aHarmonicStack, 2);
         $fPeriod = $this->oWaveform->getPeriod();
         foreach ($this->aInitPhases as $i => $fPhaseNormalised) {
             $this->aInitPhases[$i] = $fPeriod * $fPhaseNormalised;
         }
-        $this->aPhaseCorrections   = $this->aInitPhases;
+        $this->aPhaseCorrections = $this->aInitPhases;
     }
 }
