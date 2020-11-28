@@ -43,7 +43,7 @@ foreach ($aWaveforms as $sName => $oWaveform) {
     );
 
     echo "Testing : ", $oOscillator, "\n";
-    $oOutput->open('output/test_' . $sName . ".wav");
+    $oOutput->open('output/test_simple_' . $sName . ".wav");
 
     do {
         $oOutput->write($oOscillator->emit());
