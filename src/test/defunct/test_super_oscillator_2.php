@@ -48,7 +48,7 @@ $oResonanceEnvelope = new Envelope\Generator\LinearInterpolated(
 );
 
 // Very poor man's arp
-$oPitchEnvelope = new Envelope\Generator\LinearInterpolated(
+$oPitchEnvelope = new Signal\Control\Stream\SemitonesToMultiplier(new Envelope\Generator\LinearInterpolated(
     new Envelope\Shape(
         0.0, [
             [0.0, 0.249],
@@ -85,7 +85,7 @@ $oPitchEnvelope = new Envelope\Generator\LinearInterpolated(
             [0.0, 0.001],
         ]
     )
-);
+));
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
