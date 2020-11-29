@@ -27,9 +27,10 @@ class Modulator implements Processor {
 
     use Signal\Audio\TStreamIndexed;
 
-    private int                  $iPosition = 0;
-    private Signal\Audio\IStream $oInputStream1;
-    private Signal\Audio\IStream $oInputStream2;
+    private Signal\Audio\IStream
+        $oInputStream1,
+        $oInputStream2
+    ;
 
     /**
      * Constructor

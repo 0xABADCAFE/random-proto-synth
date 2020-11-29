@@ -76,7 +76,7 @@ interface IAmplifier extends Processor {
 /**
  * IFilter
  *
- * Tag interface for Filters
+ * Main interface for audio stream filters.
  */
 interface IFilter extends Processor {
     const
@@ -87,4 +87,58 @@ interface IFilter extends Processor {
         F_DEF_RESONANCE = 0.0,
         F_MAX_RESONANCE = 1.0
     ;
+
+    /**
+     * Sets the cutoff, in the range self::F_MIN_CUTOFF ... self::F_MAX_CUTOFF. Values outside this range are clamped,
+     *
+     * @param  float $fCutoff
+     * @return self
+     */
+    public function setFixedCutoff(float $fCutoff) : self;
+
+    /**
+     * @return float
+     */
+    public function getFixedCutoff() : float;
+
+    /**
+     * Sets the resonance, in the range self::F_MIN_RESONANCE ... self::F_MAX_RESONANCE. Values outside this range are clamped.
+     * Uses a normalised scale in which 1.0 is the highest setting supported by the filter before self-oscillation or other
+     * chaotic behaviours emerge. Zero implies no resonance.
+     *
+     * @param  float $fCutoff
+     * @return self
+     */
+    public function setFixedResonance(float $fResonance) : self;
+
+    /**
+     * @return float
+     */
+    public function getFixedResonance() : float;
+
+    /**
+     * Sets a control stream to use for cutoff. Setting null reverts back to fixed cutoff.
+     *
+     * @param  Signal\Control\IStream|null $oCutoffControl
+     * @return self
+     */
+    public function setCutoffControl(?Signal\Control\IStream $oCutoffControl) : self;
+
+    /**
+     * @return Signal\Control\IStream|null
+     */
+    public function getCutoffControl() : ?Signal\Control\IStream;
+
+    /**
+     * Sets a control stream to use for resonance. Setting null reverts back to fixed resonance.
+     *
+     * @param  Signal\Control\IStream|null $oResonanceControl
+     * @return self
+     */
+    public function setResonanceControl(?Signal\Control\IStream $oResonanceControl) : self;
+
+    /**
+     * @return Signal\Control\IStream|null
+     */
+    public function getResonanceControl() : ?Signal\Control\IStream;
 }
