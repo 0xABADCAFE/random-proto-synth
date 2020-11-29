@@ -19,11 +19,20 @@ use ABadCafe\Synth\Signal;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Tag interface for classes are Signal\Audio\IStream and in turn consume Signal\Audio\IStream
+ */
+interface Processor extends Signal\Audio\IStream {
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
  * IMixer
  *
  * Top level interface for audio stream mixers
  */
-interface IMixer extends Signal\Audio\IStream {
+interface IMixer extends Processor {
 
     /**
      * Add a named input stream to the mix. If a stream already exists with then given name, it will be replaced.
@@ -58,72 +67,7 @@ interface IMixer extends Signal\Audio\IStream {
  *
  * Tag interface for Amplifiers
  */
-interface IAmplifier extends Signal\Audio\IStream {
+interface IAmplifier extends Processor {
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Modulator
- *
- * Performs amplitude modulation of two Signal\Audio\IStream
- */
-class Modulator implements Signal\Audio\IStream {
-
-    use Signal\TContextIndexAware;
-
-    private int                  $iPosition = 0;
-    private Signal\Audio\Packet  $oLastPacket;
-    private Signal\Audio\IStream $oInput1;
-    private Signal\Audio\IStream $oInput2;
-
-    /**
-     * Constructor
-     *
-     * @param Signal\Audio\IStream $oInput1 - audio stream 1
-     * @param Signal\Audio\IStream $oInput2 - audio stream 2
-     */
-    public function __construct(Signal\Audio\IStream $oInput1, Signal\Audio\IStream $oInput2) {
-        $this->oInput1     = $oInput1;
-        $this->oInput2     = $oInput2;
-        $this->oLastPacket = new Signal\Audio\Packet();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getPosition() : int {
-        return $this->oInput1->getPosition();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function reset() : self {
-        $this->iLastIndex = 0;
-        $this->oLastPacket->fillWith(0);
-        $this->oInput1->reset();
-        $this->oInput2->reset();
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
-        if ($this->useLast($iIndex)) {
-            return $this->oLastPacket;
-        }
-        return $this->emitNew();
-    }
-
-    /**
-     * @return Audio\Packet
-     */
-    private function emitNew() : Signal\Audio\Packet {
-        $this->oLastPacket->copyFrom($this->oInput1->emit($this->iLastIndex));
-        $this->oLastPacket->modulateWith($this->oInput2->emit($this->iLastIndex));
-        return $this->oLastPacket;
-    }
-}

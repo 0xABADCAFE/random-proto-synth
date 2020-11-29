@@ -19,11 +19,11 @@ use ABadCafe\Synth\Signal;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * FixedMixer
+ * Mixer\Fixed
  *
  * Implements a simple fixed level mixer for a set of Audio\IStreams, each with their own level.
  */
-class Mixer implements Signal\Audio\Stream\IMixer {
+class Fixed implements Signal\Audio\Stream\IMixer {
 
     use Signal\TContextIndexAware;
 

@@ -9,7 +9,7 @@ $oOscillator1 = new Oscillator\Audio\Simple(new Signal\Waveform\SawDown(), 220);
 $oOscillator2 = new Oscillator\Audio\Simple(new Signal\Waveform\SawDown(), 440);
 $oOscillator3 = new Oscillator\Audio\Simple(new Signal\Waveform\SawDown(), 880);
 
-$oMixer = new Signal\Audio\Stream\FixedMixer();
+$oMixer = new Signal\Audio\Stream\Mixer\Fixed();
 $oMixer
     ->addStream('osc1', $oOscillator1, 0.5)
     ->addStream('osc2', $oOscillator2, 0.25)

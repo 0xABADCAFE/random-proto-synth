@@ -23,7 +23,7 @@ use ABadCafe\Synth\Signal;
  *
  * Performs amplitude modulation of two Signal\Audio\IStream
  */
-class Modulator implements Signal\Audio\IStream {
+class Modulator implements Processor {
 
     use Signal\TContextIndexAware;
 
