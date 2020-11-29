@@ -1,0 +1,75 @@
+#!/usr/bin/php -n
+<?php
+
+namespace ABadCafe\Synth;
+
+require_once '../Synth.php';
+
+class PassWave implements Signal\IWaveform {
+
+    public function getPeriod() : float {
+        return 1.0;
+    }
+
+    public function map(Signal\IPacket $oPacket) : Signal\IPacket {
+        return $oPacket;
+    }
+}
+
+// Test some generators
+$aWaveforms = [
+    'pass'     => new PassWave(),
+    'sine'     => new Signal\Waveform\Sine(),
+    'square'   => new Signal\Waveform\Square(),
+    'saw_up'   => new Signal\Waveform\SawUp(),
+    'saw_down' => new Signal\Waveform\SawDown(),
+    'triangle' => new Signal\Waveform\Triangle(),
+    'noise'    => new Signal\Waveform\Noise(),
+];
+
+const I_MAX_PACKETS = 100000;
+
+$iTotalSamples = I_MAX_PACKETS * Signal\Context::get()->getPacketLength();
+$fOutputTime   = (float)$iTotalSamples / (float)Signal\Context::get()->getProcessRate();
+
+printf("Benchnmarking Simple Oscillator for %d packets (%.3f seconds) of output...\n", I_MAX_PACKETS, $fOutputTime);
+
+$aResults = [];
+
+foreach ($aWaveforms as $sName => $oWaveform) {
+
+    $oOscillator = new Oscillator\Audio\Simple(
+        $oWaveform,
+        440
+    );
+
+    $fStart = microtime(true);
+    $i = I_MAX_PACKETS / 10;
+    while ($i--) {
+        $oOscillator->emit();
+        $oOscillator->emit();
+        $oOscillator->emit();
+        $oOscillator->emit();
+        $oOscillator->emit();
+        $oOscillator->emit();
+        $oOscillator->emit();
+        $oOscillator->emit();
+        $oOscillator->emit();
+        $oOscillator->emit();
+    }
+    $fRealTime = microtime(true) - $fStart;
+    $fRatio    = $fOutputTime / $fRealTime;
+    $aResults[$sName] = (object)['time' => $fRealTime, 'xrealtime' => $fRatio];
+}
+
+uasort($aResults, function(object $o1, object $o2) {
+    return (int)(1000*($o1->time - $o2->time));
+});
+
+$fBaseTime = reset($aResults)->time;
+foreach ($aResults as $oResult) {
+    $oResult->relative = $oResult->time / $fBaseTime;
+}
+
+
+print_r($aResults);
