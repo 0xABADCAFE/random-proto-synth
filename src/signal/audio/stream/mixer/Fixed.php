@@ -25,18 +25,17 @@ use ABadCafe\Synth\Signal;
  */
 class Fixed implements Signal\Audio\Stream\IMixer {
 
-    use Signal\TContextIndexAware;
+    use Signal\Audio\TStreamIndexed;
 
     private int    $iPosition = 0;
     private array  $aStreams  = [];
     private array  $aLevels   = [];
-    private Signal\Audio\Packet $oLastPacket;
 
     /**
      * Constructor
      */
     public function __construct() {
-        $this->oLastPacket = new Signal\Audio\Packet();
+        $this->oLastOutputPacket = new Signal\Audio\Packet();
     }
 
     /**
@@ -59,7 +58,7 @@ class Fixed implements Signal\Audio\Stream\IMixer {
     public function reset() : self {
         $this->iPosition  = 0;
         $this->iLastIndex = 0;
-        $this->oLastPacket->fillWith(0);
+        $this->oLastOutputPacket->fillWith(0);
         foreach ($this->aStreams as $oStream) {
             $oStream->reset();
         }
@@ -70,9 +69,8 @@ class Fixed implements Signal\Audio\Stream\IMixer {
      * @inheritDoc
      */
     public function emit(?int $iIndex = null) : Signal\Audio\Packet {
-        $this->iPosition += Signal\Context::get()->getPacketLength();
         if (empty($this->aLevels) || $this->useLast($iIndex)) {
-            return $this->oLastPacket;
+            return $this->oLastOutputPacket;
         }
         return $this->emitNew();
     }
@@ -106,13 +104,14 @@ class Fixed implements Signal\Audio\Stream\IMixer {
      * @return Packet
      */
     private function emitNew() : Signal\Audio\Packet {
-        $this->oLastPacket->fillWith(0.0);
+        $this->iPosition += Signal\Context::get()->getPacketLength();
+        $this->oLastOutputPacket->fillWith(0.0);
         foreach ($this->aStreams as $i => $oStream) {
-            $this->oLastPacket->accumulate(
+            $this->oLastOutputPacket->accumulate(
                 $oStream->emit($this->iLastIndex),
                 $this->aLevels[$i]
             );
         }
-        return $this->oLastPacket;
+        return $this->oLastOutputPacket;
     }
 }

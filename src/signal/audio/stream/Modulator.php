@@ -38,8 +38,8 @@ class Modulator implements Processor {
      * @param Signal\Audio\IStream $oInputStream2 - audio stream 2
      */
     public function __construct(Signal\Audio\IStream $oInputStream1, Signal\Audio\IStream $oInputStream2) {
-        $this->oInputStream1           = $oInputStream1;
-        $this->oInputStream2           = $oInputStream2;
+        $this->oInputStream1     = $oInputStream1;
+        $this->oInputStream2     = $oInputStream2;
         $this->oLastOutputPacket = new Signal\Audio\Packet();
     }
 
