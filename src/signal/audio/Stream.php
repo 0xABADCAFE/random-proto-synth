@@ -71,3 +71,20 @@ interface IAmplifier extends Processor {
 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * IFilter
+ *
+ * Tag interface for Filters
+ */
+interface IFilter extends Processor {
+    const
+        F_MIN_CUTOFF    = 0.001,
+        F_DEF_CUTOFF    = 0.5,
+        F_MAX_CUTOFF    = 1.0,
+        F_MIN_RESONANCE = 0.0,
+        F_DEF_RESONANCE = 0.0,
+        F_MAX_RESONANCE = 1.0
+    ;
+}

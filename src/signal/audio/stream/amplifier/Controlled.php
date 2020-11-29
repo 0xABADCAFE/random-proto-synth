@@ -52,8 +52,8 @@ class Controlled extends Base {
      * @overridden
      */
     protected function emitNew() : Signal\Audio\Packet {
-        $this->oLastPacket->copyFrom($this->oInput->emit($this->iLastIndex));
-        return $this->oLastPacket->levelControl($this->oControl->emit($this->iLastIndex));
+        $this->oLastOutputPacket->copyFrom($this->oInput->emit($this->iLastIndex));
+        return $this->oLastOutputPacket->levelControl($this->oControl->emit($this->iLastIndex));
     }
 }
 

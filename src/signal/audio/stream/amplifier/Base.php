@@ -25,9 +25,9 @@ use ABadCafe\Synth\Signal;
  */
 abstract class Base implements Signal\Audio\Stream\IAmplifier {
 
-    use Signal\TContextIndexAware;
+    use Signal\Audio\TStreamIndexed;
 
-    protected Signal\Audio\Packet  $oLastPacket;
+    protected Signal\Audio\Packet  $oLastOutputPacket;
     protected Signal\Audio\IStream $oInput;
 
     /**
@@ -38,7 +38,7 @@ abstract class Base implements Signal\Audio\Stream\IAmplifier {
      */
     public function __construct(Signal\Audio\IStream $oInput) {
         $this->oInput      = $oInput;
-        $this->oLastPacket = new Signal\Audio\Packet();
+        $this->oLastOutputPacket = new Signal\Audio\Packet();
     }
 
     /**
@@ -53,25 +53,10 @@ abstract class Base implements Signal\Audio\Stream\IAmplifier {
      */
     public function reset() : self {
         $this->iLastIndex = 0;
-        $this->oLastPacket->fillWith(0);
+        $this->oLastOutputPacket->fillWith(0);
         $this->oInput->reset();
         return $this;
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
-        if ($this->useLast($iIndex)) {
-            return $this->oLastPacket;
-        }
-        return $this->emitNew();
-    }
-
-    /**
-     * @return Signal\Audio\Packet
-     */
-    protected abstract function emitNew() : Signal\Audio\Packet;
 
 }
 

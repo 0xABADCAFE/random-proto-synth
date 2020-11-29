@@ -58,7 +58,7 @@ class Fixed extends Base {
      * @overridden
      */
     protected function emitNew() : Signal\Audio\Packet {
-        $this->oLastPacket->copyFrom($this->oInput->emit($this->iLastIndex));
-        return $this->oLastPacket->scaleBy($this->fLevel);
+        $this->oLastOutputPacket->copyFrom($this->oInput->emit($this->iLastIndex));
+        return $this->oLastOutputPacket->scaleBy($this->fLevel);
     }
 }

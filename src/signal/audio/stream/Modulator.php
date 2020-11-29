@@ -25,30 +25,29 @@ use ABadCafe\Synth\Signal;
  */
 class Modulator implements Processor {
 
-    use Signal\TContextIndexAware;
+    use Signal\Audio\TStreamIndexed;
 
     private int                  $iPosition = 0;
-    private Signal\Audio\Packet  $oLastPacket;
-    private Signal\Audio\IStream $oInput1;
-    private Signal\Audio\IStream $oInput2;
+    private Signal\Audio\IStream $oInputStream1;
+    private Signal\Audio\IStream $oInputStream2;
 
     /**
      * Constructor
      *
-     * @param Signal\Audio\IStream $oInput1 - audio stream 1
-     * @param Signal\Audio\IStream $oInput2 - audio stream 2
+     * @param Signal\Audio\IStream $oInputStream1 - audio stream 1
+     * @param Signal\Audio\IStream $oInputStream2 - audio stream 2
      */
-    public function __construct(Signal\Audio\IStream $oInput1, Signal\Audio\IStream $oInput2) {
-        $this->oInput1     = $oInput1;
-        $this->oInput2     = $oInput2;
-        $this->oLastPacket = new Signal\Audio\Packet();
+    public function __construct(Signal\Audio\IStream $oInputStream1, Signal\Audio\IStream $oInputStream2) {
+        $this->oInputStream1           = $oInputStream1;
+        $this->oInputStream2           = $oInputStream2;
+        $this->oLastOutputPacket = new Signal\Audio\Packet();
     }
 
     /**
      * @inheritDoc
      */
     public function getPosition() : int {
-        return $this->oInput1->getPosition();
+        return $this->oInputStream1->getPosition();
     }
 
     /**
@@ -56,28 +55,19 @@ class Modulator implements Processor {
      */
     public function reset() : self {
         $this->iLastIndex = 0;
-        $this->oLastPacket->fillWith(0);
-        $this->oInput1->reset();
-        $this->oInput2->reset();
+        $this->oLastOutputPacket->fillWith(0);
+        $this->oInputStream1->reset();
+        $this->oInputStream2->reset();
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
-        if ($this->useLast($iIndex)) {
-            return $this->oLastPacket;
-        }
-        return $this->emitNew();
-    }
 
     /**
-     * @return Audio\Packet
+     * @return Signal\Audio\Packet
      */
-    private function emitNew() : Signal\Audio\Packet {
-        $this->oLastPacket->copyFrom($this->oInput1->emit($this->iLastIndex));
-        $this->oLastPacket->modulateWith($this->oInput2->emit($this->iLastIndex));
-        return $this->oLastPacket;
+    protected function emitNew() : Signal\Audio\Packet {
+        $this->oLastOutputPacket->copyFrom($this->oInputStream1->emit($this->iLastIndex));
+        $this->oLastOutputPacket->modulateWith($this->oInputStream2->emit($this->iLastIndex));
+        return $this->oLastOutputPacket;
     }
 }
