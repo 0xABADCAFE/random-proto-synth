@@ -27,8 +27,8 @@ use ABadCafe\Synth\Oscillator;
  */
 class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeModulated, IPhaseModulated {
 
-    protected Signal\Audio\Stream\FixedMixer $oPhaseMixer;
-    protected Signal\Audio\Stream\FixedMixer $oAmplitudeMixer;
+    protected Signal\Audio\Stream\Mixer\Fixed $oPhaseMixer;
+    protected Signal\Audio\Stream\Mixer\Fixed $oAmplitudeMixer;
 
     /**
      * @overridden
@@ -49,8 +49,8 @@ class ModulatableOscillator extends UnmodulatedOscillator implements IAmplitudeM
             $oPitchControl,
             $oRootNoteMap
         );
-        $this->oPhaseMixer     = new Signal\Audio\Stream\FixedMixer();
-        $this->oAmplitudeMixer = new Signal\Audio\Stream\FixedMixer();
+        $this->oPhaseMixer     = new Signal\Audio\Stream\Mixer\Fixed();
+        $this->oAmplitudeMixer = new Signal\Audio\Stream\Mixer\Fixed();
     }
 
     /**
