@@ -62,18 +62,26 @@ interface IStream extends Signal\IStream {
     public function emit(?int $iIndex = null) : Packet; // Covariant return
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * TStreamIndexed
  *
  * Extension trait for IStream implementors that need to implement context index awareness.
  */
 trait TStreamIndexed {
+
     use Signal\TContextIndexAware;
 
-    protected Signal\Audio\Packet $oLastOutputPacket;
+    /**
+     * Most recently computed packet for a given index
+     */
+    protected Packet $oLastOutputPacket;
 
     /**
      * Default implementation of IStream::emit() that checks if we need to calculate a new Packet or not.
+     *
+     * @implements IStream::emit()
      */
     public function emit(?int $iIndex = null) : Packet {
         if ($this->useLast($iIndex)) {
@@ -83,7 +91,10 @@ trait TStreamIndexed {
     }
 
     /**
-     * Trait users must implement this
+     * Trait users must implement this. When the requested index is different than the most recently known one we
+     * must calculate a new Packet.
+     *
+     * @return Packet
      */
     protected abstract function emitNew() : Packet;
 

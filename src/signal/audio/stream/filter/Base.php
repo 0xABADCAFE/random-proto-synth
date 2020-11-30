@@ -102,7 +102,7 @@ abstract class Base implements Signal\Audio\Stream\IFilter {
     /**
      * @inheritDoc
      */
-    public function getFixedCutoff(float $fCutoff) : float {
+    public function getFixedCutoff() : float {
         return $this->fFixedCutoff;
     }
 
@@ -117,7 +117,7 @@ abstract class Base implements Signal\Audio\Stream\IFilter {
     /**
      * @inheritDoc
      */
-    public function getFixedResonance(float $fResonance) : float {
+    public function getFixedResonance() : float {
         return $this->fFixedResonance;
     }
 
@@ -159,6 +159,12 @@ abstract class Base implements Signal\Audio\Stream\IFilter {
     protected function chooseFilterFunction() {
         $iFunctionIndex = ($this->oCutoffControl ? 1 : 0) | ($this->oResonanceControl ? 2 : 0);
         $this->cFilterFunction = [$this, self::$aFilterFunctionNames[$iFunctionIndex]];
+    }
+
+    protected function emitNew() : Signal\Audio\Packet {
+        $cFilterFunction = $this->cFilterFunction;
+        $cFilterFunction();
+        return $this->oLastOutputPacket;
     }
 
     /**

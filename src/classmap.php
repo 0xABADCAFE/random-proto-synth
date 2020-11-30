@@ -63,6 +63,7 @@ const CLASS_MAP = [
   'ABadCafe\\Synth\\Signal\\Audio\\Stream\\IAmplifier' => '/signal/audio/Stream.php',
   'ABadCafe\\Synth\\Signal\\Audio\\Stream\\IFilter' => '/signal/audio/Stream.php',
   'ABadCafe\\Synth\\Signal\\Audio\\Stream\\Modulator' => '/signal/audio/stream/Modulator.php',
+  'ABadCafe\\Synth\\Signal\\Audio\\Stream\\Filter\\MoogLowPass' => '/signal/audio/stream/filter/MoogLowPass.php',
   'ABadCafe\\Synth\\Signal\\Audio\\Stream\\Filter\\Base' => '/signal/audio/stream/filter/Base.php',
   'ABadCafe\\Synth\\Signal\\Audio\\Stream\\Mixer\\Fixed' => '/signal/audio/stream/mixer/Fixed.php',
   'ABadCafe\\Synth\\Signal\\Audio\\Stream\\Amplifier\\Fixed' => '/signal/audio/stream/amplifier/Fixed.php',
