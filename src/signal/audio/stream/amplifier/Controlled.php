@@ -25,18 +25,18 @@ use ABadCafe\Synth\Signal;
  */
 class Controlled extends Base {
 
-    private Signal\Control\IStream $oControl;
+    private Signal\Control\IStream $oControlStream;
 
     /**
      * Constructor
      *
-     * @param Signal\Audio\IStream   $oInput   - audio source
-     * @param Signal\Control\IStream $oControl - control source
+     * @param Signal\Audio\IStream   $oInputStream   - audio source
+     * @param Signal\Control\IStream $oControlStream - control source
      */
-    public function __construct(Signal\Audio\IStream $oInput, Signal\Control\IStream $oControl) {
-        parent::__construct($oInput);
-        $this->oInput      = $oInput;
-        $this->oControl    = $oControl;
+    public function __construct(Signal\Audio\IStream $oInputStream, Signal\Control\IStream $oControlStream) {
+        parent::__construct($oInputStream);
+        $this->oInputStream   = $oInputStream;
+        $this->oControlStream = $oControlStream;
     }
 
     /**
@@ -44,7 +44,7 @@ class Controlled extends Base {
      */
     public function reset() : self {
         parent::__reset();
-        $this->oControl->reset();
+        $this->oControlStream->reset();
         return $this;
     }
 
@@ -52,8 +52,8 @@ class Controlled extends Base {
      * @overridden
      */
     protected function emitNew() : Signal\Audio\Packet {
-        $this->oLastOutputPacket->copyFrom($this->oInput->emit($this->iLastIndex));
-        return $this->oLastOutputPacket->levelControl($this->oControl->emit($this->iLastIndex));
+        $this->oLastOutputPacket->copyFrom($this->oInputStream->emit($this->iLastIndex));
+        return $this->oLastOutputPacket->levelControl($this->oControlStream->emit($this->iLastIndex));
     }
 }
 

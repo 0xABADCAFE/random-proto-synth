@@ -87,8 +87,21 @@ abstract class Base implements Signal\Audio\Stream\IFilter {
     public function reset() : self {
         $this->iLastIndex = 0;
         $this->oLastOutputPacket->fillWith(0);
+        if ($this->oFilterControl) {
+            $this->oFilterControl->reset();
+        }
+        if ($this->oResonanceControl) {
+            $this->oResonanceControl->reset();
+        }
         $this->oInput->reset();
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isSilent() : bool {
+        return false;
     }
 
     /**

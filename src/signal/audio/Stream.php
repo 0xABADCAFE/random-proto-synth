@@ -22,7 +22,12 @@ use ABadCafe\Synth\Signal;
  * Tag interface for classes are Signal\Audio\IStream and in turn consume Signal\Audio\IStream
  */
 interface Processor extends Signal\Audio\IStream {
-
+    /**
+     * Returns true if the mixer has no active inputs
+     *
+     * @return bool
+     */
+    public function isSilent() : bool;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,13 +56,6 @@ interface IMixer extends Processor {
      * @return self
      */
     public function removeStream(string $sName) : self;
-
-    /**
-     * Returns true if the mixer has no active inputs
-     *
-     * @return bool
-     */
-    public function isSilent() : bool;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

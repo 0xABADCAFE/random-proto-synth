@@ -25,40 +25,47 @@ use ABadCafe\Synth\Signal;
  */
 class Fixed extends Base {
 
-    protected float $fLevel;
+    protected float $fFixedLevel;
 
     /**
      * Constructor
      *
-     * @param Signal\Audio\IStream $oInput - audio source
-     * @param float                $fLevel
+     * @param Signal\Audio\IStream $oInputStream - audio source
+     * @param float                $fFixedLevel
      */
-    public function __construct(Signal\Audio\IStream $oInput, float $fLevel) {
-        parent::__construct($oInput);
-        $this->fLevel = $fLevel;
+    public function __construct(Signal\Audio\IStream $oInputStream, float $fFixedLevel) {
+        parent::__construct($oInputStream);
+        $this->fFixedLevel = $fFixedLevel;
     }
 
     /**
      * @return float
      */
     public function getLevel() : float {
-        return $this->fLevel;
+        return $this->fFixedLevel;
     }
 
     /**
-     * @param  float $fLevel
+     * @param  float $fFixedLevel
      * @return self
      */
-    public function setLevel(float $fLevel) : self {
-        $this->fLevel = $fLevel;
+    public function setLevel(float $fFixedLevel) : self {
+        $this->fFixedLevel = $fFixedLevel;
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isSilent() : bool {
+        return abs($this->fFixedLevel) <= 1e-6;
     }
 
     /**
      * @overridden
      */
     protected function emitNew() : Signal\Audio\Packet {
-        $this->oLastOutputPacket->copyFrom($this->oInput->emit($this->iLastIndex));
-        return $this->oLastOutputPacket->scaleBy($this->fLevel);
+        $this->oLastOutputPacket->copyFrom($this->oInputStream->emit($this->iLastIndex));
+        return $this->oLastOutputPacket->scaleBy($this->fFixedLevel);
     }
 }

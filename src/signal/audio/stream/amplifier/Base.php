@@ -28,16 +28,16 @@ abstract class Base implements Signal\Audio\Stream\IAmplifier {
     use Signal\Audio\TStreamIndexed;
 
     protected Signal\Audio\Packet  $oLastOutputPacket;
-    protected Signal\Audio\IStream $oInput;
+    protected Signal\Audio\IStream $oInputStream;
 
     /**
      * Constructor
      *
-     * @param Signal\Audio\IStream $oInput - audio source
+     * @param Signal\Audio\IStream $oInputStream - audio source
      * @param float                $fLevel
      */
-    public function __construct(Signal\Audio\IStream $oInput) {
-        $this->oInput      = $oInput;
+    public function __construct(Signal\Audio\IStream $oInputStream) {
+        $this->oInputStream = $oInputStream;
         $this->oLastOutputPacket = new Signal\Audio\Packet();
     }
 
@@ -45,7 +45,7 @@ abstract class Base implements Signal\Audio\Stream\IAmplifier {
      * @inheritDoc
      */
     public function getPosition() : int {
-        return $this->oInput->getPosition();
+        return $this->oInputStream->getPosition();
     }
 
     /**
@@ -54,9 +54,15 @@ abstract class Base implements Signal\Audio\Stream\IAmplifier {
     public function reset() : self {
         $this->iLastIndex = 0;
         $this->oLastOutputPacket->fillWith(0);
-        $this->oInput->reset();
+        $this->oInputStream->reset();
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function isSilent() : bool {
+        return false;
+    }
 }
 
