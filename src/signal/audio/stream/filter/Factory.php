@@ -13,7 +13,7 @@
 
 declare(strict_types = 1);
 
-namespace ABadCafe\Synth\Signal\Audio\Filter;
+namespace ABadCafe\Synth\Signal\Audio\Stream\Filter;
 use ABadCafe\Synth\Signal;
 use ABadCafe\Synth\Oscillator;
 use ABadCafe\Synth\Utility;
@@ -29,15 +29,15 @@ class Factory implements Utility\IFactory {
     use Utility\TSingleton;
 
     const PRODUCT_TYPES = [
-        'lowpass' => 'createLowPass',
+        'mooglpf' => 'createMoogLPF',
         'karlsen' => 'createKarlsen',
     ];
 
     const KARLSEN_MODES = [
-        'lowpass'  => KarlsenLowPass::class,
-        'bandpass' => KarlsenBandPass::class,
-        'highpass' => KarlsenHighPass::class,
-        'notch'    => KarlsenNotchReject::class,
+        'lowpass'  => Karlsen\LowPass::class,
+        'bandpass' => Karlsen\BandPass::class,
+        'highpass' => Karlsen\HighPass::class,
+        'notch'    => Karlsen\NotchReject::class,
     ];
 
     /**
@@ -45,7 +45,7 @@ class Factory implements Utility\IFactory {
      * @return Signal\Audio\IFilter
      * @throws \Exception
      */
-    public function createFrom(object $oDescription) : Signal\Audio\IFilter {
+    public function createFrom(object $oDescription) : Signal\Audio\Stream\IFilter {
         $sType    = strtolower($oDescription->type ?? '<none>');
         $sProduct = self::PRODUCT_TYPES[$sType] ?? null;
         if ($sProduct) {
@@ -67,10 +67,10 @@ class Factory implements Utility\IFactory {
      * @return ResonantLowPass
      * @throws \Exception
      */
-    private function createLowPass(object $oDescription) : ResonantLowPass {
-        return new ResonantLowPass(
-            (float)($oDescription->cutoff ?? Signal\Audio\IFilter::F_DEF_CUTOFF),
-            (float)($oDescription->resonance ?? IResonanceControlled::F_DEF_RESONANCE)
+    private function createMoogLPF(object $oDescription) : MoogLowPass {
+        return new MoogLowPass(
+//             (float)($oDescription->cutoff ?? Signal\Audio\IFilter::F_DEF_CUTOFF),
+//             (float)($oDescription->resonance ?? IResonanceControlled::F_DEF_RESONANCE)
         );
     }
 
@@ -84,8 +84,8 @@ class Factory implements Utility\IFactory {
         $sClass     = self::KARLSEN_MODES[$sMode] ?? null;
         if ($sClass) {
             return new $sClass(
-                (float)($oDescription->cutoff ?? Signal\Audio\IFilter::F_DEF_CUTOFF),
-                (float)($oDescription->resonance ?? IResonanceControlled::F_DEF_RESONANCE)
+//                 (float)($oDescription->cutoff ?? Signal\Audio\IFilter::F_DEF_CUTOFF),
+//                 (float)($oDescription->resonance ?? IResonanceControlled::F_DEF_RESONANCE)
             );
         }
         throw new \Exception('Unknown Filter Mode ' . $sMode);

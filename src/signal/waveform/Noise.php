@@ -24,7 +24,7 @@ use \SPLFixedArray;
  *
  * Maps to a randomised value, irrespective of input
  */
-class Noise extends Base {
+class Noise extends Primitive {
 
     const F_PERIOD = 1.0;
 

@@ -23,48 +23,42 @@ use ABadCafe\Synth\Signal;
  */
 class Simple extends Base {
 
-    use Signal\TContextIndexAware;
-
     /**
      * @inheritDoc
      */
-    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
+    protected function emitNew() : Signal\Audio\Packet {
+        $oInputValues = $this->oWaveformInput->getValues();
+        if ($this->oPitchModulator) {
+            // We have something modulating our basic pitch. This gets complicated...
+            $oPitchShift = $this->oPitchModulator->emit($this->iLastIndex)->getValues();
 
-        if ($this->useLast($iIndex)) {
-            return $this->oLastOutput;
-        }
-
-        $oValues = $this->oWaveformInput->getValues();
-
-        if ($this->oPitchShift) {
-            // Every sample point has a new frequency, we must also correct the phase for every sample point.
-            // The phase correction is accumulated, which is equivalent to integrating over the time step.
-            $fTimeStep     = Signal\Context::get()->getSamplePeriod() * $this->oWaveform->getPeriod();
-            foreach ($this->oPitchShift as $i => $fNextFrequency) {
-                $fTime                   = $fTimeStep * $this->iSamplePosition++;
-                $oValues[$i]             = ($this->fCurrentFrequency * $fTime) + $this->fPhaseCorrection;
+            // Every sample point has a new frequency, but we can't just use the instantaneous Waveform value for
+            // that as it would be the value that the function has if it was always at that frequency.
+            // Therefore we must also correct the phase for every sample point too. The phase correction is
+            // accumulated, which is equivalent to integrating over the time step.
+            foreach ($oPitchShift as $i => $fNextFrequencyMultiplier) {
+                $fNextFrequency          = $this->fFrequency * $fNextFrequencyMultiplier;
+                $fTime                   = $this->fTimeStep * $this->iSamplePosition++;
+                $oInputValues[$i]        = ($this->fCurrentFrequency * $fTime) + $this->fPhaseCorrection;
                 $this->fPhaseCorrection += $fTime * ($this->fCurrentFrequency - $fNextFrequency);
                 $this->fCurrentFrequency = $fNextFrequency;
             }
         } else {
-            // Basic linear intervals, there is no phase adjustment
-            foreach ($oValues as $i => $fValue) {
-                $oValues[$i] = $this->fScaleVal * $this->iSamplePosition++;
+            // Basic linear intervals, there is no phase adjustment for changes in pitch. Nice and simple.
+            foreach ($oInputValues as $i => $fValue) {
+                $oInputValues[$i] = $this->fScaleVal * $this->iSamplePosition++;
             }
         }
 
-        // Apply phase modulation
-        if ($this->oPhaseShift) {
-            foreach ($this->oPhaseShift as $i => $fPhase) {
-                $oValues[$i] += $fPhase;
+        if ($this->oPhaseModulator) {
+            // We have somthing modulating our basic phase. Thankfully this is just additive. We assume the
+            // phase modulation is normalised, such that 1.0 is a complete full cycle of our waveform.
+            // We simply multiply the shift by our Waveform's period value to get this.
+            $oPhaseShift = $this->oPhaseModulator->emit($this->iLastIndex)->getValues();
+            foreach ($oPhaseShift as $i => $fValue) {
+                $oInputValues[$i] += $this->fWaveformPeriod * $fValue;
             }
         }
-
-        $this->oLastOutput = $this->oWaveform->map($this->oWaveformInput);
-
-        //$this->postProcess();
-
-        return $this->oLastOutput;
+        return $this->oLastOutput = $this->oWaveform->map($this->oWaveformInput);
     }
-
 }

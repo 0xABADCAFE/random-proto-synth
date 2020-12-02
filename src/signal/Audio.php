@@ -65,6 +65,44 @@ interface IStream extends Signal\IStream {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * TStreamIndexed
+ *
+ * Extension trait for IStream implementors that need to implement context index awareness.
+ */
+trait TStreamIndexed {
+
+    use Signal\TContextIndexAware;
+
+    /**
+     * Most recently computed packet for a given index
+     */
+    protected Packet $oLastOutputPacket;
+
+    /**
+     * Default implementation of IStream::emit() that checks if we need to calculate a new Packet or not.
+     *
+     * @implements IStream::emit()
+     */
+    public function emit(?int $iIndex = null) : Packet {
+        if ($this->useLast($iIndex)) {
+            return $this->oLastOutputPacket;
+        }
+        return $this->oLastOutputPacket = $this->emitNew();
+    }
+
+    /**
+     * Trait users must implement this. When the requested index is different than the most recently known one we
+     * must calculate a new Packet.
+     *
+     * @return Packet
+     */
+    protected abstract function emitNew() : Packet;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
  * IFilter
  *
  * Main audio signal filter interface. The filter cutoff is normalised such that the range 0.0 - 1.0 covers the full

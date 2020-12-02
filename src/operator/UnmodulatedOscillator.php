@@ -41,12 +41,11 @@ class UnmodulatedOscillator extends Base implements ISource {
         $fDetune
     ;
 
-    protected ?Signal\Control\IStream
-        $oAmplitudeControl,
-        $oPitchControl
-    ;
+    protected ?Signal\Control\IStream $oAmplitudeControl;
+    protected ?signal\Control\IStream $oPitchControl;
 
-    /** @var Map\Note\IMIDINumber */
+    protected ?Signal\Audio\Stream\Amplifier $oAmplifier;
+
     protected Map\Note\IMIDINumber $oRootNoteMap;
 
     protected array
@@ -83,6 +82,14 @@ class UnmodulatedOscillator extends Base implements ISource {
         $this->oRootNoteMap      = $oRootNoteMap ?: Map\Note\TwelveToneEqualTemperament::getStandardNoteMap();
         $this->configureNoteMapBehaviours();
         $this->assignInstanceID();
+
+        // If an Amplitude Control is provide, create an Amplifier from it
+        if ($oAmplitudeControl) {
+            $this->oAmplifier = new Signal\Audio\Stream\Amplifier(
+                $this->oOscillator,
+                $oAmplitudeControl
+            );
+        }
     }
 
     /**
@@ -96,9 +103,10 @@ class UnmodulatedOscillator extends Base implements ISource {
      * @inheritdoc
      */
     public function reset() : Signal\Audio\IStream {
-        $this->oOscillator->reset();
-        if ($this->oAmplitudeControl) {
-            $this->oAmplitudeControl->reset();
+        if ($this->oAmplifier) {
+            $this->oAmplifier->reset();
+        } else {
+            $this->oOscillator->reset();
         }
         if ($this->oPitchControl) {
             $this->oPitchControl->reset();
@@ -228,15 +236,13 @@ class UnmodulatedOscillator extends Base implements ISource {
             $this->oOscillator->setPitchModulation($this->oPitchControl->emit($this->iLastIndex));
         }
 
-        // Get the raw oscillator output
-        $oOscillatorPacket = $this->oOscillator->emit($this->iLastIndex);
-
-        // Apply any amplitude control
-        if ($this->oAmplitudeControl) {
-            $oOscillatorPacket->levelControl($this->oAmplitudeControl->emit($this->iLastIndex));
+        // If we have a volume control, get the amplifier output. Otherwise, the raw oscillator
+        if ($this->oAmplifier) {
+            $this->oLastPacket = $this->oAmplifier->emit($this->iLastIndex);
+        } else {
+            $this->oLastPacket = $this->oOscillator->emit($this->iLastIndex);
         }
 
-        $this->oLastPacket        = $oOscillatorPacket;
         return $this->oLastPacket;
     }
 

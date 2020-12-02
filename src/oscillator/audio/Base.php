@@ -24,27 +24,27 @@ use function ABadCafe\Synth\Utility\clamp;
  */
 abstract class Base implements IOscillator {
 
-    const F_INV_TWELVE = 1.0/12.0;
+    use Signal\TContextIndexAware;
 
     protected Signal\IWaveform $oWaveform;
     protected Signal\Audio\Packet
         $oWaveformInput,
         $oLastOutput
     ;
+
+    protected ?Signal\Control\IStream $oPitchModulator = null;
+    protected ?Signal\Audio\IStream   $oPhaseModulator = null;
+
     protected int $iSamplePosition = 0;
 
     protected float
         $fFrequency        = ILimits::F_DEF_FREQ, // The base frequency
         $fCurrentFrequency = ILimits::F_DEF_FREQ, // The present instantaneous frequency considering any pitch control
         $fPhaseCorrection  = 0.0,                 // The accumulated phase difference as a result of pitch control */
+        $fWaveformPeriod   = 1.0,                 // The period of the Waveform, to avoid repeatedly asking for it.
+        $fTimeStep         = 0.0,
         $fScaleVal         = 0.0
     ;
-
-    protected ?\SPLFixedArray
-        $oPhaseShift = null,
-        $oPitchShift = null
-    ;
-
 
     /**
      * Constructor.
@@ -55,14 +55,32 @@ abstract class Base implements IOscillator {
      */
     public function __construct(
         Signal\IWaveform $oWaveform,
-        float             $fFrequency  = ILimits::F_DEF_FREQ,
-        float             $fPhase      = 0.0
+        float            $fFrequency  = ILimits::F_DEF_FREQ,
+        float            $fPhase      = 0.0
     ) {
         $this->oWaveform        = $oWaveform;
         $this->oWaveformInput   = new Signal\Audio\Packet();
         $this->oLastOutput      = new Signal\Audio\Packet();
+        $this->fWaveformPeriod  = $oWaveform->getPeriod();
+        $this->fTimeStep        = Signal\Context::get()->getSamplePeriod() * $this->fWaveformPeriod;
+        $this->fPhaseCorrection = $this->fWaveformPeriod * $fPhase;
         $this->setFrequency($fFrequency);
-        $this->fPhaseCorrection = $oWaveform->getPeriod() * $fPhase;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setPitchModulator(?Signal\Control\IStream $oPitchModulator) : self {
+        $this->oPitchModulator = $oPitchModulator;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setPhaseModulator(?Signal\Audio\IStream $oPhaseModulator) : self {
+        $this->oPhaseModulator = $oPhaseModulator;
+        return $this;
     }
 
     /**
@@ -90,12 +108,17 @@ abstract class Base implements IOscillator {
     }
 
     /**
-     * Get the oscillator signal frequency
-     *
-     * @return int
+     * @inheritDoc
      */
     public function getFrequency() : float {
         return $this->fFrequency;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentFrequency() : float {
+        return $this->fCurrentFrequency;
     }
 
     /**
@@ -119,43 +142,26 @@ abstract class Base implements IOscillator {
      * @return self
      */
     public function setFrequency(float $fFrequency) : self {
-        $this->fFrequency = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
-        $this->fScaleVal  = $this->oWaveform->getPeriod() * $this->fFrequency * Signal\Context::get()->getSamplePeriod();
-        $this->fCurrentFreqency = $this->fFrequency;
+        $this->fFrequency        = clamp($fFrequency, ILimits::F_MIN_FREQ, ILimits::F_MAX_FREQ);
+        $this->fScaleVal         = $this->fTimeStep * $this->fFrequency;
+        $this->fCurrentFrequency = $this->fFrequency;
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function setPitchModulation(Signal\Control\Packet $oPitch = null) : self {
-        if ($oPitch) {
-            // Convert the linear semitone based shifts into absolute multiples of the base frequency
-            $this->oPitchShift = clone $oPitch->getValues();
-            foreach ($this->oPitchShift as $i => $fValue) {
-                $this->oPitchShift[$i] = $this->fFrequency * (2 ** ($fValue * self::F_INV_TWELVE));
-            }
-        } else {
-            $this->oPitchShift = null;
+    public function emit(?int $iIndex = null) : Signal\Audio\Packet {
+        if ($this->useLast($iIndex)) {
+            return $this->oLastOutput;
         }
-        return $this;
+        return $this->emitNew();
     }
-
 
     /**
-     * @inheritdoc
+     * Calculates a new audio packet
+     *
+     * @return Signal\Audio\Packet;
      */
-    public function setPhaseModulation(Signal\Audio\Packet $oPhase = null) : self {
-        if ($oPhase) {
-            $fPhaseSize = $this->oWaveform->getPeriod();
-            $this->oPhaseShift = clone $oPhase->getValues();
-            foreach ($this->oPhaseShift as $i => $fValue) {
-                $this->oPhaseShift[$i] = $fValue * $fPhaseSize;
-            }
-        } else {
-            $this->oPhaseShift = null;
-        }
-        return $this;
-    }
-
+    protected abstract function emitNew() : Signal\Audio\Packet;
 }
