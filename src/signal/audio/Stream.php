@@ -19,43 +19,40 @@ use ABadCafe\Synth\Signal;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Tag interface for classes are Signal\Audio\IStream and in turn consume Signal\Audio\IStream
+ * IProcessor
+ *
+ * Tag interface for classes are Signal\Audio\IStream implementors and in turn consume other Signal\Audio\IStream
+ * implementors as input. This provides the foundation for a whole family of signal processors.
  */
-interface Processor extends Signal\Audio\IStream {
+interface IProcessor extends Signal\Audio\IStream {
     /**
-     * Returns true if the mixer has no active inputs
+     * To facilitate programmtic construction and initialisation of Processor implementations we don't require
+     * an initial input Signal\Audio\IStream on construction, allowing it to be set later. We therefore provide a
+     * query method to see if the Processor has any Inputs yet.
      *
      * @return bool
      */
-    public function isSilent() : bool;
+    public function hasInput() : bool;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * IMixer
+ * ISingleStreamProcessor
  *
- * Top level interface for audio stream mixers
+ * Extension interface for Processors that consume a single input stream, for example, VCA, VCF etc.
  */
-interface IMixer extends Processor {
+interface ISingleStreamProcessor extends IProcessor {
+    /**
+     * Sets the input Audio Stream to use. This is intentionally non-nullable.
+     */
+    public function setInput(Signal\Audio\IStream $oInputStream) : self;
 
     /**
-     * Add a named input stream to the mix. If a stream already exists with then given name, it will be replaced.
-     *
-     * @param  string               $sName
-     * @param  Signal\Audio\IStream $oStream
-     * @param  float                $fInitialLevel
-     * @return self
+     * Returns the currently set input Audio Stream. As this may not yet have been set, this return is nullable.
      */
-    public function addStream(string $sName, Signal\Audio\IStream $oStream, float $fInitialLevel) : self;
-
-    /**
-     * Removes a named input stream. No errors are raised if the named stream does not exist.
-     *
-     * @param  string $sName
-     * @return self
-     */
-    public function removeStream(string $sName) : self;
+    public function getInput() : ?Signal\Audio\IStream;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,9 +60,9 @@ interface IMixer extends Processor {
 /**
  * IAmplifier
  *
- * Tag interface for Amplifiers
+ * Tag interface for Amplifiers. Does not currently define any behaviour beyond the ISingleStreamProcessor.
  */
-interface IAmplifier extends Processor {
+interface IAmplifier extends ISingleStreamProcessor {
 
 }
 
@@ -76,7 +73,7 @@ interface IAmplifier extends Processor {
  *
  * Main interface for audio stream filters.
  */
-interface IFilter extends Processor {
+interface IFilter extends ISingleStreamProcessor {
     const
         F_MIN_CUTOFF    = 0.001,
         F_DEF_CUTOFF    = 0.5,
@@ -139,4 +136,40 @@ interface IFilter extends Processor {
      * @return Signal\Control\IStream|null
      */
     public function getResonanceControl() : ?Signal\Control\IStream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * IMixer
+ *
+ * Top level interface for audio stream mixers. As this is not a single stream processor, directly extends the
+ * IProcessor interface.
+ */
+interface IMixer extends IProcessor {
+
+    /**
+     * Add a named input stream to the mix. If a stream already exists with then given name, it will be replaced.
+     *
+     * @param  string               $sName
+     * @param  Signal\Audio\IStream $oStream
+     * @param  float                $fInitialLevel
+     * @return self
+     */
+    public function addInput(string $sName, Signal\Audio\IStream $oStream, float $fInitialLevel) : self;
+
+    /**
+     * Removes a named input stream. No errors are raised if the named stream does not exist.
+     *
+     * @param  string $sName
+     * @return self
+     */
+    public function removeInput(string $sName) : self;
+
+    /**
+     * Returns the currently assigned set of input streams.
+     *
+     * @return  Signal\Audio\IStream[]
+     */
+    public function getInputs() : array;
 }
