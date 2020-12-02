@@ -33,7 +33,7 @@ class Fixed extends Base {
      * @param Signal\Audio\IStream $oInputStream - audio source
      * @param float                $fFixedLevel
      */
-    public function __construct(Signal\Audio\IStream $oInputStream, float $fFixedLevel) {
+    public function __construct(?Signal\Audio\IStream $oInputStream, float $fFixedLevel) {
         parent::__construct($oInputStream);
         $this->fFixedLevel = $fFixedLevel;
     }
@@ -55,17 +55,14 @@ class Fixed extends Base {
     }
 
     /**
-     * @inheritDoc
-     */
-    public function isSilent() : bool {
-        return abs($this->fFixedLevel) <= 1e-6;
-    }
-
-    /**
      * @overridden
      */
     protected function emitNew() : Signal\Audio\Packet {
-        $this->oLastOutputPacket->copyFrom($this->oInputStream->emit($this->iLastIndex));
-        return $this->oLastOutputPacket->scaleBy($this->fFixedLevel);
+        $this->iPosition += Signal\Context::get()->getPacketLength();
+        if ($this->oInputStream) {
+            $this->oLastOutputPacket->copyFrom($this->oInputStream->emit($this->iLastIndex));
+            $this->oLastOutputPacket->scaleBy($this->fFixedLevel);
+        }
+        return $this->oLastOutputPacket;
     }
 }

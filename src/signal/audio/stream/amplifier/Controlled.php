@@ -33,7 +33,7 @@ class Controlled extends Base {
      * @param Signal\Audio\IStream   $oInputStream   - audio source
      * @param Signal\Control\IStream $oControlStream - control source
      */
-    public function __construct(Signal\Audio\IStream $oInputStream, Signal\Control\IStream $oControlStream) {
+    public function __construct(?Signal\Audio\IStream $oInputStream, Signal\Control\IStream $oControlStream) {
         parent::__construct($oInputStream);
         $this->oInputStream   = $oInputStream;
         $this->oControlStream = $oControlStream;
@@ -52,8 +52,12 @@ class Controlled extends Base {
      * @overridden
      */
     protected function emitNew() : Signal\Audio\Packet {
-        $this->oLastOutputPacket->copyFrom($this->oInputStream->emit($this->iLastIndex));
-        return $this->oLastOutputPacket->levelControl($this->oControlStream->emit($this->iLastIndex));
+        $this->iPosition += Signal\Context::get()->getPacketLength();
+        if ($this->oInputStream) {
+            $this->oLastOutputPacket->copyFrom($this->oInputStream->emit($this->iLastIndex));
+            $this->oLastOutputPacket->levelControl($this->oControlStream->emit($this->iLastIndex));
+        }
+        return  $this->oLastOutputPacket;
     }
 }
 

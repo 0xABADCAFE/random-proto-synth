@@ -23,12 +23,11 @@ use ABadCafe\Synth\Signal;
  *
  * Common base fpr IAmplifier implementations
  */
-abstract class Base implements Signal\Audio\Stream\IAmplifier {
+abstract class Base extends Signal\Audio\Stream\BaseSingleStreamProcessor implements Signal\Audio\Stream\IAmplifier {
 
     use Signal\Audio\TStreamIndexed;
 
-    protected Signal\Audio\Packet  $oLastOutputPacket;
-    protected Signal\Audio\IStream $oInputStream;
+    protected Signal\Audio\Packet $oLastOutputPacket;
 
     /**
      * Constructor
@@ -36,16 +35,14 @@ abstract class Base implements Signal\Audio\Stream\IAmplifier {
      * @param Signal\Audio\IStream $oInputStream - audio source
      * @param float                $fLevel
      */
-    public function __construct(Signal\Audio\IStream $oInputStream) {
+    public function __construct(?Signal\Audio\IStream $oInputStream) {
         $this->oInputStream = $oInputStream;
         $this->oLastOutputPacket = new Signal\Audio\Packet();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getPosition() : int {
-        return $this->oInputStream->getPosition();
+    public function setInputStream(Signal\Audio\IStream $oInputStream) : self {
+        $this->oInputStream = $oInputStream;
+        return $this;
     }
 
     /**
@@ -53,16 +50,11 @@ abstract class Base implements Signal\Audio\Stream\IAmplifier {
      */
     public function reset() : self {
         $this->iLastIndex = 0;
-        $this->oLastOutputPacket->fillWith(0);
-        $this->oInputStream->reset();
+        $this->iPosition  = 0;
+        $this->oLastOutputPacket->fillWith(0.0);
+        //$this->oInputStream->reset();
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function isSilent() : bool {
-        return false;
-    }
 }
 

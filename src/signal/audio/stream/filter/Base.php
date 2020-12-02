@@ -23,12 +23,9 @@ use ABadCafe\Synth\Signal;
  *
  * Common base for IFilter implementations
  */
-abstract class Base implements Signal\Audio\Stream\IFilter {
+abstract class Base extends Signal\Audio\Stream\BaseSingleStreamProcessor implements Signal\Audio\Stream\IFilter {
 
     use Signal\Audio\TStreamIndexed;
-
-    /** Input audio stream */
-    protected Signal\Audio\IStream $oInputStream;
 
     /** Optional control streams for cutoff and resonance */
     protected ?Signal\Control\IStream
@@ -59,7 +56,7 @@ abstract class Base implements Signal\Audio\Stream\IFilter {
      * @param Signal\Audio\IStream $oInput - audio source
      */
     public function __construct(
-        Signal\Audio\IStream    $oInputStream,
+        ?Signal\Audio\IStream   $oInputStream,
         ?Signal\Control\IStream $oCutoffControl    = null,
         ?Signal\Control\IStream $oResonanceControl = null,
         float $fFixedCutoff                        = self::F_DEF_CUTOFF,
@@ -77,14 +74,8 @@ abstract class Base implements Signal\Audio\Stream\IFilter {
     /**
      * @inheritDoc
      */
-    public function getPosition() : int {
-        return $this->oInputStream->getPosition();
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function reset() : self {
+        $this->iPosition  = 0;
         $this->iLastIndex = 0;
         $this->oLastOutputPacket->fillWith(0);
         if ($this->oFilterControl) {
@@ -93,15 +84,9 @@ abstract class Base implements Signal\Audio\Stream\IFilter {
         if ($this->oResonanceControl) {
             $this->oResonanceControl->reset();
         }
-        $this->oInput->reset();
-        return $this;
-    }
 
-    /**
-     * @inheritDoc
-     */
-    public function isSilent() : bool {
-        return false;
+        //$this->oInputStream->reset();
+        return $this;
     }
 
     /**
@@ -175,8 +160,11 @@ abstract class Base implements Signal\Audio\Stream\IFilter {
     }
 
     protected function emitNew() : Signal\Audio\Packet {
-        $cFilterFunction = $this->cFilterFunction;
-        $cFilterFunction();
+        $this->iPosition += Signal\Context::get()->getPacketLength();
+        if ($this->oInputStream) {
+            $cFilterFunction = $this->cFilterFunction;
+            $cFilterFunction();
+        }
         return $this->oLastOutputPacket;
     }
 

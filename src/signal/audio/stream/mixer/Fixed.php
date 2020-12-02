@@ -48,8 +48,8 @@ class Fixed implements Signal\Audio\Stream\IMixer {
     /**
      * Returns true if the mixer has no inputs to mix.
      */
-    public function isSilent() : bool {
-        return empty($this->aStreams);
+    public function hasInput() : bool {
+        return false === empty($this->aStreams);
     }
 
     /**
@@ -59,9 +59,9 @@ class Fixed implements Signal\Audio\Stream\IMixer {
         $this->iPosition  = 0;
         $this->iLastIndex = 0;
         $this->oLastOutputPacket->fillWith(0);
-        foreach ($this->aStreams as $oStream) {
-            $oStream->reset();
-        }
+//         foreach ($this->aStreams as $oStream) {
+//             $oStream->reset();
+//         }
         return $this;
     }
 
@@ -76,28 +76,28 @@ class Fixed implements Signal\Audio\Stream\IMixer {
     }
 
     /**
-     * Adds a named stream, overwriting any existing stream of the same name,
-     *
-     * @param  string  $sName
-     * @param  IStream $oStream
-     * @param  float   $fLevel
-     * @return self
+     * @inheritDoc
      */
-    public function addStream(string $sName, Signal\Audio\IStream $oStream, float $fLevel) : self {
+    public function addInput(string $sName, Signal\Audio\IStream $oStream, float $fLevel) : self {
         $this->aStreams[$sName] = $oStream;
         $this->aLevels[$sName]  = $fLevel;
         return $this;
     }
 
     /**
-     * Remove a named stream
-     *
-     * @return self
+     * @inheritDoc
      */
-    public function removeStream(string $sName) : self {
+    public function removeInput(string $sName) : self {
         unset($this->aStreams[$sName]);
         unset($this->aLevels[$sName]);
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getInputs() : array {
+        return $this->aStreams;
     }
 
     /**
